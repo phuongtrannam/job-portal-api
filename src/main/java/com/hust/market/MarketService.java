@@ -104,6 +104,7 @@ public class MarketService {
         jsonObject.put("detail",array);
         return jsonObject;
     }
+    
 
     public JSONObject getRecruitmentDemandByPeriodOfTime(){
         final JSONObject jsonObject = new JSONObject();

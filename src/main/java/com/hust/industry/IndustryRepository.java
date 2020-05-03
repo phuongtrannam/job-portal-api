@@ -15,6 +15,7 @@ public interface IndustryRepository extends CrudRepository<Industry, String> {
     @Query(value = "select * from industries" , nativeQuery = true)
     List<Object[]> getIndustryList();
 
+    
     // @Query(value = "select * from company where idCompany = :id" , nativeQuery = true)
     // List<Object[]> getCompanyInfo(@Param("id") String id);
 

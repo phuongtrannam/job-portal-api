@@ -16,6 +16,7 @@ public class Company {
 
     public Company (){
 
+        
     }
     public Company(String id, String name, String phone, String description, String foundedYear, String idLocation){
         super();

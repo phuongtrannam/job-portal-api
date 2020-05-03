@@ -32,6 +32,7 @@ public interface CompanyRepository extends CrudRepository<Company, String> {
     List<Object[]> getCurrentJobByCompany(@Param("id") String id);
 
     
+    
     @Query(value = "select company_fact.idCompany, province.province, timed.timestampD, " +  
                                     "sum(company_fact.number_of_recruitment) " + 
                     "from company_fact, province, timed " +

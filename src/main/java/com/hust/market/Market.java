@@ -7,4 +7,5 @@ import javax.persistence.Id;
 public class Market {
     @Id
     String id;
+    
 }

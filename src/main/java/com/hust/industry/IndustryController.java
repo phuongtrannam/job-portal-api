@@ -16,7 +16,6 @@ public class IndustryController {
         return industryService.getJobList();
     }
 
-
     @RequestMapping("/industries/getindustrylist")
     public JSONObject getIndustryList(){
         return industryService.getIndustryList();

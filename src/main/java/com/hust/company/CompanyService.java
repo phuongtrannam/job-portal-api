@@ -39,6 +39,7 @@ public class CompanyService {
 
     }
 
+    
     public JSONObject getCompanyInfo(String id) {
         final JSONObject jsonObject = new JSONObject();
         jsonObject.put("id", id);

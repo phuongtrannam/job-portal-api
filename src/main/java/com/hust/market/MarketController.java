@@ -11,7 +11,6 @@ public class MarketController {
     @Autowired
     private MarketService marketService;
 
-
     @RequestMapping("/markets/getjobshighestsalary")
     public JSONObject getJobsHighestSalary(){
         return marketService.getJobsHighestSalary();

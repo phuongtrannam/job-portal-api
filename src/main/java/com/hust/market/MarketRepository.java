@@ -10,4 +10,5 @@ import org.springframework.stereotype.Repository;
 public interface MarketRepository extends CrudRepository<Market, String> {
 
     
+    
 }

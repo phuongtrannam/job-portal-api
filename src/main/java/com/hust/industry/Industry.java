@@ -8,4 +8,5 @@ import javax.persistence.Id;
 public class Industry {
     @Id
     String id;
+    
 }
