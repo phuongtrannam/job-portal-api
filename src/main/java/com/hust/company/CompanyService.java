@@ -160,8 +160,8 @@ public class CompanyService {
             literacy.put("timestamp", ob[2].toString());
             literacy.put("literacy", ob[3].toString());
             literacy.put("num_job", ob[4].toString());
-            period.put("year", ob[0].toString());
-            period.put("quarter", ob[0].toString());
+            literacy.put("year", ob[0].toString());
+            literacy.put("quarter", ob[0].toString());
             literacies.add(literacy);
         }
         jsonObject.put("result", literacies);
