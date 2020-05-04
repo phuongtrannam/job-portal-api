@@ -26,13 +26,15 @@ public class IndustryService {
             HashMap<String, String> jobObject = new HashMap<String, String>();
             jobObject.put("id", ob[0].toString());
             jobObject.put("name", ob[1].toString());
+            jobObject.put("description", ob[1].toString());
             jobObject.put("num_job", ob[0].toString());
-            jobObject.put("description", ob[0].toString());
             jobObject.put("average_salary", ob[0].toString());
-            jobObject.put("industry", ob[1].toString());
+            jobObject.put("min_salary", ob[0].toString());
+            jobObject.put("max_salary", ob[0].toString());
+            jobObject.put("industry", ob[0].toString());
             jobList.add(jobObject);
         }
-        jsonObject.put("job_list", jobList);
+        jsonObject.put("value", jobList);
         return jsonObject;
     }
 
@@ -49,92 +51,143 @@ public class IndustryService {
             HashMap<String, String> industryObject = new HashMap<String, String>();
             industryObject.put("id", ob[0].toString());
             industryObject.put("name", ob[1].toString());
+            industryObject.put("description", ob[1].toString());
             industryObject.put("num_job", ob[0].toString());
-            // industryObject.put("description", ob[0].toString());
-            // industryObject.put("average_salary", ob[0].toString());
-            // industryObject.put("industry", ob[1].toString());
+            industryObject.put("average_salary", ob[0].toString());
             industryList.add(industryObject);
         }
-        jsonObject.put("industry_list", industryList);
+        jsonObject.put("value", industryList);
         return jsonObject;
     }
 
     
+    // public JSONObject getJobListByIndustry(String industryId) {
+    //     final JSONObject jsonObject = new JSONObject();
+       
+    //     return jsonObject;
+    // }
 
-
-
-
-
-    public JSONObject getJobListByIndustry(String industryId) {
+    
+    public JSONObject getRelatedJob(String id){
+        
         final JSONObject jsonObject = new JSONObject();
-        jsonObject.put("name", "the job list by industry");
+        jsonObject.put("id", id);
+        jsonObject.put("description", "The related job list ");
 
         final JSONArray jobList = new JSONArray();
-        HashMap<String, String> jobDetail = new HashMap<String, String>();
-        jobDetail.put("id", "1111");
-        jobDetail.put("name", "Lập trình viên");
-        jobList.add(jobDetail);
-        jobList.add(jobDetail);
-        jsonObject.put("detail",jobList);
+
+        List<Object[]> list = industryRepository.getRelatedJob(id);
+        for(Object[] ob : list){
+            HashMap<String, String> jobObject = new HashMap<String, String>();
+            jobObject.put("id", ob[0].toString());
+            jobObject.put("name", ob[1].toString());
+            jobObject.put("description", ob[1].toString());
+            jobObject.put("num_job", ob[0].toString());
+            jobObject.put("average_salary", ob[0].toString());
+            jobObject.put("min_salary", ob[0].toString());
+            jobObject.put("max_salary", ob[0].toString());
+            jobObject.put("industry", ob[0].toString());
+            jobList.add(jobObject);
+        }
+        jsonObject.put("value", jobList);
         return jsonObject;
     }
-    public JSONObject getJobDemandByPeriodOfTime(){
+    
+    public JSONObject getJobDemandByPeriodOfTime(String id){
         final JSONObject jsonObject = new JSONObject();
-        jsonObject.put("description", "The jobs demand by period of time");
-        
-        final JSONArray periodOfTImes = new JSONArray();
-        HashMap<String, String> timesObject = new HashMap<String, String>();
-        timesObject.put("timestime", "QIV/2017");
-        timesObject.put("value", "50");
-        timesObject.put("growth", "2");
-        periodOfTImes.add(timesObject);
-        periodOfTImes.add(timesObject);
-        jsonObject.put("periodOfTImes", periodOfTImes);
+        jsonObject.put("id", id);
+        jsonObject.put("description", "The job demand by period of time");
+
+        final JSONArray periods = new JSONArray();
+        System.out.println(id);
+        List<Object[]> list = industryRepository.getJobDemandByPeriodOfTime(id);
+        System.out.println(id);
+        for(Object[] ob : list){
+            HashMap<String, String> period = new HashMap<String, String>();
+            period.put("id_time", ob[0].toString());
+            period.put("id_job", ob[1].toString());
+            period.put("province", ob[2].toString());
+            period.put("timestamp", ob[3].toString());
+            period.put("num_job", ob[4].toString());
+            period.put("year", ob[0].toString());
+            period.put("quarter", ob[0].toString());
+            periods.add(period);
+        }
+        jsonObject.put("result", periods);
         return jsonObject;
     }
 
-    public JSONObject getJobDemandByLiteracy(){
+    public JSONObject getJobDemandByAge(String id){
         final JSONObject jsonObject = new JSONObject();
-        jsonObject.put("description", "The jobs demand by literacy");
-        
-        final JSONArray literacies = new JSONArray();
-        HashMap<String, String> literacyObject = new HashMap<String, String>();
-        literacyObject.put("name", "Trung học cơ sở");
-        literacyObject.put("value", "5000");
-        literacyObject.put("growth", "-2");
-        literacies.add(literacyObject);
-        literacies.add(literacyObject);
-        jsonObject.put("literacies", literacies);
-        return jsonObject;
-    }
+        jsonObject.put("id", id);
+        jsonObject.put("description", "The job demand by age and gender");
 
-    public JSONObject getJobDemandByAge(){
-        final JSONObject jsonObject = new JSONObject();
-        jsonObject.put("description", "The jobs demand by age");
-        
         final JSONArray ageRanges = new JSONArray();
-        HashMap<String, String> ageRangeObject = new HashMap<String, String>();
-        ageRangeObject.put("name", "18-25");
-        ageRangeObject.put("value", "5000");
-        ageRangeObject.put("growth", "-2");
-        ageRanges.add(ageRangeObject);
-        ageRanges.add(ageRangeObject);
-        jsonObject.put("literacies", ageRanges);
+        System.out.println(id);
+        List<Object[]> list = industryRepository.getJobDemandByAge(id);
+        System.out.println(id);
+        for(Object[] ob : list){
+            HashMap<String, String> ageRange = new HashMap<String, String>();
+            ageRange.put("id_job", ob[0].toString());
+            ageRange.put("id_time", ob[1].toString());
+            ageRange.put("timestamp", ob[2].toString());
+            ageRange.put("age_range", ob[3].toString());
+            ageRange.put("gender", ob[4].toString());
+            ageRange.put("num_job", ob[5].toString());
+            ageRange.put("year", ob[0].toString());
+            ageRange.put("quarter", ob[0].toString());
+            ageRanges.add(ageRange);
+        }
+        jsonObject.put("result", ageRanges);
         return jsonObject;
     }
 
-    public JSONObject getAverageSalaryByPeriodOfTime(){
+    public JSONObject getJobDemandByLiteracy(String id){
         final JSONObject jsonObject = new JSONObject();
-        jsonObject.put("description", "The average salary  by period of time");
-        
-        final JSONArray periodOfTImes = new JSONArray();
-        HashMap<String, String> averageSalaryObject = new HashMap<String, String>();
-        averageSalaryObject.put("timestime", "QIV/2017");
-        averageSalaryObject.put("value", "25");
-        averageSalaryObject.put("growth", "2");
-        periodOfTImes.add(averageSalaryObject);
-        periodOfTImes.add(averageSalaryObject);
-        jsonObject.put("periodOfTImes", periodOfTImes);
+        jsonObject.put("id", id);
+        jsonObject.put("description", "The job demand by literacy");
+
+        final JSONArray literacies = new JSONArray();
+        System.out.println(id);
+        List<Object[]> list = industryRepository.getJobDemandByLiteracy(id);
+        System.out.println(id);
+        for(Object[] ob : list){
+            HashMap<String, String> literacy = new HashMap<String, String>();
+            literacy.put("id", ob[0].toString());
+            literacy.put("idTime", ob[1].toString());
+            literacy.put("timestamp", ob[2].toString());
+            literacy.put("literacy", ob[3].toString());
+            literacy.put("num_job", ob[4].toString());
+            literacy.put("year", ob[0].toString());
+            literacy.put("quarter", ob[0].toString());
+            literacies.add(literacy);
+        }
+        jsonObject.put("result", literacies);
+        return jsonObject;
+    }
+
+
+    public JSONObject getAverageSalaryByPeriodOfTime(String id){
+        final JSONObject jsonObject = new JSONObject();
+        jsonObject.put("id", id);
+        jsonObject.put("description", "The average salary of job");
+
+        final JSONArray periods = new JSONArray();
+        System.out.println(id);
+        List<Object[]> list = industryRepository.getAverageSalaryByPeriodOfTime(id);
+        System.out.println(id);
+        for(Object[] ob : list){
+            HashMap<String, String> period = new HashMap<String, String>();
+            period.put("id_time", ob[0].toString());
+            period.put("id_job", ob[1].toString());
+            period.put("province", ob[2].toString());
+            period.put("timestamp", ob[3].toString());
+            period.put("average_salaray", ob[4].toString());
+            period.put("year", ob[0].toString());
+            period.put("quarter", ob[0].toString());
+            periods.add(period);
+        }
+        jsonObject.put("result", periods);
         return jsonObject;
     }
 

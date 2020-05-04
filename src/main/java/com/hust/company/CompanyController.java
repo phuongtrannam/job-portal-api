@@ -27,8 +27,8 @@ public class CompanyController {
         return companyService.getCompanyInfo(companyId);
     }
 
-    @RequestMapping(value = "/companies/getcompanyrelated", method = RequestMethod.POST)
-    public JSONObject getCompanyRelated(@RequestBody Map<String, Object> payload) throws Exception {
+    @RequestMapping(value = "/companies/getrelatedcompany", method = RequestMethod.POST)
+    public JSONObject getRelatedCompany(@RequestBody Map<String, Object> payload) throws Exception {
         // System.out.println(payload.get("id"));
         String companyId = payload.get("id").toString();
         return companyService.getRelatedCompany(companyId);
