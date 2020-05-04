@@ -15,7 +15,7 @@ public class CompanyController {
     @Autowired
     private CompanyService companyService;
 
-    
+
     @RequestMapping("/companies/getcompanylist")
     public JSONObject getCompanyList() {
         return companyService.getCompanyList();
@@ -34,11 +34,11 @@ public class CompanyController {
         return companyService.getRelatedCompany(companyId);
     }
 
-    @RequestMapping(value = "/companies/getcurrentjobbycompany", method = RequestMethod.POST)
-    public JSONObject getCurrentJobByCompany(@RequestBody Map<String, Object> payload) throws Exception {
+    @RequestMapping(value = "/companies/getrecentjobbycompany", method = RequestMethod.POST)
+    public JSONObject getRecentJobByCompany(@RequestBody Map<String, Object> payload) throws Exception {
         // System.out.println(payload.get("id"));
         String companyId = payload.get("id").toString();
-        return companyService.getCurrentJobByCompany(companyId);
+        return companyService.getRecentJobByCompany(companyId);
     }
 
     @RequestMapping(value = "/companies/getjobdemandbyperiodoftime", method = RequestMethod.POST)
@@ -47,17 +47,22 @@ public class CompanyController {
         return companyService.getJobDemandByPeriodOfTime(companyId);
     }
 
+    @RequestMapping(value = "/companies/getjobdemandbyliteracy", method = RequestMethod.POST)
+    public JSONObject getJobDemandByLiteracy(@RequestBody Map<String, Object> payload) throws Exception {
+        String companyId = payload.get("id").toString();
+        return companyService.getJobDemandByLiteracy(companyId);
+    }
 
     
-    @RequestMapping("/companies/getnumberofjob")
-    public JSONObject getNumberOfJob() {
-        return companyService.getNumberOfJob();
-    }
+    // @RequestMapping("/companies/getnumberofjob")
+    // public JSONObject getNumberOfJob() {
+    //     return companyService.getNumberOfJob();
+    // }
 
-    @RequestMapping("/companies/getjobshighestsalary")
-    public JSONObject getJobsHighestSalary() {
-        return companyService.getJobsHighestSalary();
-    }
+    // @RequestMapping("/companies/getjobshighestsalary")
+    // public JSONObject getJobsHighestSalary() {
+    //     return companyService.getJobsHighestSalary();
+    // }
 
     
 }
