@@ -1,4 +1,4 @@
-package com.hust.market;
+package com.hust.market.model;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
