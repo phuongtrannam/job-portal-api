@@ -135,6 +135,8 @@ public class CompanyService {
             period.put("province", ob[1].toString());
             period.put("timestamp", ob[2].toString());
             period.put("num_job", ob[3].toString());
+            period.put("year", ob[0].toString());
+            period.put("quarter", ob[0].toString());
             periods.add(period);
         }
         jsonObject.put("result", periods);
@@ -158,6 +160,8 @@ public class CompanyService {
             literacy.put("timestamp", ob[2].toString());
             literacy.put("literacy", ob[3].toString());
             literacy.put("num_job", ob[4].toString());
+            period.put("year", ob[0].toString());
+            period.put("quarter", ob[0].toString());
             literacies.add(literacy);
         }
         jsonObject.put("result", literacies);
