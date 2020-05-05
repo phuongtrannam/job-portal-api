@@ -12,48 +12,55 @@ public class MarketController {
     @Autowired
     private MarketService marketService;
 
+    //done
     @RequestMapping("/markets/get_jobs_highest_salary")
     public JSONObject getJobsHighestSalary(){
         return marketService.getJobsHighestSalary();
     }
 
+    //done
     @RequestMapping("/markets/get_jobs_highest_recruitment")
     public JSONObject getJobsHighestRecruitment(){
         return marketService.getJobsHighestRecruitment();
     }
 
+    //done
     @RequestMapping("/markets/get_companies_highest_recruitment")
     public JSONObject getCompaniesHighestRecruitment(){
         return marketService.getCompaniesHighestRecruitment();
     }
 
+    //done
     @RequestMapping("/markets/get_companies_highest_salary")
     public JSONObject getCompaniesHighestSalary(){
         return marketService.getCompaniesHighestSalary();
     }
 
-//    todo make api "/markets/get_recruitment_demand_by_age"
-    @RequestMapping("/markets/get_recruitment_demand_by_age")
-    public JSONObject getRecruitmentDemandByAge(){
-        return marketService.getRecruitmentDemandByAge();
+    //todo
+    @RequestMapping("/markets/get_recruitment_demand_with_age_gender")
+    public JSONObject getRecruitmentDemandWithAgeGender(){
+        return marketService.getRecruitmentDemandWithAgeGender();
     }
 
+    //todo
     @RequestMapping("/markets/get_recruitment_demand_by_literacy")
     public JSONObject getRecruitmentDemandByLiteracy(){
         return marketService.getRecruitmentDemandByLiteracy();
     }
 
+    //done
     @RequestMapping("/markets/get_recruitment_demand_by_industry")
     public JSONObject getRecruitmentDemandByIndustry(){
         return marketService.getRecruitmentDemandByIndustry();
     }
 
+    //todo
     //Nhu cầu tuyển dụng theo thời gian
     @RequestMapping("/markets/get_recruitment_demand_by_period_of_time")
     public JSONObject getRecruitmentDemandByPeriodOfTime(){
         return marketService.getRecruitmentDemandByPeriodOfTime();
     }
-
+    //todo
     @RequestMapping("/markets/get_average_salary_by_industry")
     public JSONObject getAverageSalaryByIndustry(){
         return marketService.getAverageSalaryByIndustry();

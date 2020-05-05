@@ -13,13 +13,16 @@ import org.json.simple.JSONObject;
 @Service
 public class MarketService {
 
-    @Autowired
-    private MarketRepository marketRepository;
+    private final MarketRepository marketRepository;
 
-    @Autowired
-    private Utils utils;
+    private final Utils utils;
 
     private List<String> majorRegion = Arrays.asList("Hà Nội", "Thành phố Hồ Chí Minh");
+
+    public MarketService(MarketRepository marketRepository, Utils utils) {
+        this.marketRepository = marketRepository;
+        this.utils = utils;
+    }
 
 
     public JSONObject getJobsHighestSalary(){
@@ -97,19 +100,21 @@ public class MarketService {
         return jsonObject;
     }
 
-    public JSONObject getRecruitmentDemandByAge(){
+    public JSONObject getRecruitmentDemandWithAgeGender(){
         final JSONObject jsonObject = new JSONObject();
-        jsonObject.put("name", "the highest paid jobs");
+        jsonObject.put("Name", "Recruitment Demand With Age Gender");
 
-        final JSONArray array = new JSONArray();
-        HashMap<String, String> jobDetail = new HashMap<String, String>();
-        jobDetail.put("name", "Giám đốc kinh doanh");
-        jobDetail.put("value", "50");
-        jobDetail.put("growth", "-0.5");
-        jobDetail.put("hỉing", "86");
-        array.add(jobDetail);
-        array.add(jobDetail);
-        jsonObject.put("detail",array);
+        List<Object[]> listRecruitmentWithAgeGender = marketRepository.getRecruitmentWithAgeGender();
+        jsonObject.put("Ca Nuoc",utils.convertRecruitmentWithAgeGenderToJSON(listRecruitmentWithAgeGender));
+
+        for (String region : majorRegion){
+            JSONObject regionObject = new JSONObject();
+            List<Object[]> listRecruitmentWithAgeGenderByRegion = marketRepository.getRecruitmentWithAgeGenderByRegion(region);
+            regionObject = utils.convertRecruitmentWithAgeGenderToJSON(listRecruitmentWithAgeGenderByRegion);
+            System.out.println(regionObject);
+            jsonObject.put(region,regionObject);
+        }
+        System.out.println(jsonObject);
         return jsonObject;
     }
 
@@ -131,17 +136,23 @@ public class MarketService {
 
     public JSONObject getRecruitmentDemandByIndustry(){
         final JSONObject jsonObject = new JSONObject();
-        jsonObject.put("name", "the highest paid jobs");
+        jsonObject.put("Name", "Recruitment Industries");
 
-        final JSONArray array = new JSONArray();
-        HashMap<String, String> jobDetail = new HashMap<String, String>();
-        jobDetail.put("name", "Giám đốc kinh doanh");
-        jobDetail.put("value", "50");
-        jobDetail.put("growth", "-0.5");
-        jobDetail.put("hỉing", "86");
-        array.add(jobDetail);
-        array.add(jobDetail);
-        jsonObject.put("detail",array);
+        // muc luong ca nuoc
+        List<Object[]> listIndustriesCountry = marketRepository.getIndustriesHighestRecruitment();
+        List<Object[]> listAmountRecruitment = marketRepository.getAllAmountRecuitment();
+        jsonObject.put("Ca Nuoc",utils.convertTopIndustriesToJSON(listIndustriesCountry,listAmountRecruitment));
+
+//         muc luong theo khu vuc
+        for (String region : majorRegion){
+            JSONArray regionObject = new JSONArray();
+            List<Object[]> listIndustriesByRegion = marketRepository.getIndustriesHighestRecruitmentByRegion(region);
+            List<Object[]> listAmountRecruitmentByRegion = marketRepository.getAllAmountRecruitmentByRegion(region);
+            regionObject = utils.convertTopIndustriesToJSON(listIndustriesByRegion,listAmountRecruitmentByRegion);
+            System.out.println(regionObject);
+            jsonObject.put(region,regionObject);
+        }
+        System.out.println(jsonObject);
         return jsonObject;
     }
     

@@ -15,7 +15,6 @@ public class CompanyController {
     @Autowired
     private CompanyService companyService;
 
-
     @RequestMapping("/companies/getcompanylist")
     public JSONObject getCompanyList() {
         return companyService.getCompanyList();
