@@ -18,7 +18,7 @@ public class Utils {
         JSONArray arrayJobs = new JSONArray();
         for (Object[] ob: listJobs) {
 //                System.out.println(ob[3].toString());
-            System.out.println(ob[0].toString());
+//            System.out.println(ob[0].toString());
 //                System.out.println(ob[1].toString().equals(timeStramp));
             if (!ob[2].toString().equals(timeStramp)) {
                 objectTimeStamp.put(timeStramp, arrayJobs);

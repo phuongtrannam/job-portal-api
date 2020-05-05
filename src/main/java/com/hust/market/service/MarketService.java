@@ -26,7 +26,6 @@ public class MarketService {
 
         final JSONObject jsonObject = new JSONObject();
         jsonObject.put("Name", "the highest salary jobs");
-        final JSONArray arrayRegion = new JSONArray();
 
         // muc luong ca nuoc
         List<Object[]> listJobsCountry = marketRepository.getJobsHighestSalary();
@@ -45,7 +44,6 @@ public class MarketService {
     public JSONObject getJobsHighestRecruitment(){
         final JSONObject jsonObject = new JSONObject();
         jsonObject.put("Name", "the highest recruitment jobs");
-        final JSONArray arrayRegion = new JSONArray();
 
         // muc luong ca nuoc
         List<Object[]> listJobsCountry = marketRepository.getJobsHighestRecruitment();
@@ -63,17 +61,39 @@ public class MarketService {
 
     public JSONObject getCompaniesHighestRecruitment(){
         final JSONObject jsonObject = new JSONObject();
-        jsonObject.put("name", "the highest paid jobs");
+        jsonObject.put("Name", "the highest recruitment companies");
 
-        final JSONArray array = new JSONArray();
-        HashMap<String, String> jobDetail = new HashMap<String, String>();
-        jobDetail.put("name", "Giám đốc kinh doanh");
-        jobDetail.put("value", "50");
-        jobDetail.put("growth", "-0.5");
-        jobDetail.put("hỉing", "86");
-        array.add(jobDetail);
-        array.add(jobDetail);
-        jsonObject.put("detail",array);
+        // muc luong ca nuoc
+        List<Object[]> listCompaniesCountry = marketRepository.getCompaniesHighestRecruitment();
+        jsonObject.put("Ca Nuoc",utils.convertTopEntityHighestToJSON(listCompaniesCountry));
+
+        // muc luong theo khu vuc
+        for (String region : majorRegion){
+            JSONArray regionObject = new JSONArray();
+            List<Object[]> listCompaniesByRegion = marketRepository.getCompaniesHighestRecruitmentByRegion(region);
+            regionObject = utils.convertTopEntityHighestToJSON(listCompaniesByRegion);
+            jsonObject.put(region,regionObject);
+        }
+        return jsonObject;
+    }
+
+    public JSONObject getCompaniesHighestSalary(){
+        final JSONObject jsonObject = new JSONObject();
+        jsonObject.put("Name", "the highest salary companies");
+
+        // muc luong ca nuoc
+        List<Object[]> listCompaniesCountry = marketRepository.getCompaniesHighestSalary();
+        jsonObject.put("Ca Nuoc",utils.convertTopEntityHighestToJSON(listCompaniesCountry));
+
+        // muc luong theo khu vuc
+        for (String region : majorRegion){
+            JSONArray regionObject = new JSONArray();
+            List<Object[]> listCompaniesByRegion = marketRepository.getCompaniesHighestSalaryByRegion(region);
+            regionObject = utils.convertTopEntityHighestToJSON(listCompaniesByRegion);
+            System.out.println(regionObject);
+            jsonObject.put(region,regionObject);
+        }
+        System.out.println(jsonObject);
         return jsonObject;
     }
 
