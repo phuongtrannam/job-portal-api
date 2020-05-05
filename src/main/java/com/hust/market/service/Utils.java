@@ -12,7 +12,7 @@ public class Utils {
     // Tra ve dinh danh json cho cac doi truong top10 jobs, companies, industries
     public JSONArray convertTopEntityHighestToJSON(List<Object[]> listJobs){
         String timeStramp = listJobs.get(0)[2].toString();
-        System.out.println(timeStramp);
+        // System.out.println(timeStramp);
         JSONArray arrayTimeStamp = new JSONArray();
         JSONObject objectTimeStamp = new JSONObject();
         JSONArray arrayJobs = new JSONArray();
@@ -28,6 +28,7 @@ public class Utils {
                 arrayJobs = new JSONArray();
                 timeStramp = ob[2].toString();
             }
+     
             HashMap<String, String> jobObject = new HashMap<>();
             jobObject.put("name", ob[ob.length - 4].toString());
             jobObject.put("value", ob[ob.length-3].toString());
