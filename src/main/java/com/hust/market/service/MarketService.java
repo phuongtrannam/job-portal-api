@@ -25,45 +25,43 @@ public class MarketService {
     public JSONObject getJobsHighestSalary(){
 
         final JSONObject jsonObject = new JSONObject();
-        jsonObject.put("name", "the highest salary jobs");
+        jsonObject.put("Name", "the highest salary jobs");
         final JSONArray arrayRegion = new JSONArray();
 
         // muc luong ca nuoc
         List<Object[]> listJobsCountry = marketRepository.getJobsHighestSalary();
-        arrayRegion.add(utils.convertJobsHighestToJSON(listJobsCountry, "Ca Nuoc"));
+        jsonObject.put("Ca Nuoc",utils.convertTopEntityHighestToJSON(listJobsCountry));
 
         // muc luong theo khu vuc
         for (String region : majorRegion){
-            JSONObject regionObject = new JSONObject();
+            JSONArray regionObject = new JSONArray();
             List<Object[]> listJobsByRegion = marketRepository.getJobsHighestSalaryByRegion(region);
-            regionObject = utils.convertJobsHighestToJSON(listJobsByRegion, region);
-            arrayRegion.add(regionObject);
+            regionObject = utils.convertTopEntityHighestToJSON(listJobsByRegion);
+            jsonObject.put(region,regionObject);
         }
-        jsonObject.put("detail",arrayRegion);
         return jsonObject;
     }
 
     public JSONObject getJobsHighestRecruitment(){
         final JSONObject jsonObject = new JSONObject();
-        jsonObject.put("name", "the highest salary jobs");
+        jsonObject.put("Name", "the highest recruitment jobs");
         final JSONArray arrayRegion = new JSONArray();
 
         // muc luong ca nuoc
         List<Object[]> listJobsCountry = marketRepository.getJobsHighestRecruitment();
-        arrayRegion.add(utils.convertJobsHighestToJSON(listJobsCountry, "Ca Nuoc"));
+        jsonObject.put("Ca Nuoc",utils.convertTopEntityHighestToJSON(listJobsCountry));
 
         // muc luong theo khu vuc
         for (String region : majorRegion){
-            JSONObject regionObject = new JSONObject();
+            JSONArray regionObject = new JSONArray();
             List<Object[]> listJobsByRegion = marketRepository.getJobsHighestRecruitmentByRegion(region);
-            regionObject = utils.convertJobsHighestToJSON(listJobsByRegion, region);
-            arrayRegion.add(regionObject);
+            regionObject = utils.convertTopEntityHighestToJSON(listJobsByRegion);
+            jsonObject.put(region,regionObject);
         }
-        jsonObject.put("detail",arrayRegion);
         return jsonObject;
     }
 
-    public JSONObject getRecruitmentDemandByCompany(){
+    public JSONObject getCompaniesHighestRecruitment(){
         final JSONObject jsonObject = new JSONObject();
         jsonObject.put("name", "the highest paid jobs");
 

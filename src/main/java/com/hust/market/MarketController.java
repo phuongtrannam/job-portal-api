@@ -22,11 +22,13 @@ public class MarketController {
         return marketService.getJobsHighestRecruitment();
     }
 
+    //todo make api "/markets/get_highest_recruitment_demand_by_company"
     @RequestMapping("/markets/get_highest_recruitment_demand_by_company")
-    public JSONObject getRecruitmentDemandByCompany(){
-        return marketService.getRecruitmentDemandByCompany();
+    public JSONObject getCompaniesHighestRecruitment(){
+        return marketService.getCompaniesHighestRecruitment();
     }
 
+//    todo make api "/markets/get_recruitment_demand_by_age"
     @RequestMapping("/markets/get_recruitment_demand_by_age")
     public JSONObject getRecruitmentDemandByAge(){
         return marketService.getRecruitmentDemandByAge();

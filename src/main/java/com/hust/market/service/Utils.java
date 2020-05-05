@@ -8,9 +8,9 @@ import java.util.List;
 
 public class Utils {
 
-    public JSONObject convertJobsHighestToJSON(List<Object[]> listJobs, String region){
-        final JSONObject regionObject = new JSONObject();
-        String timeStramp = listJobs.get(0)[1].toString();
+    // Tra ve dinh danh json cho cac doi truong top10 jobs, companies, industries
+    public JSONArray convertTopEntityHighestToJSON(List<Object[]> listJobs){
+        String timeStramp = listJobs.get(0)[2].toString();
         System.out.println(timeStramp);
         JSONArray arrayTimeStamp = new JSONArray();
         JSONObject objectTimeStamp = new JSONObject();
@@ -19,13 +19,13 @@ public class Utils {
 //                System.out.println(ob[3].toString());
             System.out.println(ob[0].toString());
 //                System.out.println(ob[1].toString().equals(timeStramp));
-            if (!ob[1].toString().equals(timeStramp)) {
+            if (!ob[2].toString().equals(timeStramp)) {
                 objectTimeStamp.put(timeStramp, arrayJobs);
                 arrayTimeStamp.add(objectTimeStamp);
 //                    System.out.println(arrayJobs.toString());
                 objectTimeStamp = new JSONObject();
                 arrayJobs = new JSONArray();
-                timeStramp = ob[1].toString();
+                timeStramp = ob[2].toString();
             }
             HashMap<String, String> jobObject = new HashMap<>();
             jobObject.put("name", ob[ob.length - 4].toString());
@@ -40,8 +40,7 @@ public class Utils {
         objectTimeStamp = new JSONObject();
         objectTimeStamp.put(timeStramp, arrayJobs);
         arrayTimeStamp.add(objectTimeStamp);
-        regionObject.put(region,arrayTimeStamp);
 
-        return regionObject;
+        return arrayTimeStamp;
     }
 }
