@@ -2,7 +2,6 @@ package com.hust.market.service;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
-import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 import java.util.List;
