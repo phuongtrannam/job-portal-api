@@ -171,4 +171,12 @@ public class Utils {
         jsonObject.put(timeStamp,arrayLiteracy);
         return jsonObject;
     }
+
+    public HashMap<String, String> convertRecruitmentByPeriodOfTimeToJSON(List<Object[]> listRecruitmentByPeriodOfTime){
+        HashMap<String,String> timeObject = new HashMap<>();
+        for (Object[] ob: listRecruitmentByPeriodOfTime){
+            timeObject.put(ob[1].toString(),ob[ob.length-1].toString());
+        }
+        return timeObject;
+    }
 }

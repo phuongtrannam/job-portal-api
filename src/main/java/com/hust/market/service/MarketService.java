@@ -157,17 +157,16 @@ public class MarketService {
 
     public JSONObject getRecruitmentDemandByPeriodOfTime(){
         final JSONObject jsonObject = new JSONObject();
-        jsonObject.put("name", "the highest paid jobs");
+        jsonObject.put("Name", "Recruitment By Period Of Time");
 
-        final JSONArray array = new JSONArray();
-        HashMap<String, String> jobDetail = new HashMap<String, String>();
-        jobDetail.put("name", "Giám đốc kinh doanh");
-        jobDetail.put("value", "50");
-        jobDetail.put("growth", "-0.5");
-        jobDetail.put("hỉing", "86");
-        array.add(jobDetail);
-        array.add(jobDetail);
-        jsonObject.put("detail",array);
+        List<Object[]> listRecruitmentByPeriodOfTime = marketRepository.getRecruitmentWithPeriodOfTime();
+        jsonObject.put("Ca Nuoc", utils.convertRecruitmentByPeriodOfTimeToJSON(listRecruitmentByPeriodOfTime));
+
+        for( String region: majorRegion){
+            List<Object[]> listRecruitmentPeriodOfTimeByRegion = marketRepository.getRecruitmentWithPeriodOfTimeByRegion(region);
+            jsonObject.put(region,utils.convertRecruitmentByPeriodOfTimeToJSON(listRecruitmentPeriodOfTimeByRegion));
+        }
+
         return jsonObject;
     }
     public JSONObject getAverageSalaryByIndustry(){

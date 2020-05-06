@@ -159,4 +159,19 @@ public interface MarketRepository extends CrudRepository<Market, String> {
             "order by timed.timestampD,province.province, academic_level.academic_level;", nativeQuery = true)
     List<Object[]> getRecruitmentWithLiteracyByRegion(@Param("province") String province);
 
+    @Query( value = "select timed.idtime,concat(\"Quý \",timed.quarterD,\"/\",timed.yearD) as `time`,province.province, sum(market_fact.number_of_recruitment)\n" +
+            "from market_fact, province, timed\n" +
+            "where market_fact.idTime = timed.idTime and market_fact.idProvince = province.idProvince\n" +
+            "\tand province.province = :province \n" +
+            "group by province.idProvince, timed.idTime\n" +
+            "order by province.province, timed.timestampD;", nativeQuery = true)
+    List<Object[]> getRecruitmentWithPeriodOfTimeByRegion(@Param("province") String province);
+
+    @Query( value = "select timed.idTime,concat(\"Quý \",timed.quarterD,\"/\",timed.yearD) as `time`, sum(market_fact.number_of_recruitment)\n" +
+            "from market_fact, timed\n" +
+            "where market_fact.idTime = timed.idTime\n" +
+            "group by market_fact.idTime\n" +
+            "order by market_fact.idTime;", nativeQuery = true)
+    List<Object[]> getRecruitmentWithPeriodOfTime();
+
 }
