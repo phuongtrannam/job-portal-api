@@ -120,17 +120,15 @@ public class MarketService {
 
     public JSONObject getRecruitmentDemandByLiteracy(){
         final JSONObject jsonObject = new JSONObject();
-        jsonObject.put("name", "the highest paid jobs");
+        jsonObject.put("Name", "the highest paid jobs");
 
-        final JSONArray array = new JSONArray();
-        HashMap<String, String> jobDetail = new HashMap<String, String>();
-        jobDetail.put("name", "Giám đốc kinh doanh");
-        jobDetail.put("value", "50");
-        jobDetail.put("growth", "-0.5");
-        jobDetail.put("hỉing", "86");
-        array.add(jobDetail);
-        array.add(jobDetail);
-        jsonObject.put("detail",array);
+        List<Object[]> listRecruitmentWithLiteracy = marketRepository.getRecruitmentWithLiteracy();
+        jsonObject.put("Ca Nuoc", utils.convertRecruitmentWithLiteracyToJSON(listRecruitmentWithLiteracy));
+
+        for( String region: majorRegion){
+            List<Object[]> listRecruitmentWithLiteracyByRegion = marketRepository.getRecruitmentWithLiteracyByRegion(region);
+            jsonObject.put(region,utils.convertRecruitmentWithLiteracyToJSON(listRecruitmentWithLiteracyByRegion));
+        }
         return jsonObject;
     }
 

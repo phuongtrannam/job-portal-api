@@ -140,6 +140,23 @@ public interface MarketRepository extends CrudRepository<Market, String> {
             "order by timed.timestampD,province.Province, age.age, gender.gender;", nativeQuery = true)
     List<Object[]> getRecruitmentWithAgeGenderByRegion(@Param("province") String province);
 
+    @Query( value = "select timed.idTime, timed.timestampD,concat(\"Quý \",timed.quarterD,\"/\",timed.yearD) as `time`,\n" +
+            "\tacademic_level.academic_level, sum(market_fact.number_of_recruitment)\n" +
+            "from market_fact, academic_level, timed\n" +
+            "where market_fact.idTime = timed.idTime and market_fact.idAcademic_Level = academic_level.idAcademic_Level\n" +
+            "\tand market_fact.idTime in (select idTime from (select idTime from timed order by timestampD desc limit 3) as t )\n" +
+            "group by timed.idTime, academic_level.idAcademic_Level\n" +
+            "order by timed.timestampD, academic_level.academic_level;", nativeQuery = true)
+    List<Object[]> getRecruitmentWithLiteracy();
 
+    @Query( value = "select timed.idTime, timed.timestampD,concat(\"Quý \",timed.quarterD,\"/\",timed.yearD) as `time`,province.Province, academic_level.academic_level, sum(market_fact.number_of_recruitment)\n" +
+            "from market_fact, academic_level, timed, province\n" +
+            "where market_fact.idTime = timed.idTime and market_fact.idAcademic_Level = academic_level.idAcademic_Level\n" +
+            "\tand market_fact.idProvince = province.idProvince\n" +
+            "    and province.province = :province\n" +
+            "\tand market_fact.idTime in (select idTime from (select idTime from timed order by timestampD desc limit 3) as t )\n" +
+            "group by timed.idTime,province.idProvince, academic_level.idAcademic_Level\n" +
+            "order by timed.timestampD,province.province, academic_level.academic_level;", nativeQuery = true)
+    List<Object[]> getRecruitmentWithLiteracyByRegion(@Param("province") String province);
 
 }

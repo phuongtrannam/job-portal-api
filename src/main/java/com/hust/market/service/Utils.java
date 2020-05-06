@@ -150,4 +150,25 @@ public class Utils {
 
         return jsonObject;
     }
+
+    public JSONObject convertRecruitmentWithLiteracyToJSON(List<Object[]> listRecruitmentWithLiteracy){
+        final JSONObject jsonObject = new JSONObject();
+
+        String timeStamp = listRecruitmentWithLiteracy.get(0)[2].toString();
+
+        JSONArray arrayLiteracy = new JSONArray();
+
+        for (Object[] ob : listRecruitmentWithLiteracy){
+            if(!timeStamp.equals(ob[2].toString())){
+                jsonObject.put(timeStamp,arrayLiteracy);
+                arrayLiteracy = new JSONArray();
+                timeStamp = ob[2].toString();
+            }
+            HashMap<String, String> literacyObject = new HashMap<>();
+            literacyObject.put(ob[ob.length -2].toString(),ob[ob.length -1].toString());
+            arrayLiteracy.add(literacyObject);
+        }
+        jsonObject.put(timeStamp,arrayLiteracy);
+        return jsonObject;
+    }
 }

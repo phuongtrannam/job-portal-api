@@ -42,7 +42,7 @@ public class MarketController {
         return marketService.getRecruitmentDemandWithAgeGender();
     }
 
-    //todo
+    //done
     @RequestMapping("/markets/get_recruitment_demand_by_literacy")
     public JSONObject getRecruitmentDemandByLiteracy(){
         return marketService.getRecruitmentDemandByLiteracy();
