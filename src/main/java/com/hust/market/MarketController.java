@@ -36,7 +36,7 @@ public class MarketController {
         return marketService.getCompaniesHighestSalary();
     }
 
-    //todo
+    //done
     @RequestMapping("/markets/get_recruitment_demand_with_age_gender")
     public JSONObject getRecruitmentDemandWithAgeGender(){
         return marketService.getRecruitmentDemandWithAgeGender();
@@ -60,7 +60,7 @@ public class MarketController {
     public JSONObject getRecruitmentDemandByPeriodOfTime(){
         return marketService.getRecruitmentDemandByPeriodOfTime();
     }
-    //todo
+    //done
     @RequestMapping("/markets/get_average_salary_by_industry")
     public JSONObject getAverageSalaryByIndustry(){
         return marketService.getAverageSalaryByIndustry();

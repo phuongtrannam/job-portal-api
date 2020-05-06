@@ -11,13 +11,10 @@ public class Utils {
 
     // Tra ve dinh danh json cho cac doi truong top10 jobs, companies
     public JSONArray convertTopEntityHighestToJSON(List<Object[]> listJobs){
-<<<<<<< HEAD
         String timeStamp = listJobs.get(0)[2].toString();
         System.out.println(timeStamp);
-=======
         String timeStramp = listJobs.get(0)[2].toString();
         // System.out.println(timeStramp);
->>>>>>> 9e9a120228662ee06f8f3bcd6fb690e8c34a53d7
         JSONArray arrayTimeStamp = new JSONArray();
         JSONObject objectTimeStamp = new JSONObject();
         JSONArray arrayJobs = new JSONArray();

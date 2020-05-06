@@ -174,17 +174,21 @@ public class MarketService {
     }
     public JSONObject getAverageSalaryByIndustry(){
         final JSONObject jsonObject = new JSONObject();
-        jsonObject.put("name", "the highest paid jobs");
+        jsonObject.put("Name", "the highest salary industries");
 
-        final JSONArray array = new JSONArray();
-        HashMap<String, String> jobDetail = new HashMap<String, String>();
-        jobDetail.put("name", "Giám đốc kinh doanh");
-        jobDetail.put("value", "50");
-        jobDetail.put("growth", "-0.5");
-        jobDetail.put("hỉing", "86");
-        array.add(jobDetail);
-        array.add(jobDetail);
-        jsonObject.put("detail",array);
+        // muc luong ca nuoc
+        List<Object[]> listIndustriesCountry = marketRepository.getIndustriesHighestSalary();
+        jsonObject.put("Ca Nuoc",utils.convertTopEntityHighestToJSON(listIndustriesCountry));
+
+        // muc luong theo khu vuc
+        for (String region : majorRegion){
+            JSONArray regionObject = new JSONArray();
+            List<Object[]> listIndustriesByRegion = marketRepository.getIndustriesHighestSalaryByRegion(region);
+            regionObject = utils.convertTopEntityHighestToJSON(listIndustriesByRegion);
+            System.out.println(regionObject);
+            jsonObject.put(region,regionObject);
+        }
+        System.out.println(jsonObject);
         return jsonObject;
     }
 }
