@@ -11,7 +11,7 @@ public interface CompanyRepository extends CrudRepository<Company, String> {
 
     @Query(value = "select company.idCompany, company.name_company, company.phone, " +
                             "company.`description`,company.founded_year,company.website, " +
-                            "concat(location.location,\",\",province.province) as location_detail " +
+                            "province.province as location_detail " +
                     "from company, location, province " +
                     "where company.idLocation = location.idLocation " +
                     "and location.idProvince = province.idProvince;", nativeQuery = true)
@@ -46,7 +46,7 @@ public interface CompanyRepository extends CrudRepository<Company, String> {
 
     @Query(value = "select company.idLocation, company.name_company, company.phone, " + 
                             "company.`description`,company.founded_year,company.website, " +
-                            "concat(location.location,\",\",province.province) as location_detail " +
+                            "province.province as location_detail " +
                     "from company, location, province " +
                     "where company.idLocation = location.idLocation " + 
                     "and location.IdProvince = province.IdProvince " +
@@ -55,7 +55,7 @@ public interface CompanyRepository extends CrudRepository<Company, String> {
                             "where relate_companies.idCompany1 = :id) " +
                     "or company.idCompany in " + 
                             "( select idCompany1 from relate_companies " + 
-                            "where relate_companies.idCompany2 = :id));", nativeQuery = true)
+                            "where relate_companies.idCompany2 = :id)) limit 3;", nativeQuery = true)
     List<Object[]> getRelatedCompany(@Param("id") String id);
 
     @Query(value = "select job.idJob, job.name_job, province.province, " +
