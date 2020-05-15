@@ -54,7 +54,8 @@ public class MarketController {
         return marketService.getRecruitmentDemandByIndustry();
     }
 
-    //todo
+    //done
+    
     //Nhu cầu tuyển dụng theo thời gian
     @RequestMapping("/markets/get_recruitment_demand_by_period_of_time")
     public JSONObject getRecruitmentDemandByPeriodOfTime(){
