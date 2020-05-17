@@ -16,55 +16,90 @@ public class IndustryController {
     @Autowired
     private IndustryService industryService; 
     
-    @RequestMapping("/industries/get_job_list")
-    public JSONObject getJobList() {
-        return industryService.getJobList();
-    }
-
-    @RequestMapping("/industries/getindustrylist")
+    @RequestMapping("/industries/get_industry_list")
     public JSONObject getIndustryList(){
         return industryService.getIndustryList();
     }
 
-    // @RequestMapping("/industries/getjoblistbyindustry")
-    // public JSONObject getJobListByIndustry(String idustryId){
-    //     String industryId = idustryId;
-    //     return industryService.getJobListByIndustry(industryId);
-    // }
     @CrossOrigin(origins = "http://localhost:4200")
-    @RequestMapping(value = "/industries/getrelatedjob", method = RequestMethod.POST)
-    public JSONObject getRelatedJob(@RequestBody Map<String, Object> payload) throws Exception {
+    @RequestMapping(value = "/industries/get_job_list", method = RequestMethod.POST)
+    public JSONObject getJobListByIndustry(@RequestBody Map<String, Object> payload) throws Exception {
         // System.out.println(payload.get("id"));
-        String jobId = payload.get("id").toString();
-        return industryService.getRelatedJob(jobId);
+        String industryId = payload.get("id").toString();
+        return industryService.getJobListByIndustry(industryId);
     }
+
     @CrossOrigin(origins = "http://localhost:4200")
-    @RequestMapping(value = "/industries/get_job_demand_by_period_of_time", method = RequestMethod.POST)
-    public JSONObject getJobDemandByPeriodOfTime(@RequestBody Map<String, Object> payload) throws Exception {
+    @RequestMapping(value = "/industries/get_top_company", method = RequestMethod.POST)
+    public JSONObject getTopCompanyByIndustry(@RequestBody Map<String, Object> payload) throws Exception {
         // System.out.println(payload.get("id"));
-        String jobId = payload.get("id").toString();
-        return industryService.getJobDemandByPeriodOfTime(jobId);
+        String industryId = payload.get("idIndustry").toString();
+        String locationId = payload.get("locationId").toString();
+        return industryService.getTopCompanyByIndustry(industryId, locationId);
     }
+
+    @CrossOrigin(origins = "http://localhost:4200")
+    @RequestMapping(value = "/industries/get_job_demand", method = RequestMethod.POST)
+    public JSONObject getJobDemandByIndustry(@RequestBody Map<String, Object> payload) throws Exception {
+        // System.out.println(payload.get("id"));
+        String industryId = payload.get("idIndustry").toString();
+        String locationId = payload.get("locationId").toString();
+        return industryService.getJobDemandByIndustry(industryId, locationId);
+    }
+
+    @CrossOrigin(origins = "http://localhost:4200")
+    @RequestMapping(value = "/industries/get_job_demand_sub_region", method = RequestMethod.POST)
+    public JSONObject getJobDemandInSubRegion(@RequestBody Map<String, Object> payload) throws Exception {
+        // System.out.println(payload.get("id"));
+        String industryId = payload.get("idIndustry").toString();
+        String locationId = payload.get("locationId").toString();
+        return industryService.getJobDemandInSubRegion(industryId, locationId);
+    }
+
+    
+
+    @CrossOrigin(origins = "http://localhost:4200")
+    @RequestMapping(value = "/industries/get_top_hiring_company", method = RequestMethod.POST)
+    public JSONObject getTopHiringCompany(@RequestBody Map<String, Object> payload) throws Exception {
+        // System.out.println(payload.get("id"));
+        String industryId = payload.get("idIndustry").toString();
+        String locationId = payload.get("locationId").toString();
+        return industryService.getTopHiringCompany(industryId, locationId);
+    }
+
+    @CrossOrigin(origins = "http://localhost:4200")
+    @RequestMapping(value = "/industries/get_top_hiring_job", method = RequestMethod.POST)
+    public JSONObject getTopHiringJob(@RequestBody Map<String, Object> payload) throws Exception {
+        // System.out.println(payload.get("id"));
+        String industryId = payload.get("idIndustry").toString();
+        String locationId = payload.get("locationId").toString();
+        return industryService.getTopHiringJob(industryId, locationId);
+    }
+
+    @CrossOrigin(origins = "http://localhost:4200")
+    @RequestMapping(value = "/industries/get_highest_salary_job", method = RequestMethod.POST)
+    public JSONObject getHighestSalaryJob(@RequestBody Map<String, Object> payload) throws Exception {
+        // System.out.println(payload.get("id"));
+        String industryId = payload.get("idIndustry").toString();
+        String locationId = payload.get("locationId").toString();
+        return industryService.getHighestSalaryJob(industryId, locationId);
+    }
+
     @CrossOrigin(origins = "http://localhost:4200")
     @RequestMapping(value = "/industries/get_job_demand_by_age", method = RequestMethod.POST)
     public JSONObject getJobDemandByAge(@RequestBody Map<String, Object> payload) throws Exception {
         // System.out.println(payload.get("id"));
-        String jobId = payload.get("id").toString();
-        return industryService.getJobDemandByAge(jobId);
+        String industryId = payload.get("idIndustry").toString();
+        String locationId = payload.get("locationId").toString();
+        return industryService.getJobDemandByAge(industryId, locationId);
     }
     @CrossOrigin(origins = "http://localhost:4200")
     @RequestMapping(value = "/industries/get_job_demand_by_literacy", method = RequestMethod.POST)
     public JSONObject getJobDemandByLiteracy(@RequestBody Map<String, Object> payload) throws Exception {
         // System.out.println(payload.get("id"));
-        String jobId = payload.get("id").toString();
-        return industryService.getJobDemandByLiteracy(jobId);
-    }
-    @CrossOrigin(origins = "http://localhost:4200")
-    @RequestMapping(value = "/industries/get_average_salary_by_period_of_time", method = RequestMethod.POST)
-    public JSONObject getAverageSalaryByPeriodOfTime(@RequestBody Map<String, Object> payload) throws Exception {
-        // System.out.println(payload.get("id"));
-        String jobId = payload.get("id").toString();
-        return industryService.getAverageSalaryByPeriodOfTime(jobId);
+        String industryId = payload.get("idIndustry").toString();
+        String locationId = payload.get("locationId").toString();
+        return industryService.getJobDemandByLiteracy(industryId, locationId);
     }
 
     
