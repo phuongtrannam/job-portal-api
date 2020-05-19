@@ -36,26 +36,36 @@ public class IndustryService {
         return jsonObject;
     }
 
-    public JSONObject getJobListByIndustry(String industryId ){
+    public JSONObject getJobListByIndustry(String industryId){
 
-        final JSONObject jsonObject = new JSONObject();
+        JSONObject jsonObject = new JSONObject();
         jsonObject.put("description", "The job list by industry");
 
         final JSONArray jobList = new JSONArray();
 
         List<Object[]> list = industryRepository.getJobListByIndustry(industryId);
+        String idJob = "";
+        double numJob = 0;
+        HashMap<String, String> jobObject = new HashMap<String, String>();
+//        System.out.println(list);
         for(Object[] ob : list){
-            HashMap<String, String> jobObject = new HashMap<String, String>();
+            if(ob[0].toString().equals(idJob)) {
+                double growth = ((numJob/(double)ob[2]) - 1)*100;
+                jobObject.put("numJob", String.valueOf(numJob));
+                jobObject.put("growth", String.valueOf(round(growth,2)));
+                jobList.add(jobObject);
+                jobObject = new HashMap<String, String>();
+                continue;
+            }
+            idJob = ob[0].toString();
             jobObject.put("id", ob[0].toString());
-            jobObject.put("timestamp", ob[1].toString());
-            jobObject.put("name", ob[2].toString());
-            jobObject.put("averageSalary", ob[3].toString());
-            jobObject.put("minSalary", ob[4].toString());
-            jobObject.put("maxSalary", ob[5].toString());
-            jobObject.put("numJob", ob[6].toString());
-            jobObject.put("growth", ob[6].toString());
+            jobObject.put("timestamp", ob[ob.length - 1].toString());
+            jobObject.put("name", ob[1].toString());
+//            jobObject.put("averageSalary", ob[3].toString());
+            jobObject.put("minSalary", ob[3].toString());
+            jobObject.put("maxSalary", ob[4].toString());
+            numJob = (double) ob[2];
             // jobObject.put("description", ob[2].toString());
-            jobList.add(jobObject);
         }
         jsonObject.put("value", jobList);
         return jsonObject;
@@ -226,5 +236,14 @@ public class IndustryService {
         }
         jsonObject.put("result", literacies);
         return jsonObject;
+    }
+
+    public static double round(double value, int places) {
+        if (places < 0) throw new IllegalArgumentException();
+
+        long factor = (long) Math.pow(10, places);
+        value = value * factor;
+        long tmp = Math.round(value);
+        return (double) tmp / factor;
     }
 }

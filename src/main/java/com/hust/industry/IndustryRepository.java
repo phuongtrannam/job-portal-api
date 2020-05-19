@@ -14,7 +14,16 @@ public interface IndustryRepository extends CrudRepository<Industry, String> {
     @Query(value = "select * from job fact" , nativeQuery = true)
     List<Object[]> getIndustryList();
 
-    @Query(value = "select * from job fact", nativeQuery = true)
+    @Query(value = "select job.idJob, job.name_job,\n" +
+            "       sum(job_fact.number_of_recruitment), min(job_fact.salary), max(job_fact.salary),\n" +
+            "       concat(\"Quý \",timed.quarterD,\"/\",timed.yearD) as `time`\n" +
+            "from job_industry, industries, job, job_fact,timed\n" +
+            "where job.idJob = job_industry.idJob and industries.idIndustry = job_industry.idIndustry\n" +
+            "  and job.idJob = job_fact.idJob and timed.idTime = job_fact.idTime\n" +
+            "  and job_fact.idTime in (select idTime from (select idTime from timed order by timestampD desc limit 2) as t )\n" +
+            "  and industries.idIndustry = :industryId\n" +
+            "group by job_fact.idTime,industries.idIndustry, job.idJob\n" +
+            "order by industries.idIndustry, job.idJob, timed.idTime desc;", nativeQuery = true)
     List<Object[]> getJobListByIndustry(@Param("industryId") String industryId);
 
     @Query(value = "select * from job fact", nativeQuery = true)
