@@ -26,11 +26,11 @@ public class CompanyService {
             companyObject.put("id", ob[0].toString());
             companyObject.put("name", ob[1].toString());
             companyObject.put("phonenumber", ob[2].toString());
-            companyObject.put("description", ob[2].toString());
+            companyObject.put("description", ob[1].toString());
             companyObject.put("founded_year", ob[4].toString());
-            companyObject.put("industry", ob[1].toString());
+            // companyObject.put("industry", ob[1].toString());
+            companyObject.put("website", ob[5].toString());
             companyObject.put("location", ob[6].toString());
-            companyObject.put("website", ob[1].toString());
             companyObject.put("logo", ob[1].toString());
             companyList.add(companyObject);
         }
@@ -39,6 +39,26 @@ public class CompanyService {
 
     }
 
+    public JSONObject getBusinessLinesOfTheCompany(String id) {
+        final JSONObject jsonObject = new JSONObject();
+        jsonObject.put("id", id);
+        jsonObject.put("description", "The business lines of the company");
+
+        final JSONArray businessLines = new JSONArray();
+
+        List<Object[]> list = companyRepository.getBusinessLinesOfTheCompany(id);
+        System.out.println(id);
+        for(Object[] ob : list){
+            HashMap<String, String> industryObject = new HashMap<String, String>();
+            industryObject.put("id", ob[0].toString());
+            industryObject.put("name", ob[1].toString());
+            
+            businessLines.add(industryObject);
+        }
+        jsonObject.put("result", businessLines);
+        return jsonObject;
+
+    }
 
     public JSONObject getCompanyInfo(String id) {
         final JSONObject jsonObject = new JSONObject();
@@ -50,16 +70,14 @@ public class CompanyService {
         HashMap<String, String> companyObject = new HashMap<String, String>();
         for(Object[] ob : list){
             
-            companyObject.put("id", ob[0].toString());
-            companyObject.put("name", ob[1].toString());
-            companyObject.put("phonenumber", ob[2].toString());
-            companyObject.put("description", ob[3].toString());
-            companyObject.put("founded_year", ob[4].toString());
-            companyObject.put("location", ob[10].toString());
-            companyObject.put("location", ob[11].toString());
-            companyObject.put("num_job", ob[12].toString());
-            companyObject.put("industry", ob[0].toString());
-            companyObject.put("website", ob[0].toString());
+            companyObject.put("id", id);
+            companyObject.put("name", ob[0].toString());
+            companyObject.put("phonenumber", ob[1].toString());
+            companyObject.put("description", ob[0].toString());
+            companyObject.put("founded_year", ob[3].toString());
+            companyObject.put("website", ob[4].toString());
+            companyObject.put("location", ob[5].toString());
+            companyObject.put("num_job", ob[6].toString());
             companyObject.put("logo", ob[0].toString());
         }
         jsonObject.put("result", companyObject);
@@ -82,10 +100,10 @@ public class CompanyService {
             companyObject.put("id", ob[0].toString());
             companyObject.put("name", ob[1].toString());
             companyObject.put("phonenumber", ob[2].toString());
+            companyObject.put("description", ob[1].toString());
             companyObject.put("founded_year", ob[4].toString());
+            companyObject.put("website", ob[5].toString());
             companyObject.put("location", ob[6].toString());
-            companyObject.put("industry", ob[0].toString());
-            companyObject.put("website", ob[0].toString());
             companyObject.put("logo", ob[0].toString());
             relatedCompany.add(companyObject);
         }
@@ -107,13 +125,12 @@ public class CompanyService {
         for(Object[] ob : list){
             HashMap<String, String> jobObject = new HashMap<String, String>();
             jobObject.put("id", ob[0].toString());
-            jobObject.put("company_name", ob[1].toString());
-            jobObject.put("job_name", ob[2].toString());
-            jobObject.put("province", ob[3].toString());
-            jobObject.put("min_salary", ob[4].toString());
-            jobObject.put("max_salary", ob[5].toString());
+            jobObject.put("job_name", ob[1].toString());
+            jobObject.put("province", ob[2].toString());
+            jobObject.put("min_salary", ob[3].toString());
+            jobObject.put("max_salary", ob[4].toString());
+            jobObject.put("num_job", ob[5].toString());
             jobObject.put("industry", ob[0].toString());
-            jobObject.put("num_job", ob[0].toString());
             jobList.add(jobObject);
         }
         jsonObject.put("result", jobList);
@@ -135,6 +152,8 @@ public class CompanyService {
             period.put("province", ob[1].toString());
             period.put("timestamp", ob[2].toString());
             period.put("num_job", ob[3].toString());
+            // period.put("year", ob[0].toString());
+            // period.put("quarter", ob[0].toString());
             periods.add(period);
         }
         jsonObject.put("result", periods);
@@ -158,13 +177,37 @@ public class CompanyService {
             literacy.put("timestamp", ob[2].toString());
             literacy.put("literacy", ob[3].toString());
             literacy.put("num_job", ob[4].toString());
+            // literacy.put("year", ob[0].toString());
+            // literacy.put("quarter", ob[0].toString());
             literacies.add(literacy);
         }
         jsonObject.put("result", literacies);
         return jsonObject;
-
     }
 
+    public JSONObject getJobDemandByAge(String id){
+        final JSONObject jsonObject = new JSONObject();
+        jsonObject.put("id", id);
+        jsonObject.put("description", "The job demand by age and gender");
+
+        final JSONArray ageRanges = new JSONArray();
+        System.out.println(id);
+        List<Object[]> list = companyRepository.getJobDemandByAge(id);
+        System.out.println(id);
+        for(Object[] ob : list){
+            HashMap<String, String> ageRange = new HashMap<String, String>();
+            ageRange.put("id", ob[0].toString());
+            ageRange.put("idTime", ob[1].toString());
+            ageRange.put("timestamp", ob[2].toString());
+            ageRange.put("age", ob[3].toString());
+            ageRange.put("gender", ob[4].toString());
+            ageRange.put("num_job", ob[5].toString());
+            ageRanges.add(ageRange);
+        }
+        jsonObject.put("result", ageRanges);
+        return jsonObject;
+
+    }
 
 
     // public JSONObject getNumberOfJob(){
