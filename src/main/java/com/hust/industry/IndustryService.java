@@ -168,7 +168,7 @@ public class IndustryService {
         return jsonObject;
     }
 
-    public JSONObject getHighestSalaryJob(String industryId, String locationId ){
+    public JSONObject getHighestSalaryJob(String industryId, String locationId){
         final JSONObject jsonObject = new JSONObject();
         jsonObject.put("description", "The highest salary job");
 
@@ -192,7 +192,6 @@ public class IndustryService {
 
     public JSONObject getJobDemandByAge(String industryId, String locationId ){
         final JSONObject jsonObject = new JSONObject();
-        jsonObject.put("id", id);
         jsonObject.put("description", "The job demand by age and gender");
 
         final JSONArray ageRanges = new JSONArray();
