@@ -2,7 +2,6 @@ package com.hust.market;
 
 import java.util.List;
 
-import com.hust.market.model.Market;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
