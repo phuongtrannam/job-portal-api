@@ -25,8 +25,16 @@ public class MarketService {
     public JSONObject getJobsHighestSalary(){
 
         final JSONObject jsonObject = new JSONObject();
+        JSONArray jobList;
         jsonObject.put("Name", "the highest salary jobs");
-
+        List<Object[]> listObject  = marketRepository.getJobsHighestSalary();
+        jobList = convertQueryToJSON(listObject, "Ca nuoc","Country");
+        for(String region: majorRegion){
+            listObject = marketRepository.getJobsHighestSalaryByRegion(region);
+            jobList = concatArray(jobList, convertQueryToJSON(listObject, region,"Province"));
+        }
+//        System.out.println(jobList.size());
+        jsonObject.put("result",jobList);
         return jsonObject;
     }
 
@@ -89,5 +97,30 @@ public class MarketService {
 
         System.out.println(jsonObject);
         return jsonObject;
+    }
+
+    private JSONArray convertQueryToJSON(List<Object[]> resultQuery,String region , String type_area){
+        final JSONArray listObject = new JSONArray();
+        for(Object[] ob : resultQuery){
+            HashMap<String, String> object = new HashMap<>();
+            object.put("time",ob[1].toString());
+            object.put("name",ob[ob.length - 4].toString());
+            object.put("value",ob[ob.length - 3].toString());
+            object.put("growth",ob[ob.length - 2].toString());
+            object.put("area", region);
+            object.put("type",type_area);
+            listObject.add(object);
+        }
+        return listObject;
+    }
+
+    private JSONArray concatArray(JSONArray... arrs) {
+        JSONArray result = new JSONArray();
+        for (JSONArray arr : arrs) {
+            for (int i = 0; i < arr.size(); i++) {
+                result.add(arr.get(i));
+            }
+        }
+        return result;
     }
 }

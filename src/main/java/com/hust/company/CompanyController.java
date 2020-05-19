@@ -16,12 +16,8 @@ public class CompanyController {
     @Autowired
     private CompanyService companyService;
 
-<<<<<<< HEAD
-    @RequestMapping("/companies/getcompanylist")
-=======
     @CrossOrigin(origins = "http://localhost:4200")
     @RequestMapping("/companies/get_company_list")
->>>>>>> master
     public JSONObject getCompanyList() {
         return companyService.getCompanyList();
     }
