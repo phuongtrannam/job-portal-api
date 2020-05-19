@@ -96,7 +96,7 @@ public class RegionService {
             HashMap<String, String> regionObject = new HashMap<String, String>();
             regionObject.put("id", ob[0].toString());
             regionObject.put("name", ob[1].toString());
-            regionObject.put("type", ob[2].toString());
+            regionObject.put("type", ob[2].toString()); // country, province, district
             regionArr.add(regionObject);
         }
         jsonObject.put("result", regionArr);
