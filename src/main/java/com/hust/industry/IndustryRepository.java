@@ -6,38 +6,39 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+
 @Repository
 public interface IndustryRepository extends CrudRepository<Industry, String> {
 
 
-    @Query(value = "" , nativeQuery = true)
+    @Query(value = "select * from job fact" , nativeQuery = true)
     List<Object[]> getIndustryList();
 
-    @Query(value = "", nativeQuery = true)
+    @Query(value = "select * from job fact", nativeQuery = true)
     List<Object[]> getJobListByIndustry(@Param("industryId") String industryId);
 
-    @Query(value = "", nativeQuery = true)
+    @Query(value = "select * from job fact", nativeQuery = true)
     List<Object[]> getTopCompanyByIndustry(@Param("industryId") String industryId, @Param("locationId") String locationId );
 
-    @Query(value = "", nativeQuery = true)
+    @Query(value = "select * from job fact", nativeQuery = true)
     List<Object[]> getJobDemandByIndustry(@Param("industryId") String industryId, @Param("locationId") String locationId );
     
-    @Query(value = "", nativeQuery = true)
+    @Query(value = "select * from job fact", nativeQuery = true)
     List<Object[]> getJobDemandInSubRegion(@Param("industryId") String industryId, @Param("locationId") String locationId );
 
-    @Query(value = "", nativeQuery = true)
+    @Query(value = "select * from job fact", nativeQuery = true)
     List<Object[]> getTopHiringCompany(@Param("industryId") String industryId, @Param("locationId") String locationId );
     
-    @Query(value = "", nativeQuery = true)
+    @Query(value = "select * from job fact", nativeQuery = true)
     List<Object[]> getTopHiringJob(@Param("industryId") String industryId, @Param("locationId") String locationId );
 
-    @Query(value = "", nativeQuery = true)
+    @Query(value = "select * from job fact", nativeQuery = true)
     List<Object[]> getHighestSalaryJob(@Param("industryId") String industryId, @Param("locationId") String locationId );
 
-    @Query(value = "", nativeQuery = true)
+    @Query(value = "select * from job fact", nativeQuery = true)
     List<Object[]> getJobDemandByAge(@Param("industryId") String industryId, @Param("locationId") String locationId );
 
-    @Query(value = "", nativeQuery = true)
+    @Query(value = "select * from job fact", nativeQuery = true)
     List<Object[]> getJobDemandByLiteracy(@Param("industryId") String industryId, @Param("locationId") String locationId );
 
 

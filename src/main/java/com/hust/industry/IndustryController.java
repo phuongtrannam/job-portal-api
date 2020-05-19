@@ -56,7 +56,6 @@ public class IndustryController {
         return industryService.getJobDemandInSubRegion(industryId, locationId);
     }
 
-    
 
     @CrossOrigin(origins = "http://localhost:4200")
     @RequestMapping(value = "/industries/get_top_hiring_company", method = RequestMethod.POST)
