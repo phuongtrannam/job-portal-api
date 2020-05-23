@@ -2,6 +2,7 @@ package com.hust.industry;
 
 import java.util.List;
 
+import org.hibernate.validator.internal.metadata.aggregated.rule.OverridingMethodMustNotAlterParameterConstraints;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
@@ -110,8 +111,38 @@ public interface IndustryRepository extends CrudRepository<Industry, String> {
             List<Object[]> getTopHiringCompanyWithProvince(@Param("industryId") String industryId, @Param("locationId") String locationId);
 
     
-    @Query(value = "select * from job fact", nativeQuery = true)
-    List<Object[]> getTopHiringJob(@Param("industryId") String industryId, @Param("locationId") String locationId );
+    @Query(value = "with rank_companies_4 as (\n" +
+            "    select idTime ,idIndustry, job_fact.idJob, sum(number_of_recruitment) as `so luong cong viec`,\n" +
+            "           rank()  over ( partition by idTime, idIndustry order by sum(number_of_recruitment) desc ) as \"rankd\"\n" +
+            "    from job_fact, job_industry\n" +
+            "    where job_fact.idJob = job_industry.idJob and idIndustry = :industryId\n" +
+            "    group by idTime, idIndustry, job_fact.idJob\n" +
+            ")\n" +
+            "select concat(\"Quý \",timed.quarterD,\"/\",timed.yearD) as `time`, job.idJob, job.name_job,\n" +
+            "    `so luong cong viec`, timed.idTime\n" +
+            "from rank_companies_4, job, timed\n" +
+            "where rank_companies_4.idJob = job.idJob and timed.idTime = rank_companies_4.idTime\n" +
+            "    and rankd <= 10\n" +
+            "    and rank_companies_4.idTime in (select idTime from (select idTime from timed order by timestampD desc limit 3) as t)\n" +
+            "order by timed.idTime, `so luong cong viec` desc;", nativeQuery = true)
+    List<Object[]> getTopHiringJobWithCountry(@Param("industryId") String industryId );
+
+    @Query( value = "with rank_companies_4 as (\n" +
+            "    select idTime ,idIndustry,province.idProvince, job_fact.idJob, sum(number_of_recruitment) as `so luong cong viec`,\n" +
+            "           rank()  over ( partition by idTime, idIndustry, province.idProvince order by sum(number_of_recruitment) desc ) as \"rankd\"\n" +
+            "    from job_fact, job_industry, province\n" +
+            "    where job_fact.idJob = job_industry.idJob and job_fact.IdProvince = province.idProvince\n" +
+            "        and idIndustry = :industryId and province.idProvince = :locationId\n" +
+            "    group by idTime, idIndustry, province.idProvince,job_fact.idJob\n" +
+            ")\n" +
+            "select concat(\"Quý \",timed.quarterD,\"/\",timed.yearD) as `time`, job.idJob, job.name_job,\n" +
+            "    `so luong cong viec`, timed.idTime\n" +
+            "from rank_companies_4, job, timed\n" +
+            "where rank_companies_4.idJob = job.idJob and timed.idTime = rank_companies_4.idTime\n" +
+            "    and rankd <= 10\n" +
+            "    and rank_companies_4.idTime in (select idTime from (select idTime from timed order by timestampD desc limit 3) as t)\n" +
+            "order by timed.idTime, `so luong cong viec` desc;", nativeQuery = true)
+    List<Object[]> getTopHiringJobWithProvince(@Param("industryId") String industryId, @Param("locationId") String locationId);
 
     @Query(value = "select * from job fact", nativeQuery = true)
     List<Object[]> getHighestSalaryJob(@Param("industryId") String industryId, @Param("locationId") String locationId );
@@ -154,6 +185,27 @@ public interface IndustryRepository extends CrudRepository<Industry, String> {
             "group by company_fact.idTime, company_fact.idCompany,industries.idIndustry, province.idProvince;", nativeQuery = true)
     List<Object[]> getRecruitmentOfCompanyInQuarter( @Param("idTime") String idTime, @Param("idCompany") String idCompany,
                                                      @Param("idProvince") String idProvince, @Param("industryId") String industryId);
+
+
+    @Query( value = "select job.name_job, sum(number_of_recruitment)\n" +
+            "from job_fact, job, timed, job_industry\n" +
+            "where job_fact.idJob = job.idJob and job_fact.idTime = timed.idTime\n" +
+            "  and job_fact.idJob = job_industry.idJob\n" +
+            "  and job.idJob = :jobId\n" +
+            "  and job_industry.idIndustry = :industryId and timed.idTime = :timeId\n" +
+        "group by job_fact.idTime, job_fact.idJob,job_industry.idIndustry;", nativeQuery = true)
+    List<Object[]> getRecruitmentJobInQuarterWithCountry( @Param("jobId") String jobId, @Param("industryId") String industryId,
+                                                          @Param("timeId") String timedId);
+
+    @Query( value = "select job.name_job, sum(number_of_recruitment)\n" +
+            "from job_fact, job, timed, job_industry, province\n" +
+            "where job_fact.idJob = job.idJob and job_fact.idTime = timed.idTime\n" +
+            "  and job_fact.idJob = job_industry.idJob and job_fact.IdProvince = province.idProvince\n" +
+            "  and job.idJob = :jobId and province.idProvince = :locationId\n" +
+            "  and job_industry.idIndustry = :industryId and timed.idTime = :timeId\n" +
+            "group by job_fact.idTime, job_fact.idJob,job_industry.idIndustry;", nativeQuery = true)
+    List<Object[]> getRecruitmentJobInQuarterWithProvince( @Param("jobId") String jobId, @Param("industryId") String industryId,
+                                                           @Param("timeId") String timeId, @Param("locationId") String locationId);
 
     
 
