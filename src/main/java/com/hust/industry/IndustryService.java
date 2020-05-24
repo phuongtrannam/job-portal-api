@@ -395,24 +395,89 @@ public class IndustryService {
     }
 
     public JSONObject getHighestSalaryJob(String industryId, String locationId){
+
         final JSONObject jsonObject = new JSONObject();
         jsonObject.put("description", "The highest salary job");
 
-        final JSONArray jobArr = new JSONArray();
-        List<Object[]> list = industryRepository.getHighestSalaryJob(industryId, locationId);
+        JSONArray jobArray = new JSONArray();
+        JSONArray dataArray = new JSONArray();
+        JSONArray growthArray = new JSONArray();
+        JSONObject timeObject = new JSONObject();
 
-        for(Object[] ob : list){
-            HashMap<String, String> job = new HashMap<String, String>();
-            job.put("idTime", ob[0].toString());
-            job.put("timestamp", ob[1].toString());
-            job.put("idJob", ob[0].toString());
-            job.put("jobName", ob[0].toString());
-            job.put("averageSalary", ob[5].toString());
-            job.put("growth", ob[5].toString());
-            job.put("numJob", ob[5].toString());
-            jobArr.add(job);
+        if(locationId.equals("")){
+            System.out.println(industryId);
+            List<Object[]> list = industryRepository.getHighestSalaryJobWithCountry(industryId);
+
+            String timestamp = list.get(0)[0].toString();
+            String idTime = null;
+            double salary = 0;
+
+            for(Object[] ob : list){
+                if(!timestamp.equals(ob[0].toString())){
+                    timeObject.put("company",jobArray);
+                    timeObject.put("data", dataArray);
+                    timeObject.put("growth", growthArray);
+                    jsonObject.put(timestamp, timeObject);
+                    timeObject = new JSONObject();
+                    jobArray = new JSONArray();
+                    dataArray = new JSONArray();
+                    growthArray = new JSONArray();
+                    timestamp = ob[0].toString();
+                }
+                HashMap<String , String> jobObject = new HashMap<>();
+                jobObject.put("id",ob[1].toString());
+                jobObject.put("name", ob[2].toString());
+                jobArray.add(jobObject);
+                salary =  (double) ob[ob.length - 2];
+                dataArray.add(String.valueOf(round(salary,2)));
+                idTime = ob[ob.length-1].toString();
+                String lastIdTime = "T" + ((Character.getNumericValue(idTime.charAt(1))) - 1);
+                System.out.println(idTime);
+                List<Object[]> recruitmentOfJobInQuarter = industryRepository.getSalaryJobInQuarterWithCountry(ob[1].toString(),industryId, lastIdTime);
+                getGrowthValue(growthArray, ob, recruitmentOfJobInQuarter);
+            }
+            timeObject.put("company",jobArray);
+            timeObject.put("data", dataArray);
+            timeObject.put("growth", growthArray);
+            jsonObject.put(timestamp, timeObject);
         }
-        jsonObject.put("result", jobArr);
+        else if(locationId.contains("P")){
+            System.out.println(industryId);
+            List<Object[]> list = industryRepository.getHighestSalaryJobWithProvince(industryId, locationId);
+
+            String timestamp = list.get(0)[0].toString();
+            String idTime = null;
+            double salary = 0;
+
+            for(Object[] ob : list){
+                if(!ob[0].toString().equals(timestamp)){
+                    timeObject.put("company",jobArray);
+                    timeObject.put("data", dataArray);
+                    timeObject.put("growth", growthArray);
+                    jsonObject.put(timestamp, timeObject);
+                    timeObject = new JSONObject();
+                    jobArray = new JSONArray();
+                    dataArray = new JSONArray();
+                    growthArray = new JSONArray();
+                    timestamp = ob[0].toString();
+                }
+                HashMap<String , String> jobObject = new HashMap<>();
+                jobObject.put("id",ob[1].toString());
+                jobObject.put("name", ob[2].toString());
+                jobArray.add(jobObject);
+                salary = (double) ob[ob.length -2];
+                dataArray.add(String.valueOf(round(salary,2)));
+                idTime = ob[ob.length-1].toString();
+                String lastIdTime = "T" + ((Character.getNumericValue(idTime.charAt(1))) - 1);
+                System.out.println(idTime);
+                List<Object[]> recruitmentOfJobInQuarter = industryRepository.getSalaryJobInQuarterWithProvince(ob[1].toString(),industryId, lastIdTime, locationId);
+                getGrowthValue(growthArray, ob, recruitmentOfJobInQuarter);
+            }
+            timeObject.put("company",jobArray);
+            timeObject.put("data", dataArray);
+            timeObject.put("growth", growthArray);
+            jsonObject.put(timestamp, timeObject);
+        }
         return jsonObject;
     }
 
