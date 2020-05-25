@@ -59,8 +59,24 @@ public interface RegionRepository extends CrudRepository<Region, String> {
             "order by timed.idTime, top10.salary desc;", nativeQuery = true)
     List<Object[]> getAverageSalaryByIndustryWithProvince(@Param("idProvince") String idProvince);
     
-    @Query(value = "select * from job fact", nativeQuery = true)
-    List<Object[]> getJobDemandByIndustry(@Param("id") String id);
+    @Query(value = "select industries.idIndustry, industries.name_industry,\n" +
+            "       top10.number_of_recruitment, top10.growth, concat(\"Quý \",timed.quarterD,\"/\",timed.yearD) as `time`\n" +
+            "from top10_industries_with_the_highest_recruitment as top10, timed, industries\n" +
+            "where top10.idTime = timed.idTime\n" +
+            "  and top10.idTime in ( select idTime from ( select idTime from timed order by timestampD desc limit 3 ) as t )\n" +
+            "  and top10.idIndustry = industries.idIndustry\n" +
+            "order by timed.idTime, top10.number_of_recruitment desc", nativeQuery = true)
+    List<Object[]> getJobDemandByIndustryWithCountry();
+
+    @Query( value = "select industries.idIndustry, industries.name_industry,\n" +
+            "       top10.number_of_recruitment, top10.growth, concat(\"Quý \",timed.quarterD,\"/\",timed.yearD) as `time`\n" +
+            "from top10_industries_with_the_highest_recruitment_by_region as top10, timed, province, industries\n" +
+            "where top10.idTime = timed.idTime and top10.idProvince = province.idProvince\n" +
+            "  and top10.idTime in ( select idTime from ( select idTime from timed order by timestampD desc limit 3 ) as t )\n" +
+            "  and top10.idIndustry = industries.idIndustry\n" +
+            "  and province.idProvince = :idProvince \n" +
+            "order by timed.idTime, top10.number_of_recruitment desc", nativeQuery = true)
+    List<Object[]> getJobDemandByIndustryWithProvince(@Param("idProvince") String idProvince);
 
     @Query(value = "select * from job fact", nativeQuery = true)
     List<Object[]> getHighestSalaryJobs(@Param("id") String id);

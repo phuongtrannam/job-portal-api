@@ -295,28 +295,53 @@ public class RegionService {
         return idIndustry;
     }
 
-    public JSONObject getJobDemandByIndustry(String id){
-        System.out.println(id);
+    public JSONObject getJobDemandByIndustry(String regionId){
+        System.out.println(regionId);
         final JSONObject jsonObject = new JSONObject();
-        jsonObject.put("id", id);
+        jsonObject.put("id", regionId);
         jsonObject.put("description", "The job demand by industry");
 
-        final JSONArray industryArr = new JSONArray();
+        JSONObject timeObject = new JSONObject();
+        JSONArray industryArray = new JSONArray();
+        JSONArray growthArray = new JSONArray();
+        JSONArray numJobArray = new JSONArray();
 
-        List<Object[]> list = regionRepository.getJobDemandByIndustry(id);
-        System.out.println(id);
-        for(Object[] ob : list){
-            HashMap<String, String> industryObject = new HashMap<String, String>();
+        if(regionId.equals("")){
+            List<Object[]> list = regionRepository.getJobDemandByIndustryWithCountry();
+            getJSONObjectJobDemandByIndustry(jsonObject, timeObject, industryArray, growthArray, numJobArray, list);
+        }
+        else if( regionId.contains("P")){
+            List<Object[]> list = regionRepository.getJobDemandByIndustryWithProvince(regionId);
+            getJSONObjectJobDemandByIndustry(jsonObject, timeObject, industryArray, growthArray, numJobArray, list);
+        }
+        return jsonObject;
+    }
+
+    private void getJSONObjectJobDemandByIndustry(JSONObject jsonObject, JSONObject timeObject, JSONArray industryArray, JSONArray growthArray, JSONArray numJobArray, List<Object[]> list) {
+        String time = list.get(0)[4].toString();
+        for(Object[] ob: list){
+            if(!time.equals(ob[ob.length -1].toString())){
+                timeObject.put("industry", industryArray);
+                timeObject.put("growth", growthArray);
+                timeObject.put("numJob", numJobArray);
+                jsonObject.put(time, timeObject);
+                timeObject = new JSONObject();
+                industryArray = new JSONArray();
+                growthArray = new JSONArray();
+                numJobArray = new JSONArray();
+                time = ob[ob.length -1].toString();
+            }
+            HashMap<String, String> industryObject = new HashMap<>();
             industryObject.put("id", ob[0].toString());
             industryObject.put("name", ob[1].toString());
-            industryObject.put("numJob", ob[2].toString());
-            industryObject.put("growth", ob[1].toString());
-            industryObject.put("idTime", ob[4].toString());
-            industryObject.put("timestamp", ob[5].toString());
-            industryArr.add(industryObject);
+            industryArray.add(industryObject);
+            numJobArray.add(ob[ob.length -3].toString());
+            growthArray.add(ob[ob.length -2].toString());
         }
-        jsonObject.put("result", industryArr);
-        return jsonObject;
+        timeObject.put("industry", industryArray);
+        timeObject.put("growth", growthArray);
+        timeObject.put("numJob", numJobArray);
+        jsonObject.put(time, timeObject);
     }
 
     public JSONObject getHighestSalaryJobs(String id){

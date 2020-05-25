@@ -65,7 +65,7 @@ public class RegionController {
         return regionService.getAverageSalaryByIndustry(regionId);
     }
 
-    //todo
+    //doing
     @CrossOrigin(origins = "http://localhost:4200")
     @RequestMapping(value = "/regions/get_job_demand_by_industry", method = RequestMethod.GET)
     public JSONObject getJobDemandByIndustry(@RequestBody Map<String, Object> payload) throws Exception {
