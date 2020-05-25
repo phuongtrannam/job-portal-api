@@ -15,11 +15,13 @@ public class IndustryController {
 
     @Autowired
     private IndustryService industryService; 
-    
+
+    //done
     @RequestMapping("/industries/get_industry_list")
     public JSONObject getIndustryList(){
         return industryService.getIndustryList();
     }
+    
     //done
     @CrossOrigin(origins = "http://localhost:4200")
     @RequestMapping(value = "/industries/get_job_list", method = RequestMethod.GET)
@@ -89,7 +91,7 @@ public class IndustryController {
         return industryService.getHighestSalaryJob(industryId, locationId);
     }
 
-    //doing
+    //done
     @CrossOrigin(origins = "http://localhost:4200")
     @RequestMapping(value = "/industries/get_job_demand_by_age", method = RequestMethod.GET)
     public JSONObject getJobDemandByAge(@RequestBody Map<String, Object> payload) throws Exception {
@@ -99,9 +101,9 @@ public class IndustryController {
         return industryService.getJobDemandByAge(industryId, locationId);
     }
 
-    //todo
+    //done
     @CrossOrigin(origins = "http://localhost:4200")
-    @RequestMapping(value = "/industries/get_job_demand_by_literacy", method = RequestMethod.POST)
+    @RequestMapping(value = "/industries/get_job_demand_by_literacy", method = RequestMethod.GET)
     public JSONObject getJobDemandByLiteracy(@RequestBody Map<String, Object> payload) throws Exception {
         // System.out.println(payload.get("id"));
         String industryId = payload.get("idIndustry").toString();
