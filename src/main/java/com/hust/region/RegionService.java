@@ -32,54 +32,72 @@ public class RegionService {
 
     // }
 
-    public JSONObject getRootRegion(String id) {
+    public JSONObject getRootRegion(String regionId) {
         final JSONObject jsonObject = new JSONObject();
-        jsonObject.put("id", id);
+        jsonObject.put("id", regionId);
         jsonObject.put("description", "The root region");
 
-        final JSONArray rootRegion = new JSONArray();
-
-        List<Object[]> list = regionRepository.getRootRegion(id);
-        System.out.println(id);
-        for(Object[] ob : list){
+        if(regionId.contains("P")){
+            final JSONArray rootRegion = new JSONArray();
             HashMap<String, String> regionObject = new HashMap<String, String>();
-            regionObject.put("id", ob[0].toString());
-            regionObject.put("name", ob[1].toString());
-            regionObject.put("type", ob[2].toString());
+            regionObject.put("id", "");
+            regionObject.put("name", "Cả nước");
+            regionObject.put("type", "Country");
             rootRegion.add(regionObject);
+            jsonObject.put("result", rootRegion);
         }
-        jsonObject.put("result", rootRegion);
         return jsonObject;
     }
 
-    public JSONObject getSubRegion(String id) {
+    public JSONObject getSubRegion(String regionId) {
         final JSONObject jsonObject = new JSONObject();
-        jsonObject.put("id", id);
+        jsonObject.put("id", regionId);
         jsonObject.put("description", "The sub region");
 
         final JSONArray subRegion = new JSONArray();
 
-        List<Object[]> list = regionRepository.getSubRegion(id);
-        System.out.println(id);
-        for(Object[] ob : list){
-            HashMap<String, String> regionObject = new HashMap<String, String>();
-            regionObject.put("id", ob[0].toString());
-            regionObject.put("name", ob[1].toString());
-            regionObject.put("type", ob[2].toString());
-            subRegion.add(regionObject);
+        if(regionId.equals("")){
+            List<Object[]> list = regionRepository.getProvinceRegion();
+            System.out.println(regionId);
+            for(Object[] ob : list){
+                HashMap<String, String> regionObject = new HashMap<String, String>();
+                regionObject.put("id", ob[0].toString());
+                regionObject.put("name", ob[1].toString());
+                regionObject.put("type", "Province");
+                subRegion.add(regionObject);
+            }
+        }
+        else if(regionId.contains("P")){
+            List<Object[]> list = regionRepository.getDistinctByProvince(regionId);
+            System.out.println(regionId);
+            for(Object[] ob : list){
+                HashMap<String, String> regionObject = new HashMap<String, String>();
+                regionObject.put("id", "");
+                regionObject.put("name", ob[0].toString());
+                regionObject.put("type", "District");
+                subRegion.add(regionObject);
+            }
         }
         jsonObject.put("result", subRegion);
         return jsonObject;
     }
 
-    public JSONObject getRootAndSubRegions(String id) {
+    public JSONObject getRootAndSubRegions(String regionId) {
         final JSONObject jsonObject = new JSONObject();
-        final JSONObject rootObject = getRootRegion(id);
-        final JSONObject subObject = getSubRegion(id);
-        jsonObject.put("id", id);
-        jsonObject.put("description", "The root and sub region");
-        jsonObject.put("sub", subObject.get("result"));
-        jsonObject.put("root", rootObject.get("result"));
+        if(regionId.equals("")){
+            final JSONObject subObject = getSubRegion(regionId);
+            jsonObject.put("id", regionId);
+            jsonObject.put("description", "The root and sub region");
+            jsonObject.put("sub", subObject.get("result"));
+        }
+        else if(regionId.contains("P")){
+            final JSONObject rootObject = getRootRegion(regionId);
+            final JSONObject subObject = getSubRegion(regionId);
+            jsonObject.put("id", regionId);
+            jsonObject.put("description", "The root and sub region");
+            jsonObject.put("sub", subObject.get("result"));
+            jsonObject.put("root", rootObject.get("result"));
+        }
         return jsonObject;
     }
 
@@ -201,28 +219,80 @@ public class RegionService {
         return jsonObject;
     }
 
-    public JSONObject getAverageSalaryByIndustry(String id){
+    public JSONObject getAverageSalaryByIndustry(String regionId){
         
         final JSONObject jsonObject = new JSONObject();
-        jsonObject.put("id", id);
+        jsonObject.put("id", regionId);
         jsonObject.put("description", "The average salary by industry");
 
-        final JSONArray industryArr = new JSONArray();
+        JSONObject timeObject = new JSONObject();
+        JSONArray industryArray = new JSONArray();
+        JSONArray salaryArray = new JSONArray();
+        JSONArray growthArray = new JSONArray();
+        JSONArray numJobArray = new JSONArray();
 
-        List<Object[]> list = regionRepository.getAverageSalaryByIndustry(id);
-        System.out.println(id);
-        for(Object[] ob : list){
-            HashMap<String, String> industryObject = new HashMap<String, String>();
-            industryObject.put("id", ob[0].toString());
-            industryObject.put("name", ob[1].toString());
-            industryObject.put("averageSalary", ob[2].toString());
-            industryObject.put("growth", ob[1].toString());
-            industryObject.put("idTime", ob[4].toString());
-            industryObject.put("timestamp", ob[5].toString());
-            industryArr.add(industryObject);
+        if(regionId.equals("")){
+            List<Object[]> list = regionRepository.getAverageSalaryByIndustryWithCountry();
+            String time = list.get(0)[5].toString();
+            String timeStamp = list.get(0)[4].toString();
+            for(Object[] ob : list){
+                if(!time.equals(ob[ob.length -1].toString())){
+                    putDataAvgSalaryToJSONObject(jsonObject, timeObject, industryArray, salaryArray, growthArray, numJobArray, time);
+                    timeObject = new JSONObject();
+                    industryArray = new JSONArray();
+                    salaryArray = new JSONArray();
+                    growthArray = new JSONArray();
+                    numJobArray = new JSONArray();
+                    time = ob[ob.length -1].toString();
+                    timeStamp = ob[ob.length -2].toString();
+                }
+                String idIndustry = getJSONDataAvgSalary(industryArray, salaryArray, growthArray, ob);
+                List<Object[]> listNumJob = regionRepository.getDemandByIndusrtryWithCountry(timeStamp, idIndustry);
+                numJobArray.add(listNumJob.get(0)[0].toString());
+            }
+            putDataAvgSalaryToJSONObject(jsonObject, timeObject, industryArray, salaryArray, growthArray, numJobArray, time);
         }
-        jsonObject.put("result", industryArr);
+        else if(regionId.contains("P")){
+            List<Object[]> list = regionRepository.getAverageSalaryByIndustryWithProvince(regionId);
+            String time = list.get(0)[5].toString();
+            String timeStamp = list.get(0)[4].toString();
+            for(Object[] ob : list){
+                if(!time.equals(ob[ob.length -1].toString())){
+                    putDataAvgSalaryToJSONObject(jsonObject, timeObject, industryArray, salaryArray, growthArray, numJobArray, time);
+                    timeObject = new JSONObject();
+                    industryArray = new JSONArray();
+                    salaryArray = new JSONArray();
+                    growthArray = new JSONArray();
+                    numJobArray = new JSONArray();
+                    time = ob[ob.length -1].toString();
+                    timeStamp = ob[ob.length -2].toString();
+                }
+                String idIndustry = getJSONDataAvgSalary(industryArray, salaryArray, growthArray, ob);
+                List<Object[]> listNumJob = regionRepository.getDemandByIndustryWithProvince(timeStamp, idIndustry, regionId);
+                numJobArray.add(listNumJob.get(0)[0].toString());
+            }
+            putDataAvgSalaryToJSONObject(jsonObject, timeObject, industryArray, salaryArray, growthArray, numJobArray, time);
+        }
         return jsonObject;
+    }
+
+    private void putDataAvgSalaryToJSONObject(JSONObject jsonObject, JSONObject timeObject, JSONArray industryArray, JSONArray salaryArray, JSONArray growthArray, JSONArray numJobArray, String time) {
+        timeObject.put("industry", industryArray);
+        timeObject.put("salary", salaryArray);
+        timeObject.put("growth", growthArray);
+        timeObject.put("numJob", numJobArray);
+        jsonObject.put(time, timeObject);
+    }
+
+    private String getJSONDataAvgSalary(JSONArray industryArray, JSONArray salaryArray, JSONArray growthArray, Object[] ob) {
+        String idIndustry = ob[0].toString();
+        HashMap<String, String> industryObject = new HashMap<>();
+        industryObject.put("id", idIndustry);
+        industryObject.put("name", ob[1].toString());
+        industryArray.add(industryObject);
+        salaryArray.add(ob[2].toString());
+        growthArray.add(ob[ob.length - 3].toString());
+        return idIndustry;
     }
 
     public JSONObject getJobDemandByIndustry(String id){
