@@ -254,6 +254,9 @@ public class RegionService {
         }
         else if(regionId.contains("P")){
             List<Object[]> list = regionRepository.getAverageSalaryByIndustryWithProvince(regionId);
+            if(list.isEmpty()){
+                return null;
+            }
             String time = list.get(0)[5].toString();
             String timeStamp = list.get(0)[4].toString();
             for(Object[] ob : list){
@@ -344,27 +347,82 @@ public class RegionService {
         jsonObject.put(time, timeObject);
     }
 
-    public JSONObject getHighestSalaryJobs(String id){
+    public JSONObject getHighestSalaryJobs(String regionId){
         final JSONObject jsonObject = new JSONObject();
-        jsonObject.put("id", id);
+        jsonObject.put("id", regionId);
         jsonObject.put("description", "The job highest salary jobs");
 
-        final JSONArray jobArr = new JSONArray();
-        System.out.println(id);
-        List<Object[]> list = regionRepository.getHighestSalaryJobs(id);
-        System.out.println(id);
-        for(Object[] ob : list){
-            HashMap<String, String> jobObject = new HashMap<String, String>();
-            jobObject.put("id", ob[0].toString());
-            jobObject.put("name", ob[1].toString());
-            jobObject.put("averageSalary", ob[2].toString());
-            jobObject.put("growth", ob[0].toString());
-            jobObject.put("numJob", ob[3].toString());
-            jobObject.put("timestamp", ob[0].toString());
-            jobArr.add(jobObject);
+        JSONObject timeObject = new JSONObject();
+        JSONArray jobArray = new JSONArray();
+        JSONArray salarayArray = new JSONArray();
+        JSONArray growthArray = new JSONArray();
+        JSONArray numJobArray = new JSONArray();
+
+        if(regionId.equals("")){
+            List<Object[]> list = regionRepository.getHighestSalaryJobsWithCountry();
+            String time = list.get(0)[5].toString();
+            String idTime = list.get(0)[4].toString();
+            for( Object[] ob : list){
+                if(!time.equals(ob[ob.length -1].toString())){
+                    putDataHighestSalaryJobsToJSON(jsonObject, timeObject, jobArray, salarayArray, growthArray, numJobArray, time);
+                    jobArray = new JSONArray();
+                    salarayArray = new JSONArray();
+                    growthArray = new JSONArray();
+                    numJobArray = new JSONArray();
+                    timeObject = new JSONObject();
+                    time = ob[ob.length -1].toString();
+                    idTime = ob[ob.length -2].toString();
+                }
+                String idJob = getJSONDataHighestSalaryJobs(jobArray, salarayArray, growthArray, ob);
+                List<Object[]> listNumJob = regionRepository.getDemandByJobWithCountry(idTime, idJob);
+                numJobArray.add(listNumJob.get(0)[0].toString());
+            }
+            putDataHighestSalaryJobsToJSON(jsonObject, timeObject, jobArray, salarayArray, growthArray, numJobArray, time);
         }
-        jsonObject.put("result", jobArr);
+        else if(regionId.contains("P")){
+            List<Object[]> list = regionRepository.getHighestSalaryJobsWithProvince(regionId);
+            if(list.isEmpty()){
+                return null;
+            }
+            String time = list.get(0)[5].toString();
+            String idTime = list.get(0)[4].toString();
+            for( Object[] ob : list){
+                if(!time.equals(ob[ob.length -1].toString())){
+                    putDataHighestSalaryJobsToJSON(jsonObject, timeObject, jobArray, salarayArray, growthArray, numJobArray, time);
+                    jobArray = new JSONArray();
+                    salarayArray = new JSONArray();
+                    growthArray = new JSONArray();
+                    numJobArray = new JSONArray();
+                    timeObject = new JSONObject();
+                    time = ob[ob.length -1].toString();
+                    idTime = ob[ob.length -2].toString();
+                }
+                String idJob = getJSONDataHighestSalaryJobs(jobArray, salarayArray, growthArray, ob);
+                List<Object[]> listNumJob = regionRepository.getDemandByJobWithProvince(idTime, idJob, regionId);
+                numJobArray.add(listNumJob.get(0)[0].toString());
+            }
+            putDataHighestSalaryJobsToJSON(jsonObject, timeObject, jobArray, salarayArray, growthArray, numJobArray, time);
+        }
         return jsonObject;
+    }
+
+    private String getJSONDataHighestSalaryJobs(JSONArray jobArray, JSONArray salarayArray, JSONArray growthArray, Object[] ob) {
+        HashMap<String, String> jobObject = new HashMap<>();
+        String idJob = ob[0].toString();
+        jobObject.put("id", idJob);
+        jobObject.put("name", ob[1].toString());
+        jobArray.add(jobObject);
+        salarayArray.add(ob[2].toString());
+        growthArray.add(ob[3].toString());
+        return idJob;
+    }
+
+    private void putDataHighestSalaryJobsToJSON(JSONObject jsonObject, JSONObject timeObject, JSONArray jobArray, JSONArray salarayArray, JSONArray growthArray, JSONArray numJobArray, String time) {
+        timeObject.put("job", jobArray);
+        timeObject.put("salary", salarayArray);
+        timeObject.put("growth", growthArray);
+        timeObject.put("numJob", numJobArray);
+        jsonObject.put(time, timeObject);
     }
 
     public JSONObject getHighestDemandJobs(String id){

@@ -65,7 +65,7 @@ public class RegionController {
         return regionService.getAverageSalaryByIndustry(regionId);
     }
 
-    //doing
+    //done
     @CrossOrigin(origins = "http://localhost:4200")
     @RequestMapping(value = "/regions/get_job_demand_by_industry", method = RequestMethod.GET)
     public JSONObject getJobDemandByIndustry(@RequestBody Map<String, Object> payload) throws Exception {
@@ -73,9 +73,9 @@ public class RegionController {
         return regionService.getJobDemandByIndustry(regionId);
     }
 
-    //todo
+    //done
     @CrossOrigin(origins = "http://localhost:4200")
-    @RequestMapping(value = "/regions/get_highest_salary_jobs", method = RequestMethod.POST)
+    @RequestMapping(value = "/regions/get_highest_salary_jobs", method = RequestMethod.GET)
     public JSONObject getHighestSalaryJobs(@RequestBody Map<String, Object> payload) throws Exception {
         String regionId = payload.get("id").toString();
         return regionService.getHighestSalaryJobs(regionId);
