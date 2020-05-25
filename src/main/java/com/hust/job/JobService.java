@@ -45,7 +45,7 @@ public class JobService {
 
         final JSONArray jobArr = new JSONArray();
 
-        List<Object[]> list = jobRepository.getJobInfo(idJob);
+        List<Object[]> list = jobRepository.getJobDescription(idJob);
         for(Object[] ob : list){
             HashMap<String, String> jobObject = new HashMap<String, String>();
             jobObject.put("id", ob[0].toString());
@@ -62,14 +62,14 @@ public class JobService {
         return jsonObject;
     }
 
-    public JSONObject advancedSearchJob(String queryContent, String idLocation, String idIndustry, String salary){
+    public JSONObject advancedSearchJob(String queryContent, String location, String industry, int minSalary, int maxSalary){
 
         final JSONObject jsonObject = new JSONObject();
         jsonObject.put("description", "The advanced search job");
 
         final JSONArray jobArr = new JSONArray();
 
-        List<Object[]> list = jobRepository.advancedSearchJob(queryContent, idLocation, idIndustry, salary);
+        List<Object[]> list = jobRepository.advancedSearchJob(queryContent, location, industry, minSalary, maxSalary);
         for(Object[] ob : list){
             HashMap<String, String> jobObject = new HashMap<String, String>();
             jobObject.put("id", ob[0].toString());
