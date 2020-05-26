@@ -254,9 +254,7 @@ public class RegionService {
         }
         else if(regionId.contains("P")){
             List<Object[]> list = regionRepository.getAverageSalaryByIndustryWithProvince(regionId);
-            if(list.isEmpty()){
-                return null;
-            }
+            if (checkListObjectNull(list)) return null;
             String time = list.get(0)[5].toString();
             String timeStamp = list.get(0)[4].toString();
             for(Object[] ob : list){
@@ -381,9 +379,7 @@ public class RegionService {
         }
         else if(regionId.contains("P")){
             List<Object[]> list = regionRepository.getHighestSalaryJobsWithProvince(regionId);
-            if(list.isEmpty()){
-                return null;
-            }
+            if (checkListObjectNull(list)) return null;
             String time = list.get(0)[5].toString();
             String idTime = list.get(0)[4].toString();
             for( Object[] ob : list){
@@ -459,9 +455,7 @@ public class RegionService {
         }
         else if(regionId.contains("P")){
             List<Object[]> list = regionRepository.getHighestDemandJobsWithProvince(regionId);
-            if(list.isEmpty()){
-                return null;
-            }
+            if (checkListObjectNull(list)) return null;
             String time = list.get(0)[5].toString();
             String idTime = list.get(0)[4].toString();
             for( Object[] ob : list){
@@ -485,29 +479,95 @@ public class RegionService {
         return jsonObject;
     }
 
-    public JSONObject getHighestPayingCompanies(String id){
+    private boolean checkListObjectNull(List<Object[]> list) {
+        if (list.isEmpty()) {
+            return true;
+        }
+        return false;
+    }
+
+    public JSONObject getHighestPayingCompanies(String regionId){
         final JSONObject jsonObject = new JSONObject();
-        jsonObject.put("id", id);
+        jsonObject.put("id", regionId);
         jsonObject.put("description", "The job highest paying companies");
 
-        final JSONArray companyArr = new JSONArray();
-        System.out.println(id);
-        List<Object[]> list = regionRepository.getHighestPayingCompanies(id);
-        System.out.println(id);
-        for(Object[] ob : list){
-            HashMap<String, String> companyObject = new HashMap<String, String>();
-            companyObject.put("id", ob[0].toString());
-            companyObject.put("name", ob[1].toString());
-            companyObject.put("averageSalary", ob[3].toString());
-            companyObject.put("growth", ob[0].toString());
-            companyObject.put("numJob", ob[2].toString());
-            companyObject.put("timestamp", ob[0].toString());
-            companyArr.add(companyObject);
+        JSONObject timeObject = new JSONObject();
+        JSONArray companyArray = new JSONArray();
+        JSONArray salaryArray = new JSONArray();
+        JSONArray growthArray = new JSONArray();
+        JSONArray numJobArray = new JSONArray();
+
+
+        if(regionId.equals("")){
+            List<Object[]> list = regionRepository.getHighestPayingCompaniesWithCountry();
+            String time = list.get(0)[5].toString();
+            String idTime = list.get(0)[4].toString();
+            for( Object[] ob: list){
+                if(!time.equals(ob[ob.length -1])){
+                    putDataHighestPayingCompanyToJSON(jsonObject, timeObject, companyArray, salaryArray, growthArray, numJobArray, time);
+                    timeObject = new JSONObject();
+                    companyArray = new JSONArray();
+                    salaryArray = new JSONArray();
+                    numJobArray = new JSONArray();
+                    growthArray = new JSONArray();
+                    time = ob[ob.length -1].toString();
+                    idTime = ob[ob.length -2].toString();
+                }
+                HashMap<String, String> companyObject = new HashMap<>();
+                String idCompany = ob[0].toString();
+                List<Object[]> listNumJobNow = regionRepository.getDemandByCompanyWithCountry(idTime, idCompany);
+                String lastIdTime = "T" + ((Character.getNumericValue(idTime.charAt(1))) - 1);
+                List<Object[]> listNumJobPast = regionRepository.getDemandByCompanyWithCountry(lastIdTime, idCompany);
+                getDataHighestPayingCompanyToJSON(companyArray, salaryArray, growthArray, numJobArray, ob, companyObject, idCompany, listNumJobNow, listNumJobPast);
+            }
+            putDataHighestPayingCompanyToJSON(jsonObject, timeObject, companyArray, salaryArray, growthArray, numJobArray, time);
         }
-        jsonObject.put("result", companyArr);
+        else if(regionId.contains("P")){
+            List<Object[]> list = regionRepository.getHighestPayingCompaniesWithProvince(regionId);
+            if (checkListObjectNull(list)) return null;
+            String time = list.get(0)[5].toString();
+            String idTime = list.get(0)[4].toString();
+            for( Object[] ob: list){
+                if(!time.equals(ob[ob.length -1])){
+                    putDataHighestPayingCompanyToJSON(jsonObject, timeObject, companyArray, salaryArray, growthArray, numJobArray, time);
+                    timeObject = new JSONObject();
+                    companyArray = new JSONArray();
+                    salaryArray = new JSONArray();
+                    numJobArray = new JSONArray();
+                    growthArray = new JSONArray();
+                    time = ob[ob.length -1].toString();
+                    idTime = ob[ob.length -2].toString();
+                }
+                HashMap<String, String> companyObject = new HashMap<>();
+                String idCompany = ob[0].toString();
+                List<Object[]> listNumJobNow = regionRepository.getDemandByCompanyWithProvince(idTime, idCompany, regionId);
+                String lastIdTime = "T" + ((Character.getNumericValue(idTime.charAt(1))) - 1);
+                List<Object[]> listNumJobPast = regionRepository.getDemandByCompanyWithProvince(lastIdTime, idCompany, regionId);
+                getDataHighestPayingCompanyToJSON(companyArray, salaryArray, growthArray, numJobArray, ob, companyObject, idCompany, listNumJobNow, listNumJobPast);
+            }
+            putDataHighestPayingCompanyToJSON(jsonObject, timeObject, companyArray, salaryArray, growthArray, numJobArray, time);
+        }
         return jsonObject;
     }
-    
+
+    private void getDataHighestPayingCompanyToJSON(JSONArray companyArray, JSONArray salaryArray, JSONArray growthArray, JSONArray numJobArray, Object[] ob, HashMap<String, String> companyObject, String idCompany, List<Object[]> listNumJobNow, List<Object[]> listNumJobPast) {
+        companyObject.put("id", idCompany);
+        companyObject.put("name", ob[1].toString());
+        companyArray.add(companyObject);
+        salaryArray.add(ob[ob.length - 4].toString());
+        double numJob = (double) listNumJobNow.get(0)[0];
+        numJobArray.add(String.valueOf(numJob));
+        getGrowthValue(growthArray,numJob,listNumJobPast);
+    }
+
+    private void putDataHighestPayingCompanyToJSON(JSONObject jsonObject, JSONObject timeObject, JSONArray companyArray, JSONArray salaryArray, JSONArray growthArray, JSONArray numJobArray, String time) {
+        timeObject.put("company", companyArray);
+        timeObject.put("salary", salaryArray);
+        timeObject.put("numJob", numJobArray);
+        timeObject.put("growth", growthArray);
+        jsonObject.put(time,timeObject);
+    }
+
     public JSONObject getTopHiringCompanies(String id){
         final JSONObject jsonObject = new JSONObject();
         jsonObject.put("id", id);
@@ -538,5 +598,16 @@ public class RegionService {
         value = value * factor;
         long tmp = Math.round(value);
         return (double) tmp / factor;
+    }
+
+    private void getGrowthValue(JSONArray growthArray, double valueNow, List<Object[]> pastValue) {
+        double growth = 0;
+        try {
+            double valueInLastQuarter = (double) pastValue.get(0)[0];
+            growth = ((valueNow / valueInLastQuarter) - 1) * 100;
+            growthArray.add(String.valueOf(round(growth, 2)));
+        } catch (Exception e) {
+            growthArray.add("");
+        }
     }
 }
