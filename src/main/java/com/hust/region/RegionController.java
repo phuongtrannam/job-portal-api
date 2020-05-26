@@ -97,7 +97,7 @@ public class RegionController {
         return regionService.getHighestPayingCompanies(regionId);
     }
 
-    //doing
+    //done
     @CrossOrigin(origins = "http://localhost:4200")
     @RequestMapping(value = "/regions/get_top_hiring_companies", method = RequestMethod.GET)
     public JSONObject getTopHiringCompanies(@RequestBody Map<String, Object> payload) throws Exception {

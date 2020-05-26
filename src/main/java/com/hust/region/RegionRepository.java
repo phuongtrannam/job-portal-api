@@ -190,14 +190,14 @@ public interface RegionRepository extends CrudRepository<Region, String> {
     List<Object[]> getDemandByJobWithProvince(@Param("idTime") String idTime, @Param("idJob") String idJob,
                                              @Param("idProvince") String idProvince);
 
-    @Query( value = "select avg(salary)\n" +
+    @Query( value = "select min(salary), max(salary)\n" +
             "from job_fact\n" +
             "where job_fact.idTime = :idTime and job_fact.idJob = :idJob\n" +
             "group by idTime, idJob;\n", nativeQuery = true
     )
     List<Object[]> getSalaryByJobWithCountry(@Param("idTime") String idTime, @Param("idJob") String idJob);
 
-    @Query( value = "select avg(salary)\n" +
+    @Query( value = "select min(salary), max(salary)\n" +
             "from job_fact\n" +
             "where job_fact.idTime = :idTime and job_fact.idJob = :idJob and IdProvince = :idProvince \n" +
             "group by idTime, idJob, IdProvince;", nativeQuery = true

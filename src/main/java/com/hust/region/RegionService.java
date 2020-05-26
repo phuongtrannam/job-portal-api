@@ -447,9 +447,11 @@ public class RegionService {
                     idTime = ob[ob.length -2].toString();
                 }
                 String idJob = getJSONDataHighestJobs(jobArray, numJobArray, growthArray, ob);
-                List<Object[]> listNumJob = regionRepository.getSalaryByJobWithCountry(idTime, idJob);
-                double salary = (double) listNumJob.get(0)[0];
-                salarayArray.add(String.valueOf(round(salary, 2)));
+                List<Object[]> listSalary = regionRepository.getSalaryByJobWithCountry(idTime, idJob);
+                HashMap<String, String> salaryObject = new HashMap<>();
+                salaryObject.put("min", listSalary.get(0)[0].toString());
+                salaryObject.put("max", listSalary.get(0)[1].toString());
+                salarayArray.add(salaryObject);
             }
             putDataHighestJobsToJSON(jsonObject, timeObject, jobArray, salarayArray, growthArray, numJobArray, time);
         }
@@ -470,9 +472,11 @@ public class RegionService {
                     idTime = ob[ob.length -2].toString();
                 }
                 String idJob = getJSONDataHighestJobs(jobArray, numJobArray, growthArray, ob);
-                List<Object[]> listNumJob = regionRepository.getSalaryByJobWithProvince(idTime, idJob, regionId);
-                double salary = (double) listNumJob.get(0)[0];
-                salarayArray.add(String.valueOf(round(salary, 2)));
+                List<Object[]> listSalary = regionRepository.getSalaryByJobWithProvince(idTime, idJob, regionId);
+                HashMap<String, String> salaryObject = new HashMap<>();
+                salaryObject.put("min", listSalary.get(0)[0].toString());
+                salaryObject.put("max", listSalary.get(0)[1].toString());
+                salarayArray.add(salaryObject);
             }
             putDataHighestJobsToJSON(jsonObject, timeObject, jobArray, salarayArray, growthArray, numJobArray, time);
         }
