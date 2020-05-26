@@ -27,17 +27,77 @@ public interface RegionRepository extends CrudRepository<Region, String> {
     @Query(value = "select * from job fact", nativeQuery = true)
     List<Object[]> getRelatedRegions(@Param("id") String id);
 
-    @Query(value = "select * from job fact", nativeQuery = true)
-    List<Object[]> getNumberJobPostingInRegion(@Param("id") String id);
+    @Query(value = "select timed.idTime, concat(\"Quý \",timed.quarterD,\"/\",timed.yearD) as `time`, sum(market_fact.number_of_recruitment)\n" +
+            "from market_fact, timed\n" +
+            "where market_fact.idTime = timed.idTime\n" +
+            "  and market_fact.idTime in (select idTime from ( select idTime from timed order by timestampD desc limit 2) as t)\n" +
+            "group by timed.idTime;", nativeQuery = true)
+    List<Object[]> getNumberJobPostingInCountry();
 
-    @Query(value = "select * from job fact", nativeQuery = true)
-    List<Object[]> getNumberCompanyInRegion(@Param("id") String id);
+    @Query( value = "select timed.idTime, concat(\"Quý \",timed.quarterD,\"/\",timed.yearD) as `time`, sum(market_fact.number_of_recruitment)\n" +
+            "from market_fact, timed, province\n" +
+            "where market_fact.idTime = timed.idTime and market_fact.idProvince = province.idProvince\n" +
+            "    and province.idProvince = :idProvince \n" +
+            "    and market_fact.idTime in (select idTime from ( select idTime from timed order by timestampD desc limit 2) as t)\n" +
+            "group by timed.idTime, province.idProvince;", nativeQuery = true)
+    List<Object[]> getNumberJobPostingInProvince(@Param("idProvince") String idProvince);
+
+    @Query(value = "with tmp as (\n" +
+            "    select distinct idTime, idCompany\n" +
+            "    from company_fact\n" +
+            "    where company_fact.idTime in (select idTime from ( select idTime from timed order by timestampD desc limit 2) as t)\n" +
+            ")\n" +
+            "select timed.idTime, concat(\"Quý \",timed.quarterD,\"/\",timed.yearD) as `time`, count(idCompany)\n" +
+            "from tmp, timed\n" +
+            "where tmp.idTime = timed.idTime\n" +
+            "group by idTime\n" +
+            "order by idTime desc;", nativeQuery = true)
+    List<Object[]> getNumberCompanyInCountry();
+
+    @Query( value = "with tmp as (\n" +
+            "    select distinct idTime, idCompany\n" +
+            "    from company_fact\n" +
+            "    where company_fact.idTime in (select idTime from ( select idTime from timed order by timestampD desc limit 2) as t)\n" +
+            "        and idProvince = :idProvince \n" +
+            ")\n" +
+            "select timed.idTime, concat(\"Quý \",timed.quarterD,\"/\",timed.yearD) as `time`, count(idCompany)\n" +
+            "from tmp, timed\n" +
+            "where tmp.idTime = timed.idTime\n" +
+            "group by idTime\n" +
+            "order by idTime desc;\n", nativeQuery = true)
+    List<Object[]> getNumberCompanyInProvince(@Param("idProvince") String idProvince);
 
     @Query(value = "select * from job fact", nativeQuery = true)
     List<Object[]> getAverageSalaryInRegion(@Param("id") String id);
 
-    @Query(value = "select * from job fact", nativeQuery = true)
-    List<Object[]> getAverageAgeInRegion(@Param("id") String id);
+    @Query( value = "select year(timestampD) as `thoi gian`, number_of_recruitment, salary\n" +
+            "from company_fact, timed\n" +
+            "where company_fact.idTime = timed.idTime\n" +
+            "    and timed.yearD between year(curdate()) - 2 and year(curdate()) -1 \n" +
+            "order by timed.idTime desc;", nativeQuery = true)
+    List<Object[]> getListSalaryInLastYearWithCountry();
+
+    @Query( value = "select year(timestampD) as `thoi gian`, number_of_recruitment, salary\n" +
+            "from company_fact, timed\n" +
+            "where company_fact.idTime = timed.idTime and idProvince = :idProvince \n" +
+            "    and timed.yearD between year(curdate()) - 2 and year(curdate()) -1 \n" +
+            "order by timed.idTime desc;", nativeQuery = true)
+    List<Object[]> getListSalaryInLastYearWithProvince(@Param("idProvince") String idProvince);
+
+    @Query(value = "select year(timestampD) as `thoi gian`, number_of_recruitment, age\n" +
+            "from company_fact, timed, age\n" +
+            "where company_fact.idTime = timed.idTime\n" +
+            "  and company_fact.idAge = age.idAge\n" +
+            "  and timed.yearD between year(curdate())-2 and year(curdate())-1 \n" +
+            "order by timed.idTime desc;", nativeQuery = true)
+    List<Object[]> getAverageAgeInCountry();
+
+    @Query( value = "select year(timestampD) as `thoi gian`, number_of_recruitment, age\n" +
+            "from company_fact, timed, age, province\n" +
+            "where company_fact.idTime = timed.idTime and company_fact.idProvince = province.idProvince\n" +
+            "  and company_fact.idAge = age.idAge and province.idProvince = :idProvince \n" +
+            "  and timed.yearD between year(curdate())-1 and year(curdate());", nativeQuery = true)
+    List<Object[]> getAverageAgeInProvince(@Param("idProvince") String idProvince);
 
     @Query(value = "select industries.idIndustry, industries.name_industry,\n" +
             "       top10.salary, top10.growth, timed.idTime,\n" +
