@@ -137,8 +137,23 @@ public interface RegionRepository extends CrudRepository<Region, String> {
             "order by timed.idTime, top10.salary desc;", nativeQuery = true)
     List<Object[]> getHighestPayingCompaniesWithProvince(@Param("idProvince") String idProvince);
 
-    @Query(value = "select * from job fact", nativeQuery = true)
-    List<Object[]> getTopHiringCompanies(@Param("id") String id);
+    @Query(value = "select company.idCompany, company.name_company,\n" +
+            "       top10.number_of_recruitment, top10.growth, timed.idTime, concat(\"Quý \",timed.quarterD,\"/\",timed.yearD) as `time`\n" +
+            "from top10_companies_with_the_highest_recruitment as top10, timed,  company\n" +
+            "where top10.idTime = timed.idTime\n" +
+            "  and top10.idCompany = company.idCompany\n" +
+            "  and top10.idTime in (select idTime from ( select idTime from timed order by timestampD desc limit 3) as t)\n" +
+            "order by timed.idTime, top10.number_of_recruitment desc;", nativeQuery = true)
+    List<Object[]> getTopHiringCompaniesWithCountry();
+
+    @Query( value ="select company.idCompany, company.name_company,\n" +
+            "       top10.number_of_recruitment, top10.growth, timed.idTime, concat(\"Quý \",timed.quarterD,\"/\",timed.yearD) as `time`\n" +
+            "from top10_companies_with_the_highest_recruitment_by_region as top10, timed,  company, province\n" +
+            "where top10.idTime = timed.idTime and top10.idProvince = province.idProvince\n" +
+            "  and top10.idCompany = company.idCompany and province.idProvince = :idProvince \n" +
+            "  and top10.idTime in (select idTime from ( select idTime from timed order by timestampD desc limit 3) as t)\n" +
+            "order by timed.idTime, top10.number_of_recruitment desc;", nativeQuery = true)
+    List<Object[]> getTopHiringCompaniesWithProvince(@Param("idProvince") String idProvince);
 
 
     @Query( value = "select sum(number_of_recruitment)\n" +
@@ -205,4 +220,16 @@ public interface RegionRepository extends CrudRepository<Region, String> {
     List<Object[]> getDemandByCompanyWithProvince(@Param("idTime") String idTime, @Param("idCompany") String idCompany,
                                                   @Param("idProvince") String idProvince);
 
+    @Query( value = "select min(salary), max(salary)\n" +
+            "from company_fact\n" +
+            "where idTime = :idTime and idCompany = :idCompany \n" +
+            "group by idTime, idCompany;", nativeQuery = true)
+    List<Object[]> getSalaryByCompanyWithCountry(@Param("idTime") String idTime, @Param("idCompany") String idCompany);
+
+    @Query( value = "select min(salary), max(salary)\n" +
+            "from company_fact\n" +
+            "where idTime = :idTime and idCompany = :idCompany and idProvince = :idProvince \n" +
+            "group by idTime,idProvince, idCompany;", nativeQuery = true)
+    List<Object[]> getSalaryByCompanyWithProvince(@Param("idTime") String idTime, @Param("idCompany") String idCompany,
+                                                  @Param("idProvince") String idProvince);
 }
