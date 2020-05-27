@@ -166,4 +166,11 @@ public interface JobRepository extends CrudRepository<Job, String> {
     // Su thay doi yeu cau ki nang theo thoi gian
 
 
+    @Query( value = " select * from age order by age;", nativeQuery = true)
+    List<Object[]> getAgeRange();
+
+    @Query( value = " select * from academic_level order by academic_level;", nativeQuery = true)
+    List<Object[]> getLiteracy();
+
+
 }

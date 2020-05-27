@@ -2,8 +2,11 @@ package com.hust.job;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -274,24 +277,57 @@ public class JobService {
         return jsonObject;
     }
 
+
     public JSONObject getJobDemandByAge(final String idJob, final String idLocation){
 
         final JSONObject jsonObject = new JSONObject();
         jsonObject.put("description", "The job demand by age");
-
-        final JSONArray ageRanges = new JSONArray();
-
-        final List<Object[]> list = jobRepository.getJobDemandByAge(idJob, idLocation);
-        for(final Object[] ob : list){
-            final HashMap<String, String> ageRange = new HashMap<String, String>();
-            ageRange.put("timestamp", ob[0].toString());
-            ageRange.put("numJob", ob[0].toString());
-            ageRange.put("gender", ob[0].toString());
-            ageRange.put("age", ob[1].toString());
-            
-            ageRanges.add(ageRange);
+        List<String> ageRanges = new ArrayList<String>();
+        final List<Object[]> listAge = jobRepository.getAgeRange();
+        for(Object[] ob : listAge){
+            ageRanges.add(ob[1].toString());
         }
-        jsonObject.put("result", ageRanges);
+        int lenAgeRange = ageRanges.size();
+        jsonObject.put("ageRange", ageRanges);
+        final List<Object[]> list = jobRepository.getJobDemandByAge(idJob, idLocation);
+        Set<String> timeSet = new HashSet<>();
+        for (Object[] ob : list){
+            timeSet.add(ob[1].toString());
+        }
+        // Math.round(Float.parseFloat(ob[4].toString()))
+        int index = 0;
+        int value = 0;
+        for(String time : timeSet){
+            final JSONObject timeObject = new JSONObject();
+            List<Integer> maleData = new ArrayList<Integer>(Collections.nCopies(lenAgeRange, 0));
+            List<Integer> femaleData = new ArrayList<Integer>(Collections.nCopies(lenAgeRange, 0));
+            for(Object[] ob : list){
+                String tempTime = ob[1].toString();
+                if(time.equals(tempTime)){
+                    index = ageRanges.indexOf(ob[6].toString());
+                    value = Math.round(Float.parseFloat(ob[4].toString()));
+                    if(ob[5].toString().equals("Nữ")){
+                        femaleData.set(index, value);
+                    }
+                    if(ob[5].toString().equals("Nam")){
+                        maleData.set(index, value);
+                    }
+                }
+            }
+            timeObject.put("male", maleData);
+            timeObject.put("female", femaleData);
+            jsonObject.put(time, timeObject);
+        }
+        // for(final Object[] ob : list){
+        //     final HashMap<String, String> ageRange = new HashMap<String, String>();
+        //     ageRange.put("timestamp", ob[0].toString());
+        //     ageRange.put("numJob", ob[0].toString());
+        //     ageRange.put("gender", ob[0].toString());
+        //     ageRange.put("age", ob[1].toString());
+            
+        //     ageRanges.add(ageRange);
+        // }
+        // jsonObject.put("result", ageRanges);
         return jsonObject;
     }
 
