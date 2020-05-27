@@ -52,17 +52,17 @@ public interface JobRepository extends CrudRepository<Job, String> {
                                     @Param("minSalary") int minSalary,
                                     @Param("maxSalary") int maxSalary);
 
-    @Query(value = "select *from job where job.idJob = :idJob;", nativeQuery = true)
+    @Query(value = "select * from job where job.idJob = :idJob ", nativeQuery = true)
     List<Object[]> getJobDescription(@Param("idJob") String idJob);
 
 
     @Query(value = "select distinct idTime, idJob, academic_level.academic_level " +
                     "from job_fact, academic_level " +
                     "where job_fact.idAcademic_Level = academic_level.idAcademic_Level " +
-                    "and job_fact.idJob = :idJob " +
+                    "and job_fact.idJob = :id " +
                     "and job_fact.idTime in ( select idTime from " + 
                         "( select idTime from timed order by timestampD desc limit 1 ) as t ); " , nativeQuery = true)
-    List<Object[]> getJobLiteracy(@Param("idJob") String idJob);
+    List<Object[]> getJobLiteracy(@Param("id") String idJob);
 
     @Query(value = "select idTime,idJob, min(salary), max(salary), sum(job_fact.number_of_recruitment) " +
                     "from job_fact " +
@@ -76,7 +76,7 @@ public interface JobRepository extends CrudRepository<Job, String> {
                     "from job_industry, job, industries " +
                     "where job.idJob = job_industry.idJob " + 
                     "and industries.idIndustry = job_industry.idIndustry " +
-                    "and job.idJob = :idJob; " , nativeQuery = true)
+                    "and job.idJob = :idJob ;" , nativeQuery = true)
     List<Object[]> getIndustryOfJob(@Param("idJob") String idJob);
 
     @Query(value = "select job.idJob, job.name_job, min(salary), max(salary), sum(number_of_recruitment) " +
@@ -106,7 +106,7 @@ public interface JobRepository extends CrudRepository<Job, String> {
                     "and job_fact.idTime in ( select idTime from ( " + 
                             "select idTime from timed order by timestampD desc limit 4 ) as t ) " +
                     "and job.idJob = :idJob and province.IdProvince = :idLocation " +
-                    "group by timed.idTime, job.idJob, province.IdProvince " , nativeQuery = true)
+                    "group by timed.idTime, job.idJob, province.IdProvince;" , nativeQuery = true)
     List<Object[]> getJobDemandByPeriodOfTime(@Param("idJob") String idJob, @Param("idLocation") String idLocation);
 
     @Query(value = "select timed.idTime,concat(\"Quý \",timed.quarterD,\"/\",timed.yearD) as `time`, " +
@@ -161,7 +161,7 @@ public interface JobRepository extends CrudRepository<Job, String> {
                         "select idTime from timed order by timestampD desc limit 3) as t ) " +
                     "and trend.idSkill = skill.idSkill and job.idJob = :idJob " + 
                     "order by timed.idTime, job.idJob desc;" , nativeQuery = true)
-    List<Object[]> getJobSkillsDemandByTime(@Param("idJob") String idJob, @Param("idLocation") String idLocation);
+    List<Object[]> getJobSkillsDemandByTime(@Param("idJob") String idJob);
 
     // Su thay doi yeu cau ki nang theo thoi gian
 
