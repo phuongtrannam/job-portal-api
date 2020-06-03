@@ -49,7 +49,7 @@ public class RegionController {
         return regionService.getRootAndSubRegions(regionId);
     }
 
-    //doing
+    //done
     @CrossOrigin(origins = "http://localhost:4200")
     @RequestMapping(value = "/regions/get_dashboard_data", method = RequestMethod.GET)
     public JSONObject getDashboardData(@RequestBody Map<String, Object> payload) throws Exception {
