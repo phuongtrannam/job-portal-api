@@ -24,21 +24,23 @@ public class JobController {
     }
 
     @CrossOrigin(origins =  "http://localhost:4200")
+    @RequestMapping(value = "/jobs/advanced_search_job", method = RequestMethod.POST)
+    public JSONObject advancedSearchJob(@RequestBody Map<String, Object> payload) throws Exception {
+        String queryContent = payload.get("queryContent").toString();
+        String location = payload.get("location").toString();
+        String industry = payload.get("industry").toString();
+        int minSalary = Integer.parseInt(payload.get("minSalary").toString());
+        int maxSalary = Integer.parseInt(payload.get("maxSalary").toString());
+        return jobService.advancedSearchJob(queryContent, location, industry, minSalary, maxSalary);
+    }
+    
+    @CrossOrigin(origins =  "http://localhost:4200")
     @RequestMapping(value = "/jobs/get_job_info", method = RequestMethod.POST)
     public JSONObject getJobInfo(@RequestBody Map<String, Object> payload) throws Exception {
         String idJob = payload.get("idJob").toString();
         return jobService.getJobInfo(idJob);
     }
 
-    @CrossOrigin(origins =  "http://localhost:4200")
-    @RequestMapping(value = "/jobs/advanced_search_job", method = RequestMethod.POST)
-    public JSONObject advancedSearchJob(@RequestBody Map<String, Object> payload) throws Exception {
-        String queryContent = payload.get("queryContent").toString();
-        String idLocation = payload.get("idLocation").toString();
-        String idIndustry = payload.get("idIndustry").toString();
-        String salary = payload.get("salary").toString();
-        return jobService.advancedSearchJob(queryContent, idLocation, idIndustry, salary);
-    }
 
     @CrossOrigin(origins =  "http://localhost:4200")
     @RequestMapping(value = "/jobs/get_related_job", method = RequestMethod.POST)
