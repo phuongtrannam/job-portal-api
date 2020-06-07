@@ -17,6 +17,13 @@ public class JobController {
     private JobService jobService;
 
     @CrossOrigin(origins =  "http://localhost:4200")
+    @RequestMapping(value = "/jobs/top_job", method = RequestMethod.POST)
+    public JSONObject getTopJob(@RequestBody Map<String, Object> payload) throws Exception {
+        String numJob = payload.get("numJob").toString();
+        return jobService.getTopJob(numJob);
+    }
+
+    @CrossOrigin(origins =  "http://localhost:4200")
     @RequestMapping(value = "/jobs/basic_search_job", method = RequestMethod.POST)
     public JSONObject basicSearchJob(@RequestBody Map<String, Object> payload) throws Exception {
         String queryContent = payload.get("queryContent").toString();

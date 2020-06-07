@@ -19,6 +19,29 @@ public class JobService {
     @Autowired
     private JobRepository jobRepository;
 
+    public JSONObject getTopJob(final String numJob){
+
+        final JSONObject jsonObject = new JSONObject();
+        jsonObject.put("description", "The top job");
+
+        final JSONArray jobArr = new JSONArray();
+
+        final List<Object[]> list = jobRepository.getTopJob(Integer.parseInt(numJob));
+        for(final Object[] ob : list){
+            final HashMap<String, String> jobObject = new HashMap<String, String>();
+            jobObject.put("id", ob[1].toString());
+            jobObject.put("name", ob[2].toString());
+            jobObject.put("gender", ob[3].toString());
+            jobObject.put("minSalary", ob[4].toString());
+            jobObject.put("maxSalary", ob[5].toString());
+            jobObject.put("numJob", ob[6].toString());
+            // jobObject.put("jobType", ob[5].toString());
+            jobArr.add(jobObject);
+        }
+        jsonObject.put("result", jobArr);
+        return jsonObject;
+    }
+
     public JSONObject basicSearchJob(final String queryContent){
 
         final JSONObject jsonObject = new JSONObject();

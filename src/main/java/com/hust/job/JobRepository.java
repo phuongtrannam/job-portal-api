@@ -9,7 +9,19 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface JobRepository extends CrudRepository<Job, String> {
-
+   
+    @Query(value = "select job_fact.idTime,job.idJob, job.name_job, gender.gender, " + 
+                    "min(salary), max(salary), sum(job_fact.number_of_recruitment) as `so luong tuyen dung` " +
+                    "from job, job_fact , job_industry, province, gender " +
+                    "where job.idJob = job_fact.idJob and job.idJob = job_industry.idJob " +
+                        "and job_fact.idGender = gender.idGender " +
+                        "and job_fact.IdProvince = province.idProvince " + 
+                        "and job_fact.idTime in ( select idTime from ( " + 
+                            "select idTime from timed order by timestampD desc limit 1 ) as t ) " +
+                    "group by job_fact.idTime,gender.idGender,job_fact.idJob " +
+                    "order by sum(job_fact.number_of_recruitment) desc limit :numJob", nativeQuery = true)
+    List<Object[]> getTopJob(@Param("numJob") int numJob);
+    
     @Query(value = "select job_fact.idTime,job.idJob, job.name_job, gender.gender, " + 
                     "min(salary), max(salary), sum(job_fact.number_of_recruitment) as `so luong tuyen dung` " +
                     "from job, job_fact , job_industry, province, gender " +
