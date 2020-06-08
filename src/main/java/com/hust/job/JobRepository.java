@@ -10,6 +10,9 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface JobRepository extends CrudRepository<Job, String> {
    
+    @Query(value = "select * from province order by Province", nativeQuery = true)
+    List<Object[]> getCityList();
+
     @Query(value = "select job_fact.idTime,job.idJob, job.name_job, gender.gender, " + 
                     "min(salary), max(salary), sum(job_fact.number_of_recruitment) as `so luong tuyen dung` " +
                     "from job, job_fact , job_industry, province, gender " +

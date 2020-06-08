@@ -19,6 +19,25 @@ public class JobService {
     @Autowired
     private JobRepository jobRepository;
 
+    public JSONObject getCityList(){
+
+        final JSONObject jsonObject = new JSONObject();
+        jsonObject.put("description", "The city list");
+
+        final JSONArray cityArr = new JSONArray();
+
+        final List<Object[]> list = jobRepository.getCityList();
+        for(final Object[] ob : list){
+            final HashMap<String, String> jobObject = new HashMap<String, String>();
+            jobObject.put("id", ob[0].toString());
+            jobObject.put("name", ob[1].toString());
+            jobObject.put("area", ob[2].toString());
+            cityArr.add(jobObject);
+        }
+        jsonObject.put("result", cityArr);
+        return jsonObject;
+    }
+
     public JSONObject getTopJob(final String numJob){
 
         final JSONObject jsonObject = new JSONObject();
