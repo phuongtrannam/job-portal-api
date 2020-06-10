@@ -11,43 +11,57 @@ public class MarketController {
     @Autowired
     private MarketService marketService;
 
-    @RequestMapping("/markets/getjobshighestsalary")
+    //done
+    @RequestMapping("/markets/get_jobs_highest_salary")
     public JSONObject getJobsHighestSalary(){
         return marketService.getJobsHighestSalary();
     }
 
-    @RequestMapping("/markets/getjobshighestrecruitment")
+    //done
+    @RequestMapping("/markets/get_jobs_highest_recruitment")
     public JSONObject getJobsHighestRecruitment(){
         return marketService.getJobsHighestRecruitment();
     }
 
-    @RequestMapping("/markets/getrecruitmentdemandbycompany")
-    public JSONObject getRecruitmentDemandByCompany(){
-        return marketService.getRecruitmentDemandByCompany();
+    //done
+    @RequestMapping("/markets/get_companies_highest_recruitment")
+    public JSONObject getCompaniesHighestRecruitment(){
+        return marketService.getCompaniesHighestRecruitment();
     }
 
-    @RequestMapping("/markets/getrecruitmentdemandbyage")
-    public JSONObject getRecruitmentDemandByAge(){
-        return marketService.getRecruitmentDemandByAge();
+    //done
+    @RequestMapping("/markets/get_companies_highest_salary")
+    public JSONObject getCompaniesHighestSalary(){
+        return marketService.getCompaniesHighestSalary();
     }
 
-    @RequestMapping("/markets/getrecruitmentdemandbyliteracy")
+    //done
+    @RequestMapping("/markets/get_recruitment_demand_with_age_gender")
+    public JSONObject getRecruitmentDemandWithAgeGender(){
+        return marketService.getRecruitmentDemandWithAgeGender();
+    }
+
+    //done
+    @RequestMapping("/markets/get_recruitment_demand_by_literacy")
     public JSONObject getRecruitmentDemandByLiteracy(){
         return marketService.getRecruitmentDemandByLiteracy();
     }
 
-    @RequestMapping("/markets/getrecruitmentdemandbyindustry")
+    //done
+    @RequestMapping("/markets/get_recruitment_demand_by_industry")
     public JSONObject getRecruitmentDemandByIndustry(){
         return marketService.getRecruitmentDemandByIndustry();
     }
 
+    //done
+    
     //Nhu cầu tuyển dụng theo thời gian
-    @RequestMapping("/markets/getrecruitmentdemandbyperiodoftime")
+    @RequestMapping("/markets/get_recruitment_demand_by_period_of_time")
     public JSONObject getRecruitmentDemandByPeriodOfTime(){
         return marketService.getRecruitmentDemandByPeriodOfTime();
     }
-
-    @RequestMapping("/markets/getaveragesalarybyindustry")
+    //done
+    @RequestMapping("/markets/get_average_salary_by_industry")
     public JSONObject getAverageSalaryByIndustry(){
         return marketService.getAverageSalaryByIndustry();
     }

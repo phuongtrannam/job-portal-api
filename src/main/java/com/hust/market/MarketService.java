@@ -1,7 +1,11 @@
 package com.hust.market;
+import com.hust.market.MarketRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -9,131 +13,114 @@ import org.json.simple.JSONObject;
 @Service
 public class MarketService {
 
-    public JSONObject getJobsHighestSalary(){
-        final JSONObject jsonObject = new JSONObject();
-        jsonObject.put("name", "the highest paid jobs");
+    private final MarketRepository marketRepository;
 
-        final JSONArray array = new JSONArray();
-        HashMap<String, String> jobDetail = new HashMap<String, String>();
-        jobDetail.put("name", "Giám đốc kinh doanh");
-        jobDetail.put("value", "50");
-        jobDetail.put("growth", "-0.5");
-        jobDetail.put("hỉing", "86");
-        array.add(jobDetail);
-        array.add(jobDetail);
-        jsonObject.put("detail",array);
+    private List<String> majorRegion = Arrays.asList("Hà Nội", "Thành phố Hồ Chí Minh");
+
+    public MarketService(MarketRepository marketRepository) {
+        this.marketRepository = marketRepository;
+    }
+
+
+    public JSONObject getJobsHighestSalary(){
+
+        final JSONObject jsonObject = new JSONObject();
+        JSONArray jobList;
+        jsonObject.put("Name", "the highest salary jobs");
+        List<Object[]> listObject  = marketRepository.getJobsHighestSalary();
+        jobList = convertQueryToJSON(listObject, "Ca nuoc","Country");
+        for(String region: majorRegion){
+            listObject = marketRepository.getJobsHighestSalaryByRegion(region);
+            jobList = concatArray(jobList, convertQueryToJSON(listObject, region,"Province"));
+        }
+//        System.out.println(jobList.size());
+        jsonObject.put("result",jobList);
         return jsonObject;
     }
 
     public JSONObject getJobsHighestRecruitment(){
         final JSONObject jsonObject = new JSONObject();
-        jsonObject.put("name", "the highest paid jobs");
+        jsonObject.put("Name", "the highest recruitment jobs");
 
-        final JSONArray array = new JSONArray();
-        HashMap<String, String> jobDetail = new HashMap<String, String>();
-        jobDetail.put("name", "Giám đốc kinh doanh");
-        jobDetail.put("value", "50");
-        jobDetail.put("growth", "-0.5");
-        jobDetail.put("hỉing", "86");
-        array.add(jobDetail);
-        array.add(jobDetail);
-        jsonObject.put("detail",array);
         return jsonObject;
     }
 
-    public JSONObject getRecruitmentDemandByCompany(){
+    public JSONObject getCompaniesHighestRecruitment(){
         final JSONObject jsonObject = new JSONObject();
-        jsonObject.put("name", "the highest paid jobs");
+        jsonObject.put("Name", "the highest recruitment companies");
 
-        final JSONArray array = new JSONArray();
-        HashMap<String, String> jobDetail = new HashMap<String, String>();
-        jobDetail.put("name", "Giám đốc kinh doanh");
-        jobDetail.put("value", "50");
-        jobDetail.put("growth", "-0.5");
-        jobDetail.put("hỉing", "86");
-        array.add(jobDetail);
-        array.add(jobDetail);
-        jsonObject.put("detail",array);
         return jsonObject;
     }
 
-    public JSONObject getRecruitmentDemandByAge(){
+    public JSONObject getCompaniesHighestSalary(){
         final JSONObject jsonObject = new JSONObject();
-        jsonObject.put("name", "the highest paid jobs");
+        jsonObject.put("Name", "the highest salary companies");
 
-        final JSONArray array = new JSONArray();
-        HashMap<String, String> jobDetail = new HashMap<String, String>();
-        jobDetail.put("name", "Giám đốc kinh doanh");
-        jobDetail.put("value", "50");
-        jobDetail.put("growth", "-0.5");
-        jobDetail.put("hỉing", "86");
-        array.add(jobDetail);
-        array.add(jobDetail);
-        jsonObject.put("detail",array);
+        System.out.println(jsonObject);
+        return jsonObject;
+    }
+
+    public JSONObject getRecruitmentDemandWithAgeGender(){
+        final JSONObject jsonObject = new JSONObject();
+        jsonObject.put("Name", "Recruitment Demand With Age Gender");
+
+        System.out.println(jsonObject);
         return jsonObject;
     }
 
     public JSONObject getRecruitmentDemandByLiteracy(){
         final JSONObject jsonObject = new JSONObject();
-        jsonObject.put("name", "the highest paid jobs");
+        jsonObject.put("Name", "the highest paid jobs");
 
-        final JSONArray array = new JSONArray();
-        HashMap<String, String> jobDetail = new HashMap<String, String>();
-        jobDetail.put("name", "Giám đốc kinh doanh");
-        jobDetail.put("value", "50");
-        jobDetail.put("growth", "-0.5");
-        jobDetail.put("hỉing", "86");
-        array.add(jobDetail);
-        array.add(jobDetail);
-        jsonObject.put("detail",array);
         return jsonObject;
     }
 
     public JSONObject getRecruitmentDemandByIndustry(){
         final JSONObject jsonObject = new JSONObject();
-        jsonObject.put("name", "the highest paid jobs");
+        jsonObject.put("Name", "Recruitment Industries");
 
-        final JSONArray array = new JSONArray();
-        HashMap<String, String> jobDetail = new HashMap<String, String>();
-        jobDetail.put("name", "Giám đốc kinh doanh");
-        jobDetail.put("value", "50");
-        jobDetail.put("growth", "-0.5");
-        jobDetail.put("hỉing", "86");
-        array.add(jobDetail);
-        array.add(jobDetail);
-        jsonObject.put("detail",array);
+        System.out.println(jsonObject);
         return jsonObject;
     }
     
 
     public JSONObject getRecruitmentDemandByPeriodOfTime(){
         final JSONObject jsonObject = new JSONObject();
-        jsonObject.put("name", "the highest paid jobs");
+        jsonObject.put("Name", "Recruitment By Period Of Time");
 
-        final JSONArray array = new JSONArray();
-        HashMap<String, String> jobDetail = new HashMap<String, String>();
-        jobDetail.put("name", "Giám đốc kinh doanh");
-        jobDetail.put("value", "50");
-        jobDetail.put("growth", "-0.5");
-        jobDetail.put("hỉing", "86");
-        array.add(jobDetail);
-        array.add(jobDetail);
-        jsonObject.put("detail",array);
+
         return jsonObject;
     }
     public JSONObject getAverageSalaryByIndustry(){
         final JSONObject jsonObject = new JSONObject();
-        jsonObject.put("name", "the highest paid jobs");
+        jsonObject.put("Name", "the highest salary industries");
 
-        final JSONArray array = new JSONArray();
-        HashMap<String, String> jobDetail = new HashMap<String, String>();
-        jobDetail.put("name", "Giám đốc kinh doanh");
-        jobDetail.put("value", "50");
-        jobDetail.put("growth", "-0.5");
-        jobDetail.put("hỉing", "86");
-        array.add(jobDetail);
-        array.add(jobDetail);
-        jsonObject.put("detail",array);
+        System.out.println(jsonObject);
         return jsonObject;
+    }
+
+    private JSONArray convertQueryToJSON(List<Object[]> resultQuery,String region , String type_area){
+        final JSONArray listObject = new JSONArray();
+        for(Object[] ob : resultQuery){
+            HashMap<String, String> object = new HashMap<>();
+            object.put("time",ob[1].toString());
+            object.put("name",ob[ob.length - 4].toString());
+            object.put("value",ob[ob.length - 3].toString());
+            object.put("growth",ob[ob.length - 2].toString());
+            object.put("area", region);
+            object.put("type",type_area);
+            listObject.add(object);
+        }
+        return listObject;
+    }
+
+    private JSONArray concatArray(JSONArray... arrs) {
+        JSONArray result = new JSONArray();
+        for (JSONArray arr : arrs) {
+            for (int i = 0; i < arr.size(); i++) {
+                result.add(arr.get(i));
+            }
+        }
+        return result;
     }
 }
