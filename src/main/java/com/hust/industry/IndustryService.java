@@ -171,7 +171,8 @@ public class IndustryService {
         JSONArray growthArray = new JSONArray();
 
         if(locationId.equals("")){
-            List<Object[]> list = industryRepository.getJobDemandByIndustryWithCountry(industryId);
+            int idIndustry = Integer.valueOf(industryId.replace("I", ""));
+            List<Object[]> list = industryRepository.getJobDemandByIndustryWithCountry(idIndustry);
             extractDataJob(growth, preNumJob, timeArray, dataArray, growthArray, list);
             regionObject.put("name", "Cả nước");
             regionObject.put("data", dataArray);
@@ -180,7 +181,9 @@ public class IndustryService {
             jsonObject.put("ALL", regionObject);
         }
         else if(locationId.contains("P")){
-            List<Object[]> list = industryRepository.getJobDemandByIndustryWithProvince(industryId, locationId);
+            int idIndustry = Integer.valueOf(industryId.replace("I", ""));
+            int idProvince = Integer.valueOf(locationId.replace("P", ""));
+            List<Object[]> list = industryRepository.getJobDemandByIndustryWithProvince(idIndustry, idProvince);
             extractDataJob(growth, preNumJob, timeArray, dataArray, growthArray, list);
             regionObject.put("name", list.get(0)[1]);
             regionObject.put("data", dataArray);
