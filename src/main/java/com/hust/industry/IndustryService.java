@@ -22,26 +22,34 @@ public class IndustryService {
         final JSONArray industryList = new JSONArray();
         String idIndustry = "";
         double numJob = 0;
-        HashMap<String, String> industryObject = new HashMap<String, String>();
+        double growth = 0;
+        boolean flag = false;
+        HashMap<String, Object> industryObject = new HashMap<String, Object>();
 
         List<Object[]> list = industryRepository.getIndustryList();
         for(Object[] ob : list){
             if(idIndustry.equals(ob[1].toString())){
-                double growth = ((numJob/(double)ob[ob.length -3]) - 1)*100;
-                industryObject.put("numJob", ob[ob.length -3].toString());
-                industryObject.put("id", ob[1].toString());
-                industryObject.put("name", ob[2].toString());
-//                industryObject.put("description", ob[ob.length -1].toString());
-                double avgSalary = (double) ob[ob.length -2];
-                industryObject.put("averageSalary", String.valueOf(round(avgSalary,2)));
-                industryObject.put("growth", String.valueOf(round(growth,2)));
+                flag = true;
+                growth = ((numJob/(double)ob[ob.length -3]) - 1)*100;
+                industryObject.put("growth", round(growth,2));
                 industryList.add(industryObject);
                 industryObject = new HashMap<>();
                 continue;
 
             }
+            if (!idIndustry.equals("") && !idIndustry.equals(ob[1].toString()) && !flag){
+                industryList.add(industryObject);
+                industryObject = new HashMap<>();
+                flag = false;
+            }
             idIndustry = ob[1].toString();
             numJob = (double) ob[ob.length -3];
+            industryObject.put("numJob", (int) numJob );
+            industryObject.put("id", ob[1]);
+            industryObject.put("name", ob[2].toString());
+//                industryObject.put("description", ob[ob.length -1].toString());
+            double avgSalary = (double) ob[ob.length -2];
+            industryObject.put("averageSalary", round(avgSalary,2));
 //            industryObject.put("growth", ob[0].toString());
 //            industryList.add(industryObject);
         }

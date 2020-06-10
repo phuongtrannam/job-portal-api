@@ -13,13 +13,12 @@ public interface IndustryRepository extends CrudRepository<Industry, String> {
 
 
     @Query(value = "select timed.yearD,industries.idIndustry, industries.name_industry,\n" +
-            "       sum(job_fact.number_of_recruitment), avg(job_fact.salary), industries.`description`\n" +
-            "from job_fact, industries , job_industry, timed\n" +
-            "where job_fact.idJob = job_industry.idJob and job_fact.idTime = timed.idTime\n" +
-            "  and job_industry.idIndustry = industries.idIndustry\n" +
-            "  and timed.yearD between year(curdate())-1 and year(curdate())\n" +
+            "       sum(market_fact.number_of_recruitment), avg(market_fact.salary), industries.`description`\n" +
+            "from market_fact, industries, timed\n" +
+            "where market_fact.idIndustry = industries.idIndustry and timed.idTime = market_fact.idTime\n" +
+            "  and timed.yearD between year(curdate())-2 and year(curdate())-1\n" +
             "group by timed.yearD, industries.idIndustry\n" +
-            "order by industries.idIndustry, sum(job_fact.number_of_recruitment) desc;\n" , nativeQuery = true)
+            "order by industries.idIndustry, sum(market_fact.number_of_recruitment) desc;" , nativeQuery = true)
     List<Object[]> getIndustryList();
 
     @Query(value = "select job.idJob, job.name_job,\n" +
