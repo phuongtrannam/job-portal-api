@@ -45,7 +45,7 @@ public class IndustryService {
 //            industryObject.put("growth", ob[0].toString());
 //            industryList.add(industryObject);
         }
-        jsonObject.put("value", industryList);
+        jsonObject.put("result", industryList);
         return jsonObject;
     }
 
@@ -139,7 +139,7 @@ public class IndustryService {
         final JSONObject jsonObject = new JSONObject();
         jsonObject.put("description", "The top company by industry");
 
-        jsonObject.put("value", companyList);
+        jsonObject.put("result", companyList);
         return jsonObject;
     }
 

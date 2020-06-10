@@ -31,7 +31,7 @@ public class JobService {
             final HashMap<String, String> jobObject = new HashMap<String, String>();
             jobObject.put("id", ob[0].toString());
             jobObject.put("name", ob[1].toString());
-            jobObject.put("area", ob[2].toString());
+            // jobObject.put("area", ob[2].toString());
             cityArr.add(jobObject);
         }
         jsonObject.put("result", cityArr);
@@ -53,7 +53,7 @@ public class JobService {
             jobObject.put("gender", ob[3].toString());
             jobObject.put("minSalary", ob[4].toString());
             jobObject.put("maxSalary", ob[5].toString());
-            jobObject.put("numJob", ob[6].toString());
+            jobObject.put("numJob", String.valueOf(Math.round(Float.parseFloat(ob[6].toString()))));
             // jobObject.put("jobType", ob[5].toString());
             jobArr.add(jobObject);
         }
