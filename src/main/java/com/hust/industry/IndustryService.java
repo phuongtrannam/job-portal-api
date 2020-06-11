@@ -284,8 +284,8 @@ public class IndustryService {
         JSONObject timeObject = new JSONObject();
 
         if(locationId.equals("")){
-            System.out.println(industryId);
-            List<Object[]> list = industryRepository.getTopHiringCompanyWithCountry(industryId);
+            int idIndustry = Integer.valueOf(industryId.replace("I", ""));
+            List<Object[]> list = industryRepository.getTopHiringCompanyWithCountry(idIndustry);
 
             String timestamp = list.get(0)[0].toString();
 
@@ -301,12 +301,13 @@ public class IndustryService {
                     growthArray = new JSONArray();
                     timestamp = ob[0].toString();
                 }
-                HashMap<String , String> companyObject = new HashMap<>();
-                companyObject.put("id",ob[1].toString());
+                HashMap<String , Object> companyObject = new HashMap<>();
+                companyObject.put("id", "C" + ob[1].toString());
                 companyObject.put("name", ob[2].toString());
                 companyArray.add(companyObject);
-                dataArray.add(ob[ob.length -2].toString());
-                growthArray.add(ob[ob.length -1].toString());
+                double numJob = (double) ob[ob.length -2];
+                dataArray.add((int) numJob);
+                growthArray.add(ob[ob.length -1]);
             }
             timeObject.put("company",companyArray);
             timeObject.put("data", dataArray);
@@ -314,11 +315,13 @@ public class IndustryService {
             jsonObject.put(timestamp, timeObject);
         }
         else if(locationId.contains("P")){
-            System.out.println(industryId);
-            List<Object[]> list = industryRepository.getTopHiringCompanyWithProvince(industryId, locationId);
+//            System.out.println(industryId);
+            int idIndustry = Integer.valueOf(industryId.replace("I", ""));
+            int idProvince  = Integer.valueOf(locationId.replace("P",""));
+            List<Object[]> list = industryRepository.getTopHiringCompanyWithProvince(idIndustry, idProvince);
 
             String timestamp = list.get(0)[0].toString();
-            String idTime = null;
+            int idTime = 0;
 
             for(Object[] ob : list){
                 if(!Objects.equals(timestamp, ob[0].toString())){
@@ -333,14 +336,15 @@ public class IndustryService {
                     timestamp = ob[0].toString();
                 }
                 HashMap<String , String> companyObject = new HashMap<>();
-                companyObject.put("id",ob[1].toString());
+                companyObject.put("id", "C" + ob[1].toString());
                 companyObject.put("name", ob[2].toString());
                 companyArray.add(companyObject);
-                dataArray.add(ob[ob.length -2].toString());
-                idTime = ob[ob.length-1].toString();
-                String lastIdTime = "T" + ((Character.getNumericValue(idTime.charAt(1))) - 1);
-//                List<Object[]> recruitmentOfCompanyInQuarter = industryRepository.getRecruitmentOfCompanyInQuarter(lastIdTime, ob[1].toString(), locationId, industryId);
-//                getGrowthValue(growthArray, (double) ob[ob.length -2], recruitmentOfCompanyInQuarter);
+                double numJob = (double) ob[ob.length -2];
+                dataArray.add((int)numJob);
+                idTime = (int) ob[ob.length-1];
+                int lastIdTime = idTime - 1;
+                List<Object[]> recruitmentOfCompanyInQuarter = industryRepository.getRecruitmentOfCompanyInQuarter(lastIdTime,(int) ob[1], idProvince, idIndustry);
+                getGrowthValue(growthArray, (double) ob[ob.length -2], recruitmentOfCompanyInQuarter);
             }
             timeObject.put("company",companyArray);
             timeObject.put("data", dataArray);
@@ -439,9 +443,9 @@ public class IndustryService {
         try {
             double valueInLastQuarter = (double) pastValue.get(0)[1];
             growth = ((valueNow / valueInLastQuarter) - 1) * 100;
-            growthArray.add(String.valueOf(round(growth, 2)));
+            growthArray.add(round(growth, 2));
         } catch (Exception e) {
-            growthArray.add("");
+            growthArray.add(0.0);
         }
     }
 

@@ -97,24 +97,26 @@ public interface IndustryRepository extends CrudRepository<Industry, String> {
             "    and top.idTime = timed.idTime\n" +
             "    and top.idTime in (select idTime from (select idTime from timed order by timestampD desc limit 3) as t)\n" +
             "    and industries.idIndustry = :industryId \n;", nativeQuery = true)
-    List<Object[]> getTopHiringCompanyWithCountry(@Param("industryId") String industryId);
+    List<Object[]> getTopHiringCompanyWithCountry(@Param("industryId") int industryId);
 
     @Query( value = "with rank_companies_1 as (\n" +
             "select company.idCompany, company.name_company,\n" +
             "       sum(number_of_recruitment) as `so luong tuyen dung`,\n" +
             "       concat(\"Quý \",timed.quarterD,\"/\",timed.yearD) as `time`, timed.idTime,\n" +
             "       rank() over (partition by idTime,province.idProvince, industries.idIndustry order by sum(number_of_recruitment) desc) as `rank`\n" +
-            "from company_fact, timed, company, industries, province\n" +
-            "where company_fact.idTime = timed.idTime and company_fact.idProvince = province.idProvince\n" +
-            "    and company_fact.idIndustry = industries.idIndustry and company_fact.idCompany = company.idCompany\n" +
-            "    and company_fact.idProvince = :locationId and company_fact.idIndustry = :industryId\n" +
-            "group by timed.idTime, province.idProvince, industries.idIndustry, company_fact.idCompany\n" +
+            "from\n" +
+            "    (select distinct idTime, idCompany, idProvince, idIndustry, idJob, number_of_recruitment\n" +
+            "from company_fact) as fact, timed, company, industries, province\n" +
+            "where fact.idTime = timed.idTime and fact.idProvince = province.idProvince\n" +
+            "    and fact.idIndustry = industries.idIndustry and fact.idCompany = company.idCompany\n" +
+            "    and fact.idProvince = :locationId and fact.idIndustry = :industryId\n" +
+            "group by timed.idTime, province.idProvince, industries.idIndustry, fact.idCompany\n" +
             "order by idTime, province.idProvince, industries.idIndustry,sum(number_of_recruitment) desc)\n" +
             "select `time`, idCompany, name_company, `so luong tuyen dung`, idTime\n" +
             "from rank_companies_1\n" +
             "where `rank` <= 10\n" +
-            "  and rank_companies_1.idTime in ( select idTime from ( select idTime from timed order by timestampD desc limit 3 ) as t );\n", nativeQuery = true)
-            List<Object[]> getTopHiringCompanyWithProvince(@Param("industryId") String industryId, @Param("locationId") String locationId);
+            "  and rank_companies_1.idTime in ( select idTime from ( select idTime from timed order by timestampD desc limit 3 ) as t );", nativeQuery = true)
+            List<Object[]> getTopHiringCompanyWithProvince(@Param("industryId") int industryId, @Param("locationId") int locationId);
 
     
     @Query(value = "with rank_companies_4 as (\n" +
