@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.w3c.dom.ls.LSInput;
 
+import javax.persistence.OneToMany;
 import javax.persistence.criteria.CriteriaBuilder;
 
 @Service
@@ -567,15 +568,18 @@ public class IndustryService {
         jsonObject.put("ageRange", ageRangeArray);
 
         int count = 0;
-        String[] listMale = new String[ageRangeArray.size()];
-        String[] listFeMale = new String[ageRangeArray.size()];
+        Object[] listMale = new Object[ageRangeArray.size()];
+        Object[] listFeMale = new Object[ageRangeArray.size()];
         if( locationId.equals("")){
-            List<Object[]> list = industryRepository.getJobDemandByAgeWithCountry(industryId);
+            int idIndustry = Integer.valueOf(industryId.replace("I",""));
+            List<Object[]> list = industryRepository.getJobDemandByAgeWithCountry(idIndustry);
             getJSONJobDemandByAge(jsonObject, timeObject, ageRangeArray, listMale, listFeMale, list);
 
         }
         else if ( locationId.contains("P")){
-            List<Object[]> list = industryRepository.getJobDemandByAgeWithProvince(industryId, locationId);
+            int idIndustry = Integer.valueOf(industryId.replace("I",""));
+            int idProvince = Integer.valueOf(locationId.replace("P",""));
+            List<Object[]> list = industryRepository.getJobDemandByAgeWithProvince(idIndustry, idProvince);
             getJSONJobDemandByAge(jsonObject, timeObject, ageRangeArray, listMale, listFeMale, list);
         }
 
@@ -583,7 +587,7 @@ public class IndustryService {
         return jsonObject;
     }
 
-    private void getJSONJobDemandByAge(JSONObject jsonObject, JSONObject timeObject, JSONArray ageRangeArray, String[] listMale, String[] listFeMale, List<Object[]> list) {
+    private void getJSONJobDemandByAge(JSONObject jsonObject, JSONObject timeObject, JSONArray ageRangeArray, Object[] listMale, Object[] listFeMale, List<Object[]> list) {
         JSONArray maleArray;
         JSONArray femaleArray;
         String time = list.get(0)[0].toString();
@@ -605,10 +609,10 @@ public class IndustryService {
                     System.out.println(ageRangeArray.indexOf(age));
                     int index = ageRangeArray.indexOf(age);
                     if(ob[ob.length-1].toString().equals("Nam")){
-                        listMale[index] = ob[1].toString();
+                        listMale[index] = (int) (double)ob[1];
                     }
                     else {
-                        listFeMale[index] = ob[1].toString();
+                        listFeMale[index] = (int) (double) ob[1];
                     }
                 }
             }
