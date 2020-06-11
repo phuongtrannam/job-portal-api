@@ -52,7 +52,7 @@ public class IndustryController {
         return industryService.getJobDemandByIndustry(industryId, locationId);
     }
 
-    //todo
+    //done
     @CrossOrigin(origins = "http://localhost:4200")
     @RequestMapping(value = "/industries/get_job_demand_sub_region", method = RequestMethod.GET)
     public JSONObject getJobDemandInSubRegion(@RequestBody Map<String, Object> payload) throws Exception {

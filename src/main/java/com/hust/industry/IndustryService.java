@@ -1,5 +1,6 @@
 package com.hust.industry;
 
+import java.beans.IntrospectionException;
 import java.util.*;
 
 import org.json.simple.JSONArray;
@@ -7,6 +8,8 @@ import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.w3c.dom.ls.LSInput;
+
+import javax.persistence.criteria.CriteriaBuilder;
 
 @Service
 public class IndustryService {
@@ -135,7 +138,7 @@ public class IndustryService {
                 companyObject.put("averageSalary", round((double)ob[3],2));
                 double numJob = (double) ob[2];
                 companyObject.put("numJob", (int) numJob);
-                int lastIdTime = idTime + 1 ;
+                int lastIdTime = idTime - 1 ;
                 System.out.println(lastIdTime);
                 List<Object[]> recruitmentOfCompanyInQuarter = industryRepository.getRecruitmentOfCompanyInQuarter(lastIdTime,idCompany,idProvince, idIndustry);
                 double growth = 0;
@@ -201,8 +204,8 @@ public class IndustryService {
                 growth = (((double) ob[ob.length -1]/preNumJob) -1)*100;
             }
             timeArray.add(ob[ob.length -2].toString());
-            dataArray.add(ob[ob.length -1].toString());
-            growthArray.add(String.valueOf(round(growth,2)));
+            dataArray.add(ob[ob.length -1]);
+            growthArray.add(round(growth,2));
             preNumJob = (double) ob[ob.length -1];
         }
     }
@@ -212,36 +215,53 @@ public class IndustryService {
         jsonObject.put("description", "The job demand by industry in subregion");
         double growth = 0;
         double preNumJob = 0;
+        double numJob = 0;
         JSONArray timeArray = new JSONArray();
         JSONArray dataArray = new JSONArray();
         JSONArray growthArray = new JSONArray();
 
         if( locationId.equals("")){
-            List<Object[]> list = industryRepository.getJobDemandInSubRegionOfCountry(industryId);
-            String regionId = list.get(0)[1].toString();
+            int idIndustry = Integer.valueOf(industryId.replace("I",""));
+            List<Object[]> list = industryRepository.getJobDemandInSubRegionOfCountry(idIndustry);
+            List<Object[]> listTime = industryRepository.getTime();
+            for (Object[] ob : listTime){
+                timeArray.add(ob[0].toString());
+            }
+            Integer[] listData = new Integer[timeArray.size()];
+            Double[] listGrowth = new Double[timeArray.size()];
+            int regionId = (int) list.get(0)[1];
             String nameSubRegion = list.get(0)[2].toString();
             for (Object[] ob: list){
-                if(!regionId.equals(ob[1].toString())){
+                if(regionId != (int)ob[1]){
                     JSONObject subRegionObject = new JSONObject();
                     subRegionObject.put("nameRegion",nameSubRegion);
+                    dataArray = convertArrayToJSON(listData);
                     subRegionObject.put("data", dataArray);
+                    growthArray = convertArrayToJSON(listGrowth);
                     subRegionObject.put("growth", growthArray);
-                    jsonObject.put(regionId, subRegionObject);
+                    listData = new Integer[timeArray.size()];
+                    listGrowth = new Double[timeArray.size()];
+                    jsonObject.put("P" + regionId, subRegionObject);
                     nameSubRegion = ob[2].toString();
-                    regionId = ob[1].toString();
+                    regionId = (int) ob[1];
                     preNumJob = 0;
                     growth = 0;
-                    timeArray = new JSONArray();
                     dataArray = new JSONArray();
                     growthArray = new JSONArray();
                 }
-                if(preNumJob != 0){
-                    growth = (((double) ob[ob.length -1]/preNumJob) -1)*100;
+                for(Object time : timeArray){
+                    if (ob[ob.length -2].toString().equals(time.toString())){
+                        if(preNumJob != 0){
+                            growth = (((double) ob[ob.length -1]/preNumJob) -1)*100;
+                        }
+                        numJob = (double) ob[ob.length -1];
+                        int index = timeArray.indexOf(time);
+                        listData[index] = (int) numJob;
+                        listGrowth[index] = round(growth,2);
+                        preNumJob = (double) ob[ob.length -1];
+                        break;
+                    }
                 }
-                timeArray.add(ob[ob.length -2].toString());
-                dataArray.add(ob[ob.length -1].toString());
-                growthArray.add(String.valueOf(round(growth,2)));
-                preNumJob = (double) ob[ob.length -1];
             }
             JSONObject subRegionObject = new JSONObject();
             subRegionObject.put("nameRegion",nameSubRegion);
@@ -683,10 +703,18 @@ public class IndustryService {
     }
 
 
-    public static JSONArray convertArrayToJSON( String[] myArray){
+    public static JSONArray convertArrayToJSON( Object[] myArray){
         JSONArray jsArray = new JSONArray();
 
         for (int i = 0; i < myArray.length; i++) {
+            if(myArray[i] == null){
+                try{
+                    myArray[i] = 0.0;
+                }
+                catch (Exception e){
+                    myArray[i] = 0;
+                }
+            }
             jsArray.add(myArray[i]);
         }
         return jsArray;
