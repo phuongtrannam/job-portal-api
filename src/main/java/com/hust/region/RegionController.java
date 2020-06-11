@@ -16,7 +16,7 @@ public class RegionController {
     @Autowired
     private RegionService regionService;
 
-    //todo
+    //done
     @CrossOrigin(origins = "http://localhost:4200")
     @RequestMapping(value = "/regions/basic_region_searching", method = RequestMethod.GET)
     public JSONObject basicRegionSearching(@RequestBody Map<String, Object> payload) throws Exception {
@@ -83,7 +83,7 @@ public class RegionController {
 
     //done
     @CrossOrigin(origins = "http://localhost:4200")
-    @RequestMapping(value = "/regions/get_highest_demand_jobs", method = RequestMethod.GET)
+        @RequestMapping(value = "/regions/get_highest_demand_jobs", method = RequestMethod.GET)
     public JSONObject getHighestDemandJobs(@RequestBody Map<String, Object> payload) throws Exception {
         String regionId = payload.get("id").toString();
         return regionService.getHighestDemandJobs(regionId);
