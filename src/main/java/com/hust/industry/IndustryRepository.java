@@ -218,7 +218,7 @@ public interface IndustryRepository extends CrudRepository<Industry, String> {
             "    and market_fact.idTime in (select idTime from (select idTime from timed order by timestampD desc limit 4) as t )\n" +
             "group by timed.idTime,industries.idIndustry, academic_level.idAcademic_Level\n" +
             "order by timed.timestampD, academic_level.academic_level;", nativeQuery = true)
-    List<Object[]> getJobDemandByLiteracyWithCountry(@Param("industryId") String industryId);
+    List<Object[]> getJobDemandByLiteracyWithCountry(@Param("industryId") int industryId);
 
     @Query( value = "select concat(\"Quý \",timed.quarterD,\"/\",timed.yearD) as `time`,\n" +
             "       sum(market_fact.number_of_recruitment),\n" +
@@ -230,7 +230,7 @@ public interface IndustryRepository extends CrudRepository<Industry, String> {
             "  and market_fact.idTime in (select idTime from (select idTime from timed order by timestampD desc limit 4) as t )\n" +
             "group by timed.idTime,industries.idIndustry,province.idProvince, academic_level.idAcademic_Level\n" +
             "order by timed.timestampD, academic_level.academic_level;", nativeQuery = true)
-    List<Object[]> getjobDemandByLiteracyWithProvince(@Param("industryId") String industryId, @Param("locationId") String locationId);
+    List<Object[]> getjobDemandByLiteracyWithProvince(@Param("industryId") int industryId, @Param("locationId") int locationId);
 
 
 

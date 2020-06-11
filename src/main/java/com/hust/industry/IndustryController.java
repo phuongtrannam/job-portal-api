@@ -102,7 +102,7 @@ public class IndustryController {
         return industryService.getJobDemandByAge(industryId, locationId);
     }
 
-    //todo
+    //done
     @CrossOrigin(origins = "http://localhost:4200")
     @RequestMapping(value = "/industries/get_job_demand_by_literacy", method = RequestMethod.GET)
     public JSONObject getJobDemandByLiteracy(@RequestBody Map<String, Object> payload) throws Exception {

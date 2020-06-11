@@ -7,7 +7,6 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.w3c.dom.ls.LSInput;
 
 import javax.persistence.OneToMany;
 import javax.persistence.criteria.CriteriaBuilder;
@@ -636,41 +635,44 @@ public class IndustryService {
         JSONArray growthArray = new JSONArray();
         List<Object[]> listObjectLiteracy = industryRepository.getLiteracy();
         for( Object[] ob : listObjectLiteracy){
-            HashMap<String, String> literacyObject = new HashMap<>();
+            HashMap<String, Object> literacyObject = new HashMap<>();
             literacyObject.put("id", ob[0].toString());
             literacyObject.put("name",ob[1].toString());
             literacyArray.add(literacyObject);
             listLiteracy.add(ob[0].toString());
         }
         jsonObject.put("literacy",literacyArray);
-        String[] listValueLiteracy = new String[listLiteracy.size()];
-        String[] listPastValueLiteracy = new String[listLiteracy.size()];
-        String[] listGrowth = new String[listLiteracy.size()];
+        Object[] listValueLiteracy = new Object[listLiteracy.size()];
+        Object[] listPastValueLiteracy = new Object[listLiteracy.size()];
+        Object[] listGrowth = new Object[listLiteracy.size()];
         System.out.println(listLiteracy.toString());
         if(locationId.equals("")){
-            List<Object[]> list = industryRepository.getJobDemandByLiteracyWithCountry(industryId);
+            int idIndustry = Integer.valueOf(industryId.replace("I",""));
+            List<Object[]> list = industryRepository.getJobDemandByLiteracyWithCountry(idIndustry);
             getJSONJobDemandLiteracy(jsonObject, listLiteracy, timeObject, listValueLiteracy, listPastValueLiteracy, listGrowth, list);
         }
         else if (locationId.contains("P")){
-            List<Object[]> list = industryRepository.getjobDemandByLiteracyWithProvince(industryId, locationId);
+            int idIndustry = Integer.valueOf(industryId.replace("I",""));
+            int idProvince = Integer.valueOf(locationId.replace("P",""));
+            List<Object[]> list = industryRepository.getjobDemandByLiteracyWithProvince(idIndustry, idProvince);
             getJSONJobDemandLiteracy(jsonObject, listLiteracy, timeObject, listValueLiteracy, listPastValueLiteracy, listGrowth, list);
         }
         return jsonObject;
     }
 
-    private void getJSONJobDemandLiteracy(JSONObject jsonObject, List<String> listLiteracy, JSONObject timeObject, String[] listValueLiteracy, String[] listPastValueLiteracy, String[] listGrowth, List<Object[]> list) {
+    private void getJSONJobDemandLiteracy(JSONObject jsonObject, List<String> listLiteracy, JSONObject timeObject, Object[] listValueLiteracy, Object[] listPastValueLiteracy, Object[] listGrowth, List<Object[]> list) {
         JSONArray dataArray;
         JSONArray growthArray;
         String time = list.get(0)[0].toString();
         for(Object[] ob : list){
-            System.out.println(ob[0].toString());
-            System.out.println(ob[1].toString());
-            System.out.println(ob[2].toString());
+//            System.out.println(ob[0].toString());
+//            System.out.println(ob[1].toString());
+//            System.out.println(ob[2].toString());
             if(!time.equals(ob[0].toString())) {
                 if(!checkArrayStringNotNull(listPastValueLiteracy)){
                     time = ob[0].toString();
                     listPastValueLiteracy = listValueLiteracy.clone();
-                    listValueLiteracy = new String[listLiteracy.size()];
+                    listValueLiteracy = new Object[listLiteracy.size()];
                 }
                 else{
                     dataArray = convertArrayToJSON(listValueLiteracy);
@@ -679,8 +681,8 @@ public class IndustryService {
                     timeObject.put("growth", growthArray);
                     jsonObject.put(time, timeObject);
                     listPastValueLiteracy = listValueLiteracy.clone();
-                    listValueLiteracy = new String[listLiteracy.size()];
-                    listGrowth = new String[listLiteracy.size()];
+                    listValueLiteracy = new Object[listLiteracy.size()];
+                    listGrowth = new Object[listLiteracy.size()];
                     timeObject = new JSONObject();
                     time = ob[0].toString();
                 }
@@ -688,12 +690,13 @@ public class IndustryService {
             for(String literacy: listLiteracy){
                 int index = listLiteracy.indexOf(literacy);
                 if(ob[ob.length - 2].toString().equals(literacy)){
-                    listValueLiteracy[index] = ob[1].toString();
+                    listValueLiteracy[index] = (int) (double) ob[1];
                     try {
-                        double growth = ((Double.parseDouble(listValueLiteracy[index]) / Double.parseDouble(listPastValueLiteracy[index])) - 1) * 100;
-                        listGrowth[index] = String.valueOf(round(growth, 2));
+                        double growth = (( (double)(int)listValueLiteracy[index] / (double) (int) listPastValueLiteracy[index]) - 1) * 100;
+                        listGrowth[index] = round(growth, 2);
                     } catch (Exception e) {
-                        listGrowth[index] = null;
+                        System.out.println(e);
+                        listGrowth[index] = 0.0;
                     }
                 }
             }
@@ -733,8 +736,8 @@ public class IndustryService {
         return jsArray;
     }
 
-    public static boolean checkArrayStringNotNull( String[] list){
-        for( String i: list){
+    public static boolean checkArrayStringNotNull( Object[] list){
+        for( Object i: list){
             if( i != null){
                 return true;
             }
