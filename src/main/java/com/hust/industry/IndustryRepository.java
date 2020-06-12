@@ -13,13 +13,12 @@ public interface IndustryRepository extends CrudRepository<Industry, String> {
 
 
     @Query(value = "select timed.yearD,industries.idIndustry, industries.name_industry,\n" +
-            "       sum(job_fact.number_of_recruitment), avg(job_fact.salary), industries.`description`\n" +
-            "from job_fact, industries , job_industry, timed\n" +
-            "where job_fact.idJob = job_industry.idJob and job_fact.idTime = timed.idTime\n" +
-            "  and job_industry.idIndustry = industries.idIndustry\n" +
-            "  and timed.yearD between year(curdate())-1 and year(curdate())\n" +
+            "       sum(market_fact.number_of_recruitment), avg(market_fact.salary), industries.`description`\n" +
+            "from market_fact, industries, timed\n" +
+            "where market_fact.idIndustry = industries.idIndustry and timed.idTime = market_fact.idTime\n" +
+            "  and timed.yearD between year(curdate())-2 and year(curdate())-1\n" +
             "group by timed.yearD, industries.idIndustry\n" +
-            "order by industries.idIndustry, sum(job_fact.number_of_recruitment) desc;\n" , nativeQuery = true)
+            "order by industries.idIndustry, sum(market_fact.number_of_recruitment) desc;" , nativeQuery = true)
     List<Object[]> getIndustryList();
 
     @Query(value = "select job.idJob, job.name_job,\n" +
@@ -31,8 +30,8 @@ public interface IndustryRepository extends CrudRepository<Industry, String> {
             "  and job_fact.idTime in (select idTime from (select idTime from timed order by timestampD desc limit 2) as t )\n" +
             "  and industries.idIndustry = :industryId\n" +
             "group by job_fact.idTime,industries.idIndustry, job.idJob\n" +
-            "order by industries.idIndustry, job.idJob, timed.idTime desc;", nativeQuery = true)
-    List<Object[]> getJobListByIndustry(@Param("industryId") String industryId);
+            "order by industries.idIndustry, job.idJob, timed.idTime;", nativeQuery = true)
+    List<Object[]> getJobListByIndustry(@Param("industryId") int industryId);
 
     @Query(value = "select company.idCompany, company.name_company,\n" +
             "       top.number_of_recruitment, top.growth, top.rank_company,\n" +
@@ -42,7 +41,7 @@ public interface IndustryRepository extends CrudRepository<Industry, String> {
             "  and industries.idIndustry = :industryId\n" +
             "  and top.idTime in ( select idTime from ( select idTime from timed order by timestampD desc limit 1 ) as t )\n" +
             "order by top.idTime,top.idIndustry, top.number_of_recruitment desc;", nativeQuery = true)
-    List<Object[]> getTopCompanyByIndustryWithCountry(@Param("industryId") String industryId);
+    List<Object[]> getTopCompanyByIndustryWithCountry(@Param("industryId") int industryId);
 
     @Query(value = "with rank_companies_1 as (\n" +
             "select company.idCompany, company.name_company,\n" +
@@ -59,7 +58,7 @@ public interface IndustryRepository extends CrudRepository<Industry, String> {
             "from rank_companies_1\n" +
             "where `rank` <= 10\n" +
             "  and rank_companies_1.idTime in ( select idTime from ( select idTime from timed order by timestampD desc limit 1 ) as t );", nativeQuery = true)
-    List<Object[]> getTopCompanyByIndustryWithProvince(@Param("idProvince") String idProvince, @Param("industryId") String industryId);
+    List<Object[]> getTopCompanyByIndustryWithProvince(@Param("idProvince") int idProvince, @Param("industryId") int industryId);
 
     @Query(value = "select timed.idTime, industries.name_industry,\n" +
             "       concat(\"Quý \",timed.quarterD,\"/\",timed.yearD) as `time`, sum(market_fact.number_of_recruitment)\n" +
@@ -69,7 +68,7 @@ public interface IndustryRepository extends CrudRepository<Industry, String> {
             "  and industries.idIndustry = :industryId\n" +
             "group by market_fact.idTime,industries.idIndustry\n" +
             "order by market_fact.idTime;", nativeQuery = true)
-    List<Object[]> getJobDemandByIndustryWithCountry(@Param("industryId") String industryId );
+    List<Object[]> getJobDemandByIndustryWithCountry(@Param("industryId") int industryId );
 
     @Query( value = "select timed.idTime, province.province, industries.name_industry,\n" +
             "       concat(\"Quý \",timed.quarterD,\"/\",timed.yearD) as `time`, sum(market_fact.number_of_recruitment)\n" +
@@ -79,7 +78,7 @@ public interface IndustryRepository extends CrudRepository<Industry, String> {
             "  and province.idProvince = :locationId and industries.idIndustry = :industryId\n" +
             "group by market_fact.idTime, province.idProvince, industries.idIndustry\n" +
             "order by market_fact.idTime;", nativeQuery = true)
-    List<Object[]> getJobDemandByIndustryWithProvince(@Param("industryId") String industryId, @Param("locationId") String locationId);
+    List<Object[]> getJobDemandByIndustryWithProvince(@Param("industryId") int industryId, @Param("locationId") int locationId);
     
     @Query(value = "select industries.name_industry, province.idProvince, Province, timed.idTime,\n" +
             "       concat(\"Quý \",timed.quarterD,\"/\",timed.yearD) as `time`, sum(market_fact.number_of_recruitment)\n" +
@@ -88,8 +87,8 @@ public interface IndustryRepository extends CrudRepository<Industry, String> {
             "  and market_fact.idIndustry = industries.idIndustry\n" +
             "  and industries.idIndustry = :industryId\n" +
             "group by province.idProvince, market_fact.idTime, industries.idIndustry\n" +
-            "order by province.idProvince;", nativeQuery = true)
-    List<Object[]> getJobDemandInSubRegionOfCountry(@Param("industryId") String industryId);
+            "order by province.idProvince,timed.idTime;", nativeQuery = true)
+    List<Object[]> getJobDemandInSubRegionOfCountry(@Param("industryId") int industryId);
 
     @Query(value = "select concat(\"Quý \",timed.quarterD,\"/\",timed.yearD) as `time`, company.idCompany,\n" +
             "       company.name_company, top.number_of_recruitment, top.growth\n" +
@@ -98,24 +97,26 @@ public interface IndustryRepository extends CrudRepository<Industry, String> {
             "    and top.idTime = timed.idTime\n" +
             "    and top.idTime in (select idTime from (select idTime from timed order by timestampD desc limit 3) as t)\n" +
             "    and industries.idIndustry = :industryId \n;", nativeQuery = true)
-    List<Object[]> getTopHiringCompanyWithCountry(@Param("industryId") String industryId);
+    List<Object[]> getTopHiringCompanyWithCountry(@Param("industryId") int industryId);
 
     @Query( value = "with rank_companies_1 as (\n" +
             "select company.idCompany, company.name_company,\n" +
             "       sum(number_of_recruitment) as `so luong tuyen dung`,\n" +
             "       concat(\"Quý \",timed.quarterD,\"/\",timed.yearD) as `time`, timed.idTime,\n" +
             "       rank() over (partition by idTime,province.idProvince, industries.idIndustry order by sum(number_of_recruitment) desc) as `rank`\n" +
-            "from company_fact, timed, company, industries, province\n" +
-            "where company_fact.idTime = timed.idTime and company_fact.idProvince = province.idProvince\n" +
-            "    and company_fact.idIndustry = industries.idIndustry and company_fact.idCompany = company.idCompany\n" +
-            "    and company_fact.idProvince = :locationId and company_fact.idIndustry = :industryId\n" +
-            "group by timed.idTime, province.idProvince, industries.idIndustry, company_fact.idCompany\n" +
+            "from\n" +
+            "    (select distinct idTime, idCompany, idProvince, idIndustry, idJob, number_of_recruitment\n" +
+            "from company_fact) as fact, timed, company, industries, province\n" +
+            "where fact.idTime = timed.idTime and fact.idProvince = province.idProvince\n" +
+            "    and fact.idIndustry = industries.idIndustry and fact.idCompany = company.idCompany\n" +
+            "    and fact.idProvince = :locationId and fact.idIndustry = :industryId\n" +
+            "group by timed.idTime, province.idProvince, industries.idIndustry, fact.idCompany\n" +
             "order by idTime, province.idProvince, industries.idIndustry,sum(number_of_recruitment) desc)\n" +
             "select `time`, idCompany, name_company, `so luong tuyen dung`, idTime\n" +
             "from rank_companies_1\n" +
             "where `rank` <= 10\n" +
-            "  and rank_companies_1.idTime in ( select idTime from ( select idTime from timed order by timestampD desc limit 3 ) as t );\n", nativeQuery = true)
-            List<Object[]> getTopHiringCompanyWithProvince(@Param("industryId") String industryId, @Param("locationId") String locationId);
+            "  and rank_companies_1.idTime in ( select idTime from ( select idTime from timed order by timestampD desc limit 3 ) as t );", nativeQuery = true)
+            List<Object[]> getTopHiringCompanyWithProvince(@Param("industryId") int industryId, @Param("locationId") int locationId);
 
     
     @Query(value = "with rank_companies_4 as (\n" +
@@ -132,7 +133,7 @@ public interface IndustryRepository extends CrudRepository<Industry, String> {
             "    and rankd <= 10\n" +
             "    and rank_companies_4.idTime in (select idTime from (select idTime from timed order by timestampD desc limit 3) as t)\n" +
             "order by timed.idTime, `so luong cong viec` desc;", nativeQuery = true)
-    List<Object[]> getTopHiringJobWithCountry(@Param("industryId") String industryId );
+    List<Object[]> getTopHiringJobWithCountry(@Param("industryId") int industryId );
 
     @Query( value = "with rank_companies_4 as (\n" +
             "    select idTime ,idIndustry,province.idProvince, job_fact.idJob, sum(number_of_recruitment) as `so luong cong viec`,\n" +
@@ -149,7 +150,7 @@ public interface IndustryRepository extends CrudRepository<Industry, String> {
             "    and rankd <= 10\n" +
             "    and rank_companies_4.idTime in (select idTime from (select idTime from timed order by timestampD desc limit 3) as t)\n" +
             "order by timed.idTime, `so luong cong viec` desc;", nativeQuery = true)
-    List<Object[]> getTopHiringJobWithProvince(@Param("industryId") String industryId, @Param("locationId") String locationId);
+    List<Object[]> getTopHiringJobWithProvince(@Param("industryId") int industryId, @Param("locationId") int locationId);
 
     @Query(value = "with rank_companies_4 as (\n" +
             "    select idTime ,idIndustry, job_fact.idJob, avg(salary) as `luong`, sum(number_of_recruitment) as `so luong tuyen dung`,\n" +
@@ -157,8 +158,7 @@ public interface IndustryRepository extends CrudRepository<Industry, String> {
             "    from job_fact, job_industry, province\n" +
             "    where job_fact.idJob = job_industry.idJob\n" +
             "      and idIndustry = :industryId\n" +
-            "    group by idTime, idIndustry,job_fact.idJob\n" +
-            ")\n" +
+            "    group by idTime, idIndustry,job_fact.idJob)\n" +
             "select concat(\"Quý \",timed.quarterD,\"/\",timed.yearD) as `time`, job.idJob, job.name_job,\n" +
             "       `luong`,`so luong tuyen dung`, timed.idTime\n" +
             "from rank_companies_4, job, timed\n" +
@@ -166,7 +166,7 @@ public interface IndustryRepository extends CrudRepository<Industry, String> {
             "  and rankd <= 10\n" +
             "  and rank_companies_4.idTime in (select idTime from (select idTime from timed order by timestampD desc limit 3) as t)\n" +
             "order by timed.idTime, `luong` desc;", nativeQuery = true)
-    List<Object[]> getHighestSalaryJobWithCountry(@Param("industryId") String industryId);
+    List<Object[]> getHighestSalaryJobWithCountry(@Param("industryId") int industryId);
 
     @Query( value = "with rank_companies_4 as (\n" +
             "    select idTime ,idIndustry,province.idProvince, job_fact.idJob, avg(salary) as `luong`, sum(number_of_recruitment) as `so luong tuyen dung`,\n" +
@@ -183,7 +183,7 @@ public interface IndustryRepository extends CrudRepository<Industry, String> {
             "    and rankd <= 10\n" +
             "    and rank_companies_4.idTime in (select idTime from (select idTime from timed order by timestampD desc limit 3) as t)\n" +
             "order by timed.idTime, `luong` desc;", nativeQuery = true)
-    List<Object[]> getHighestSalaryJobWithProvince(@Param("industryId") String industryId, @Param("locationId") String locationId);
+    List<Object[]> getHighestSalaryJobWithProvince(@Param("industryId") int industryId, @Param("locationId") int locationId);
 
 
     @Query(value = "select concat(\"Quý \",timed.quarterD,\"/\",timed.yearD) as `time`, sum(number_of_recruitment), age.age, gender.gender\n" +
@@ -194,7 +194,7 @@ public interface IndustryRepository extends CrudRepository<Industry, String> {
             "  and market_fact.idTime in (select idTime from ( select idTime from timed order by timestampD desc limit 3) as t )\n" +
             "group by timed.idTime,industries.idIndustry, gender.idGender, age.idAge\n" +
             "order by timed.idTime, industries.idIndustry, gender.idGender, age.age;", nativeQuery = true)
-    List<Object[]> getJobDemandByAgeWithCountry(@Param("industryId") String industryId);
+    List<Object[]> getJobDemandByAgeWithCountry(@Param("industryId") int industryId);
 
 
     @Query( value = "select concat(\"Quý \",timed.quarterD,\"/\",timed.yearD) as `time`, sum(number_of_recruitment), age.age, gender.gender\n" +
@@ -206,7 +206,7 @@ public interface IndustryRepository extends CrudRepository<Industry, String> {
             "  and market_fact.idTime in (select idTime from ( select idTime from timed order by timestampD desc limit 3) as t )\n" +
             "group by timed.idTime,industries.idIndustry, province.idProvince, gender.idGender, age.idAge\n" +
             "order by timed.idTime, industries.idIndustry, gender.idGender, age.age;", nativeQuery = true)
-    List<Object[]> getJobDemandByAgeWithProvince(@Param("industryId") String industryId, @Param("locationId") String locationId);
+    List<Object[]> getJobDemandByAgeWithProvince(@Param("industryId") int industryId, @Param("locationId") int locationId);
 
     @Query(value = "select concat(\"Quý \",timed.quarterD,\"/\",timed.yearD) as `time`,\n" +
             "       sum(market_fact.number_of_recruitment),\n" +
@@ -218,7 +218,7 @@ public interface IndustryRepository extends CrudRepository<Industry, String> {
             "    and market_fact.idTime in (select idTime from (select idTime from timed order by timestampD desc limit 4) as t )\n" +
             "group by timed.idTime,industries.idIndustry, academic_level.idAcademic_Level\n" +
             "order by timed.timestampD, academic_level.academic_level;", nativeQuery = true)
-    List<Object[]> getJobDemandByLiteracyWithCountry(@Param("industryId") String industryId);
+    List<Object[]> getJobDemandByLiteracyWithCountry(@Param("industryId") int industryId);
 
     @Query( value = "select concat(\"Quý \",timed.quarterD,\"/\",timed.yearD) as `time`,\n" +
             "       sum(market_fact.number_of_recruitment),\n" +
@@ -230,7 +230,7 @@ public interface IndustryRepository extends CrudRepository<Industry, String> {
             "  and market_fact.idTime in (select idTime from (select idTime from timed order by timestampD desc limit 4) as t )\n" +
             "group by timed.idTime,industries.idIndustry,province.idProvince, academic_level.idAcademic_Level\n" +
             "order by timed.timestampD, academic_level.academic_level;", nativeQuery = true)
-    List<Object[]> getjobDemandByLiteracyWithProvince(@Param("industryId") String industryId, @Param("locationId") String locationId);
+    List<Object[]> getjobDemandByLiteracyWithProvince(@Param("industryId") int industryId, @Param("locationId") int locationId);
 
 
 
@@ -251,7 +251,7 @@ public interface IndustryRepository extends CrudRepository<Industry, String> {
             "where company_fact.idCompany = company.idCompany and company_fact.idTime = timed.idTime\n" +
             "    and timed.idTime = :idTime and company.idCompany = :idCompany\n" +
             "group by company_fact.idTime, company_fact.idCompany;", nativeQuery = true)
-    List<Object[]> getAvgSalaryForCompanyByCountry(@Param("idTime") String idTime, @Param("idCompany") String idCompany);
+    List<Object[]> getAvgSalaryForCompanyByCountry(@Param("idTime") int idTime, @Param("idCompany") int idCompany);
 
 
     // lay thong tin  so luong tuyen dung cong ty theo quy
@@ -262,8 +262,8 @@ public interface IndustryRepository extends CrudRepository<Industry, String> {
             "    and timed.idTime = :idTime and company.idCompany = :idCompany and province.idProvince = :idProvince\n" +
             "    and industries.idIndustry = :industryId\n" +
             "group by company_fact.idTime, company_fact.idCompany,industries.idIndustry, province.idProvince;", nativeQuery = true)
-    List<Object[]> getRecruitmentOfCompanyInQuarter( @Param("idTime") String idTime, @Param("idCompany") String idCompany,
-                                                     @Param("idProvince") String idProvince, @Param("industryId") String industryId);
+    List<Object[]> getRecruitmentOfCompanyInQuarter( @Param("idTime") int idTime, @Param("idCompany") int idCompany,
+                                                     @Param("idProvince") int idProvince, @Param("industryId") int industryId);
 
 
     @Query( value = "select job.name_job, sum(number_of_recruitment)\n" +
@@ -273,8 +273,8 @@ public interface IndustryRepository extends CrudRepository<Industry, String> {
             "  and job.idJob = :jobId\n" +
             "  and job_industry.idIndustry = :industryId and timed.idTime = :timeId\n" +
         "group by job_fact.idTime, job_fact.idJob,job_industry.idIndustry;", nativeQuery = true)
-    List<Object[]> getRecruitmentJobInQuarterWithCountry( @Param("jobId") String jobId, @Param("industryId") String industryId,
-                                                          @Param("timeId") String timedId);
+    List<Object[]> getRecruitmentJobInQuarterWithCountry( @Param("jobId") int jobId, @Param("industryId") int industryId,
+                                                          @Param("timeId") int timedId);
 
     @Query( value = "select job.name_job, sum(number_of_recruitment)\n" +
             "from job_fact, job, timed, job_industry, province\n" +
@@ -283,8 +283,8 @@ public interface IndustryRepository extends CrudRepository<Industry, String> {
             "  and job.idJob = :jobId and province.idProvince = :locationId\n" +
             "  and job_industry.idIndustry = :industryId and timed.idTime = :timeId\n" +
             "group by job_fact.idTime, job_fact.idJob,job_industry.idIndustry;", nativeQuery = true)
-    List<Object[]> getRecruitmentJobInQuarterWithProvince( @Param("jobId") String jobId, @Param("industryId") String industryId,
-                                                           @Param("timeId") String timeId, @Param("locationId") String locationId);
+    List<Object[]> getRecruitmentJobInQuarterWithProvince( @Param("jobId") int jobId, @Param("industryId") int industryId,
+                                                           @Param("timeId") int timeId, @Param("locationId") int locationId);
 
     @Query( value = "select job.name_job, avg(salary)\n" +
             "from job_fact, job, timed, job_industry\n" +
@@ -293,8 +293,8 @@ public interface IndustryRepository extends CrudRepository<Industry, String> {
             "  and job.idJob = :jobId\n" +
             "  and job_industry.idIndustry = :industryId and timed.idTime = :timeId\n" +
             "group by job_fact.idTime, job_fact.idJob,job_industry.idIndustry;", nativeQuery = true)
-    List<Object[]> getSalaryJobInQuarterWithCountry( @Param("jobId") String jobId, @Param("industryId") String industryId,
-                                                          @Param("timeId") String timedId);
+    List<Object[]> getSalaryJobInQuarterWithCountry( @Param("jobId") int jobId, @Param("industryId") int industryId,
+                                                          @Param("timeId") int timedId);
 
     @Query( value = "select job.name_job, avg(salary)\n" +
             "from job_fact, job, timed, job_industry, province\n" +
@@ -303,8 +303,8 @@ public interface IndustryRepository extends CrudRepository<Industry, String> {
             "  and job.idJob = :jobId and province.idProvince = :locationId\n" +
             "  and job_industry.idIndustry = :industryId and timed.idTime = :timeId\n" +
             "group by job_fact.idTime, job_fact.idJob,job_industry.idIndustry;", nativeQuery = true)
-    List<Object[]> getSalaryJobInQuarterWithProvince( @Param("jobId") String jobId, @Param("industryId") String industryId,
-                                                      @Param("timeId") String timeId, @Param("locationId") String locationId);
+    List<Object[]> getSalaryJobInQuarterWithProvince( @Param("jobId") int jobId, @Param("industryId") int industryId,
+                                                      @Param("timeId") int timeId, @Param("locationId") int locationId);
 
 
     @Query( value = " select * from age;", nativeQuery = true)
@@ -312,5 +312,10 @@ public interface IndustryRepository extends CrudRepository<Industry, String> {
 
     @Query( value = " select * from academic_level;", nativeQuery = true)
     List<Object[]> getLiteracy();
+
+    @Query( value = "select concat(\"Quý \",timed.quarterD,\"/\",timed.yearD) as `time`\n" +
+            "from timed\n" +
+            "order by idTime;", nativeQuery = true)
+    List<Object[]> getTime();
 
 }

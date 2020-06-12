@@ -82,6 +82,7 @@ public class IndustryController {
         String locationId = payload.get("locationId").toString();
         return industryService.getTopHiringJob(industryId, locationId);
     }
+
     //done
     @CrossOrigin(origins = "http://localhost:4200")
     @RequestMapping(value = "/industries/get_highest_salary_job", method = RequestMethod.GET)
