@@ -31,7 +31,7 @@ public class JobService {
             final HashMap<String, String> jobObject = new HashMap<String, String>();
             jobObject.put("id", ob[0].toString());
             jobObject.put("name", ob[1].toString());
-            jobObject.put("area", ob[2].toString());
+            // jobObject.put("area", ob[2].toString());
             cityArr.add(jobObject);
         }
         jsonObject.put("result", cityArr);
@@ -53,7 +53,7 @@ public class JobService {
             jobObject.put("gender", ob[3].toString());
             jobObject.put("minSalary", ob[4].toString());
             jobObject.put("maxSalary", ob[5].toString());
-            jobObject.put("numJob", ob[6].toString());
+            jobObject.put("numJob", String.valueOf(Math.round(Float.parseFloat(ob[6].toString()))));
             // jobObject.put("jobType", ob[5].toString());
             jobArr.add(jobObject);
         }
@@ -291,7 +291,7 @@ public class JobService {
         jsonObject.put("description", "The average salary");
 
         List<String> timestamp = new ArrayList<String>();
-        List<Integer> data = new ArrayList<Integer>();
+        List<Float> data = new ArrayList<Float>();
         List<Float> growth = new ArrayList<Float>();
 
         if (idLocation.equals("P0")) {
@@ -306,7 +306,7 @@ public class JobService {
             for (final Object[] ob : list) {
 
                 timestamp.add(ob[1].toString());
-                data.add(Math.round(Float.parseFloat(ob[3].toString())));
+                data.add(Float.parseFloat(df.format(Float.parseFloat(ob[3].toString()))));
                 if (i == 0) {
                     growth.add(0f);
                 } else {
@@ -315,7 +315,7 @@ public class JobService {
                     growth.add(currentGrowth);
                 }
                 i++;
-                previousValue = Math.round(Float.parseFloat(ob[3].toString()));
+                previousValue = Float.parseFloat(df.format(Float.parseFloat(ob[3].toString())));
             }
             jsonObject.put("timestamp", timestamp);
             jsonObject.put("data", data);
@@ -340,7 +340,7 @@ public class JobService {
                 for (final Object[] ob : list) {
 
                     timestamp.add(ob[1].toString());
-                    data.add(Math.round(Float.parseFloat(ob[4].toString())));
+                    data.add(Float.parseFloat(df.format(Float.parseFloat(ob[4].toString()))));
                     if (i == 0) {
                         growth.add(0f);
                     } else {
@@ -349,7 +349,7 @@ public class JobService {
                         growth.add(currentGrowth);
                     }
                     i++;
-                    previousValue = Math.round(Float.parseFloat(ob[4].toString()));
+                    previousValue = Float.parseFloat(df.format(Float.parseFloat(ob[4].toString())));
                 }
                 jsonObject.put("timestamp", timestamp);
                 jsonObject.put("data", data);
