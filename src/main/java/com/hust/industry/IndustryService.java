@@ -48,7 +48,7 @@ public class IndustryService {
             idIndustry = ob[1].toString();
             numJob = (double) ob[ob.length -3];
             industryObject.put("numJob", (int) numJob );
-            industryObject.put("id", "I" + ob[1].toString());
+            industryObject.put("id", ob[1].toString());
             industryObject.put("name", ob[2].toString());
 //                industryObject.put("description", ob[ob.length -1].toString());
             double avgSalary = (double) ob[ob.length -2];

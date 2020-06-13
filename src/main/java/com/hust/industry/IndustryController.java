@@ -28,7 +28,7 @@ public class IndustryController {
     @RequestMapping(value = "/industries/get_job_list", method = RequestMethod.POST)
     public JSONObject getJobListByIndustry(@RequestBody Map<String, Object> payload) throws Exception {
         System.out.println(payload.get("idIndustry"));
-        String industryId = payload.get("idIndustry").toString();
+        String industryId = payload.get("industryId").toString();
         return industryService.getJobListByIndustry(industryId);
     }
 
@@ -38,7 +38,7 @@ public class IndustryController {
     @RequestMapping(value = "/industries/get_top_company", method = RequestMethod.POST)
     public JSONObject getTopCompanyByIndustry(@RequestBody Map<String, Object> payload) throws Exception {
         // System.out.println(payload.get("id"));
-        String industryId = payload.get("idIndustry").toString();
+        String industryId = payload.get("industryId").toString();
         String locationId = payload.get("locationId").toString();
         return industryService.getTopCompanyByIndustry(industryId, locationId);
     }
@@ -48,7 +48,7 @@ public class IndustryController {
     @RequestMapping(value = "/industries/get_job_demand", method = RequestMethod.POST)
     public JSONObject getJobDemandByIndustry(@RequestBody Map<String, Object> payload) throws Exception {
         // System.out.println(payload.get("id"));
-        String industryId = payload.get("idIndustry").toString();
+        String industryId = payload.get("industryId").toString();
         String locationId = payload.get("locationId").toString();
         return industryService.getJobDemandByIndustry(industryId, locationId);
     }
@@ -58,7 +58,7 @@ public class IndustryController {
     @RequestMapping(value = "/industries/get_job_demand_sub_region", method = RequestMethod.GET)
     public JSONObject getJobDemandInSubRegion(@RequestBody Map<String, Object> payload) throws Exception {
         // System.out.println(payload.get("id"));
-        String industryId = payload.get("idIndustry").toString();
+        String industryId = payload.get("industryId").toString();
         String locationId = payload.get("locationId").toString();
         return industryService.getJobDemandInSubRegion(industryId, locationId);
     }
@@ -68,7 +68,7 @@ public class IndustryController {
     @RequestMapping(value = "/industries/get_top_hiring_company", method = RequestMethod.POST)
     public JSONObject getTopHiringCompany(@RequestBody Map<String, Object> payload) throws Exception {
         // System.out.println(payload.get("id"));
-        String industryId = payload.get("idIndustry").toString();
+        String industryId = payload.get("industryId").toString();
         String locationId = payload.get("locationId").toString();
         return industryService.getTopHiringCompany(industryId, locationId);
     }
@@ -78,7 +78,7 @@ public class IndustryController {
     @RequestMapping(value = "/industries/get_top_hiring_job", method = RequestMethod.POST)
     public JSONObject getTopHiringJob(@RequestBody Map<String, Object> payload) throws Exception {
         // System.out.println(payload.get("id"));
-        String industryId = payload.get("idIndustry").toString();
+        String industryId = payload.get("industryId").toString();
         String locationId = payload.get("locationId").toString();
         return industryService.getTopHiringJob(industryId, locationId);
     }
@@ -88,7 +88,7 @@ public class IndustryController {
     @RequestMapping(value = "/industries/get_highest_salary_job", method = RequestMethod.POST)
     public JSONObject getHighestSalaryJob(@RequestBody Map<String, Object> payload) throws Exception {
         // System.out.println(payload.get("id"));
-        String industryId = payload.get("idIndustry").toString();
+        String industryId = payload.get("industryId").toString();
         String locationId = payload.get("locationId").toString();
         return industryService.getHighestSalaryJob(industryId, locationId);
     }
@@ -98,7 +98,7 @@ public class IndustryController {
     @RequestMapping(value = "/industries/get_job_demand_by_age", method = RequestMethod.POST)
     public JSONObject getJobDemandByAge(@RequestBody Map<String, Object> payload) throws Exception {
         // System.out.println(payload.get("id"));
-        String industryId = payload.get("idIndustry").toString();
+        String industryId = payload.get("industryId").toString();
         String locationId = payload.get("locationId").toString();
         return industryService.getJobDemandByAge(industryId, locationId);
     }
@@ -108,7 +108,7 @@ public class IndustryController {
     @RequestMapping(value = "/industries/get_job_demand_by_literacy", method = RequestMethod.POST)
     public JSONObject getJobDemandByLiteracy(@RequestBody Map<String, Object> payload) throws Exception {
         // System.out.println(payload.get("id"));
-        String industryId = payload.get("idIndustry").toString();
+        String industryId = payload.get("industryId").toString();
         String locationId = payload.get("locationId").toString();
         return industryService.getJobDemandByLiteracy(industryId, locationId);
     }
