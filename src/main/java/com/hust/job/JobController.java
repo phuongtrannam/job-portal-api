@@ -21,7 +21,7 @@ public class JobController {
     public JSONObject getCityList() throws Exception {
         return jobService.getCityList();
     }
-
+    
     @CrossOrigin(origins =  "http://localhost:4200")
     @RequestMapping(value = "/jobs/top_job", method = RequestMethod.POST)
     public JSONObject getTopJob(@RequestBody Map<String, Object> payload) throws Exception {

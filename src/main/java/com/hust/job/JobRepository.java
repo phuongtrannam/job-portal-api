@@ -122,7 +122,7 @@ public interface JobRepository extends CrudRepository<Job, String> {
                         "and job_fact.idTime in ( select idTime from ( " + 
                         "select idTime from timed order by timestampD desc limit 4 ) as t ) " +
                         "and job.idJob = :idJob " +
-                    "group by timed.idTime, job.idJob order by idTime desc; ", nativeQuery = true)
+                    "group by timed.idTime, job.idJob order by idTime ; ", nativeQuery = true)
     List<Object[]> getJobDemandByPeriodOfTimeCountry(@Param("idJob") String idJob);
 
     @Query(value = "select timed.idTime,concat(\"Quý \",timed.quarterD,\"/\",timed.yearD) as `time`, " + 
@@ -133,7 +133,7 @@ public interface JobRepository extends CrudRepository<Job, String> {
                     "and job_fact.idTime in ( select idTime from ( " + 
                             "select idTime from timed order by timestampD desc limit 4 ) as t ) " +
                     "and job.idJob = :idJob and province.IdProvince = :idLocation " +
-                    "group by timed.idTime, job.idJob, province.IdProvince order by idTime desc;" , nativeQuery = true)
+                    "group by timed.idTime, job.idJob, province.IdProvince order by idTime ;" , nativeQuery = true)
     List<Object[]> getJobDemandByPeriodOfTimeCity(@Param("idJob") String idJob, @Param("idLocation") String idLocation);
 
     @Query(value = "select timed.idTime,concat(\"Quý \",timed.quarterD,\"/\",timed.yearD) as `time`, job.name_job, avg(job_fact.salary) " + 
@@ -143,7 +143,7 @@ public interface JobRepository extends CrudRepository<Job, String> {
                     "and job_fact.idTime in ( select idTime from ( " + 
                         "select idTime from timed order by timestampD desc limit 4 ) as t ) " +
                     "and job.idJob = :idJob " +
-                    "group by timed.idTime, job.idJob order by idTime desc;", nativeQuery = true)
+                    "group by timed.idTime, job.idJob order by idTime;", nativeQuery = true)
     List<Object[]> getAverageSalaryCountry(@Param("idJob") String idJob);
 
     @Query(value = "select timed.idTime,concat(\"Quý \",timed.quarterD,\"/\",timed.yearD) as `time`, " +
@@ -154,7 +154,7 @@ public interface JobRepository extends CrudRepository<Job, String> {
                     "and job_fact.idTime in ( select idTime from ( " + 
                     "select idTime from timed order by timestampD desc limit 4 ) as t ) " +
                     "and job.idJob = :idJob and province.IdProvince = :idLocation " +
-                    "group by timed.idTime, job.idJob, province.IdProvince order by idTime desc; ", nativeQuery = true)
+                    "group by timed.idTime, job.idJob, province.IdProvince order by idTime; ", nativeQuery = true)
     List<Object[]> getAverageSalaryCity(@Param("idJob") String idJob, @Param("idLocation") String idLocation);
 
     @Query(value = "select * from job fact", nativeQuery = true)
