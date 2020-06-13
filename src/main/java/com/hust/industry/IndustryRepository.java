@@ -97,7 +97,7 @@ public interface IndustryRepository extends CrudRepository<Industry, String> {
             "from top10_companies_with_the_highest_recruitment_by_industries as top, timed, industries, company\n" +
             "where top.idIndustry = industries.idIndustry and top.idCompany = company.idCompany\n" +
             "    and top.idTime = timed.idTime\n" +
-            "    and top.idTime in (select idTime from (select idTime from timed order by timestampD asc limit 3) as t)\n" +
+            "    and top.idTime in (select idTime from (select idTime from timed order by timestampD asc limit 8) as t)\n" +
             "    and industries.idIndustry = :industryId \n;", nativeQuery = true)
     List<Object[]> getTopHiringCompanyWithCountry(@Param("industryId") int industryId);
 
@@ -117,7 +117,7 @@ public interface IndustryRepository extends CrudRepository<Industry, String> {
             "select `time`, idCompany, name_company, `so luong tuyen dung`, idTime\n" +
             "from rank_companies_1\n" +
             "where `rank` <= 10\n" +
-            "  and rank_companies_1.idTime in ( select idTime from ( select idTime from timed order by timestampD asc limit 3 ) as t );", nativeQuery = true)
+            "  and rank_companies_1.idTime in ( select idTime from ( select idTime from timed order by timestampD asc limit 8 ) as t );", nativeQuery = true)
             List<Object[]> getTopHiringCompanyWithProvince(@Param("industryId") int industryId, @Param("locationId") int locationId);
 
     
@@ -135,7 +135,7 @@ public interface IndustryRepository extends CrudRepository<Industry, String> {
             "from rank_companies_4, job, timed\n" +
             "where rank_companies_4.idJob = job.idJob and timed.idTime = rank_companies_4.idTime\n" +
             "    and rankd <= 10\n" +
-            "    and rank_companies_4.idTime in (select idTime from (select idTime from timed order by timestampD desc limit 3) as t)\n" +
+            "    and rank_companies_4.idTime in (select idTime from (select idTime from timed order by timestampD desc limit 4) as t)\n" +
             "order by timed.idTime, `so luong cong viec` desc;", nativeQuery = true)
     List<Object[]> getTopHiringJobWithCountry(@Param("industryId") int industryId );
 
@@ -153,7 +153,7 @@ public interface IndustryRepository extends CrudRepository<Industry, String> {
             "from rank_companies_4, job, timed\n" +
             "where rank_companies_4.idJob = job.idJob and timed.idTime = rank_companies_4.idTime\n" +
             "    and rankd <= 10\n" +
-            "    and rank_companies_4.idTime in (select idTime from (select idTime from timed order by timestampD desc limit 3) as t)\n" +
+            "    and rank_companies_4.idTime in (select idTime from (select idTime from timed order by timestampD desc limit 4) as t)\n" +
             "order by timed.idTime, `so luong cong viec` desc;", nativeQuery = true)
     List<Object[]> getTopHiringJobWithProvince(@Param("industryId") int industryId, @Param("locationId") int locationId);
 
@@ -169,7 +169,7 @@ public interface IndustryRepository extends CrudRepository<Industry, String> {
             "from rank_companies_4, job, timed\n" +
             "where rank_companies_4.idJob = job.idJob and timed.idTime = rank_companies_4.idTime\n" +
             "  and rankd <= 10\n" +
-            "  and rank_companies_4.idTime in (select idTime from (select idTime from timed order by timestampD desc limit 3) as t)\n" +
+            "  and rank_companies_4.idTime in (select idTime from (select idTime from timed order by timestampD desc limit 4) as t)\n" +
             "order by timed.idTime, `luong` desc;", nativeQuery = true)
     List<Object[]> getHighestSalaryJobWithCountry(@Param("industryId") int industryId);
 
@@ -186,7 +186,7 @@ public interface IndustryRepository extends CrudRepository<Industry, String> {
             "from rank_companies_4, job, timed\n" +
             "where rank_companies_4.idJob = job.idJob and timed.idTime = rank_companies_4.idTime\n" +
             "    and rankd <= 10\n" +
-            "    and rank_companies_4.idTime in (select idTime from (select idTime from timed order by timestampD desc limit 3) as t)\n" +
+            "    and rank_companies_4.idTime in (select idTime from (select idTime from timed order by timestampD desc limit 4) as t)\n" +
             "order by timed.idTime, `luong` desc;", nativeQuery = true)
     List<Object[]> getHighestSalaryJobWithProvince(@Param("industryId") int industryId, @Param("locationId") int locationId);
 
@@ -196,7 +196,7 @@ public interface IndustryRepository extends CrudRepository<Industry, String> {
             "where market_fact.idTime = timed.idTime and market_fact.idGender = gender.idGender\n" +
             "  and market_fact.idAge = age.idAge and market_fact.idIndustry = industries.idIndustry\n" +
             "  and industries.idIndustry = :industryId\n" +
-            "  and market_fact.idTime in (select idTime from ( select idTime from timed order by timestampD desc limit 3) as t )\n" +
+            "  and market_fact.idTime in (select idTime from ( select idTime from timed order by timestampD desc limit 4) as t )\n" +
             "group by timed.idTime,industries.idIndustry, gender.idGender, age.idAge\n" +
             "order by timed.idTime, industries.idIndustry, gender.idGender, age.age;", nativeQuery = true)
     List<Object[]> getJobDemandByAgeWithCountry(@Param("industryId") int industryId);
@@ -208,7 +208,7 @@ public interface IndustryRepository extends CrudRepository<Industry, String> {
             "  and market_fact.idAge = age.idAge and market_fact.idIndustry = industries.idIndustry\n" +
             "  and market_fact.idProvince = province.idProvince\n" +
             "  and industries.idIndustry = :industryId and province.idProvince = :locationId \n" +
-            "  and market_fact.idTime in (select idTime from ( select idTime from timed order by timestampD desc limit 3) as t )\n" +
+            "  and market_fact.idTime in (select idTime from ( select idTime from timed order by timestampD desc limit 4) as t )\n" +
             "group by timed.idTime,industries.idIndustry, province.idProvince, gender.idGender, age.idAge\n" +
             "order by timed.idTime, industries.idIndustry, gender.idGender, age.age;", nativeQuery = true)
     List<Object[]> getJobDemandByAgeWithProvince(@Param("industryId") int industryId, @Param("locationId") int locationId);
