@@ -53,6 +53,15 @@ public class IndustryController {
         return industryService.getJobDemandByIndustry(industryId, locationId);
     }
 
+    @CrossOrigin(origins = "http://localhost:4200")
+    @RequestMapping(value = "/industries/get_salary", method = RequestMethod.POST)
+    public JSONObject getSalaryByIndustry(@RequestBody Map<String, Object> payload) throws Exception {
+        // System.out.println(payload.get("id"));
+        String industryId = payload.get("industryId").toString();
+        String locationId = payload.get("locationId").toString();
+        return industryService.getSalaryByIndustry(industryId, locationId);
+    }
+
     //done
     @CrossOrigin(origins = "http://localhost:4200")
     @RequestMapping(value = "/industries/get_job_demand_sub_region", method = RequestMethod.GET)

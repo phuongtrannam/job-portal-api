@@ -176,7 +176,7 @@ public class IndustryService {
         if(locationId.equals("P0")){
             int idIndustry = Integer.valueOf(industryId.replace("I", ""));
             List<Object[]> list = industryRepository.getJobDemandByIndustryWithCountry(idIndustry);
-            extractDataJob(growth, preNumJob, timeArray, dataArray, growthArray, list);
+            extractDataJob(growth, preNumJob, timeArray, dataArray, growthArray, list, false);
             regionObject.put("name", "Cả nước");
             regionObject.put("data", dataArray);
             regionObject.put("growth", growthArray);
@@ -187,7 +187,7 @@ public class IndustryService {
             int idIndustry = Integer.valueOf(industryId.replace("I", ""));
             int idProvince = Integer.valueOf(locationId.replace("P", ""));
             List<Object[]> list = industryRepository.getJobDemandByIndustryWithProvince(idIndustry, idProvince);
-            extractDataJob(growth, preNumJob, timeArray, dataArray, growthArray, list);
+            extractDataJob(growth, preNumJob, timeArray, dataArray, growthArray, list, false);
             regionObject.put("name", list.get(0)[1]);
             regionObject.put("data", dataArray);
             regionObject.put("growth", growthArray);
@@ -198,13 +198,53 @@ public class IndustryService {
         return jsonObject;
     }
 
-    private void extractDataJob(double growth, double preNumJob, JSONArray timeArray, JSONArray dataArray, JSONArray growthArray, List<Object[]> list) {
+    public JSONObject getSalaryByIndustry(String industryId, String locationId ){
+        final JSONObject jsonObject = new JSONObject();
+        final JSONObject regionObject = new JSONObject();
+        jsonObject.put("description", "The job demand by industry");
+        double growth = 0;
+        double preNumJob = 0;
+        JSONArray timeArray = new JSONArray();
+        JSONArray dataArray = new JSONArray();
+        JSONArray growthArray = new JSONArray();
+
+        if(locationId.equals("P0")){
+            int idIndustry = Integer.valueOf(industryId.replace("I", ""));
+            List<Object[]> list = industryRepository.getSalaryByIndustryWithCountry(idIndustry);
+            extractDataJob(growth, preNumJob, timeArray, dataArray, growthArray, list, true);
+            regionObject.put("name", "Cả nước");
+            regionObject.put("data", dataArray);
+            regionObject.put("growth", growthArray);
+            jsonObject.put("timestamps", timeArray);
+            jsonObject.put("ALL", regionObject);
+        }
+        else {
+            int idIndustry = Integer.valueOf(industryId.replace("I", ""));
+            int idProvince = Integer.valueOf(locationId.replace("P", ""));
+            List<Object[]> list = industryRepository.getSalaryByIndustryWithProvince(idIndustry, idProvince);
+            extractDataJob(growth, preNumJob, timeArray, dataArray, growthArray, list,true);
+            regionObject.put("name", list.get(0)[1]);
+            regionObject.put("data", dataArray);
+            regionObject.put("growth", growthArray);
+            jsonObject.put("timestamps", timeArray);
+            jsonObject.put(locationId, regionObject);
+        }
+
+        return jsonObject;
+    }
+
+    private void extractDataJob(double growth, double preNumJob, JSONArray timeArray, JSONArray dataArray, JSONArray growthArray, List<Object[]> list , boolean isSalary) {
         for(Object[] ob : list){
             if(preNumJob != 0){
                 growth = (((double) ob[ob.length -1]/preNumJob) -1)*100;
             }
             timeArray.add(ob[ob.length -2].toString());
-            dataArray.add(ob[ob.length -1]);
+            if (isSalary){
+                dataArray.add(round((Double) ob[ob.length -1],2));
+            }
+            else {
+                dataArray.add(ob[ob.length -1]);
+            }
             growthArray.add(round(growth,2));
             preNumJob = (double) ob[ob.length -1];
         }
@@ -220,7 +260,7 @@ public class IndustryService {
         JSONArray dataArray = new JSONArray();
         JSONArray growthArray = new JSONArray();
 
-        if( locationId.equals("")){
+        if( locationId.equals("P0")){
             int idIndustry = Integer.valueOf(industryId.replace("I",""));
             List<Object[]> list = industryRepository.getJobDemandInSubRegionOfCountry(idIndustry);
             List<Object[]> listTime = industryRepository.getTime();
