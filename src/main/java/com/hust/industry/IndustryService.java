@@ -80,7 +80,7 @@ public class IndustryService {
                 double growth = ((numJob/lastNumJob) - 1)*100;
                 jobObject.put("numJob", (int) numJob);
                 jobObject.put("growth", round(growth,2));
-                jobObject.put("id", "J" + ob[0].toString());
+                jobObject.put("id", ob[0].toString());
                 jobObject.put("timestamp", "T" + ob[ob.length - 1].toString());
                 jobObject.put("name", ob[1].toString());
 //            jobObject.put("averageSalary", ob[3].toString());
@@ -103,7 +103,7 @@ public class IndustryService {
         List<Object[]> list = null;
         JSONArray companyList = new JSONArray();
 //        System.out.println(locationId.contains("P"));
-        if(locationId.equals("")){
+        if(locationId.equals("P0")){
             int idIndustry = Integer.valueOf(industryId.replace("I",""));
             list = industryRepository.getTopCompanyByIndustryWithCountry(idIndustry);
 
@@ -122,7 +122,7 @@ public class IndustryService {
                 companyList.add(companyObject);
             }
         }
-        else if(locationId.contains("P")){
+        else{
             int idIndustry = Integer.valueOf(industryId.replace("I",""));
             int idProvince = Integer.valueOf(locationId.replace("P",""));
             list = industryRepository.getTopCompanyByIndustryWithProvince(idProvince, idIndustry);
@@ -173,7 +173,7 @@ public class IndustryService {
         JSONArray dataArray = new JSONArray();
         JSONArray growthArray = new JSONArray();
 
-        if(locationId.equals("")){
+        if(locationId.equals("P0")){
             int idIndustry = Integer.valueOf(industryId.replace("I", ""));
             List<Object[]> list = industryRepository.getJobDemandByIndustryWithCountry(idIndustry);
             extractDataJob(growth, preNumJob, timeArray, dataArray, growthArray, list);
@@ -183,7 +183,7 @@ public class IndustryService {
             jsonObject.put("timestamps", timeArray);
             jsonObject.put("ALL", regionObject);
         }
-        else if(locationId.contains("P")){
+        else {
             int idIndustry = Integer.valueOf(industryId.replace("I", ""));
             int idProvince = Integer.valueOf(locationId.replace("P", ""));
             List<Object[]> list = industryRepository.getJobDemandByIndustryWithProvince(idIndustry, idProvince);
@@ -283,9 +283,14 @@ public class IndustryService {
         JSONArray growthArray = new JSONArray();
         JSONObject timeObject = new JSONObject();
 
-        if(locationId.equals("")){
+        if(locationId.equals("P0")){
             int idIndustry = Integer.valueOf(industryId.replace("I", ""));
             List<Object[]> list = industryRepository.getTopHiringCompanyWithCountry(idIndustry);
+            Set<String> timeSet = new LinkedHashSet<>();
+            for (Object[] ob : list) {
+                timeSet.add(ob[0].toString());
+            }
+            jsonObject.put("timestamps",timeSet);
 
             String timestamp = list.get(0)[0].toString();
 
@@ -314,12 +319,16 @@ public class IndustryService {
             timeObject.put("growth", growthArray);
             jsonObject.put(timestamp, timeObject);
         }
-        else if(locationId.contains("P")){
+        else {
 //            System.out.println(industryId);
             int idIndustry = Integer.valueOf(industryId.replace("I", ""));
             int idProvince  = Integer.valueOf(locationId.replace("P",""));
             List<Object[]> list = industryRepository.getTopHiringCompanyWithProvince(idIndustry, idProvince);
-
+            Set<String> timeSet = new LinkedHashSet<>();
+            for (Object[] ob : list) {
+                timeSet.add(ob[0].toString());
+            }
+            jsonObject.put("timestamps",timeSet);
             String timestamp = list.get(0)[0].toString();
             int idTime = 0;
 
@@ -365,11 +374,15 @@ public class IndustryService {
         JSONArray growthArray = new JSONArray();
         JSONObject timeObject = new JSONObject();
 
-        if(locationId.equals("")){
+        if(locationId.equals("P0")){
 //            System.out.println(industryId);
             int idIndustry = Integer.valueOf(industryId.replace("I",""));
             List<Object[]> list = industryRepository.getTopHiringJobWithCountry(idIndustry);
-
+            Set<String> timeSet = new LinkedHashSet<>();
+            for (Object[] ob : list) {
+                timeSet.add(ob[0].toString());
+            }
+            jsonObject.put("timestamps",timeSet);
             String timestamp = list.get(0)[0].toString();
             int idTime = 0;
 
@@ -386,7 +399,7 @@ public class IndustryService {
                     timestamp = ob[0].toString();
                 }
                 HashMap<String , Object> jobObject = new HashMap<>();
-                jobObject.put("id","J" + ob[1].toString());
+                jobObject.put("id", ob[1].toString());
                 jobObject.put("name", ob[2].toString());
                 jobArray.add(jobObject);
                 dataArray.add((int)(double)ob[ob.length -2]);
@@ -401,7 +414,7 @@ public class IndustryService {
             timeObject.put("growth", growthArray);
             jsonObject.put(timestamp, timeObject);
         }
-        else if(locationId.contains("P")){
+        else{
 //            System.out.println(industryId);
             int idIndustry = Integer.valueOf(industryId.replace("I",""));
             int idProvince = Integer.valueOf(locationId.replace("P",""));
@@ -409,6 +422,11 @@ public class IndustryService {
 
             String timestamp = list.get(0)[0].toString();
             int idTime = 0;
+            Set<String> timeSet = new LinkedHashSet<>();
+            for (Object[] ob : list) {
+                timeSet.add(ob[0].toString());
+            }
+            jsonObject.put("timestamps",timeSet);
 
             for(Object[] ob : list){
                 if(!ob[0].toString().equals(timestamp)){
@@ -423,7 +441,7 @@ public class IndustryService {
                     timestamp = ob[0].toString();
                 }
                 HashMap<String , String> jobObject = new HashMap<>();
-                jobObject.put("id", "J" + ob[1].toString());
+                jobObject.put("id", ob[1].toString());
                 jobObject.put("name", ob[2].toString());
                 jobArray.add(jobObject);
                 dataArray.add((int)(double)ob[ob.length -2]);
@@ -463,10 +481,16 @@ public class IndustryService {
         JSONArray growthArray = new JSONArray();
         JSONObject timeObject = new JSONObject();
 
-        if(locationId.equals("")){
+        if(locationId.equals("P0")){
 //            System.out.println(industryId);
             int idIndustry = Integer.valueOf(industryId.replace("I", ""));
             List<Object[]> list = industryRepository.getHighestSalaryJobWithCountry(idIndustry);
+            Set<String> timeSet = new LinkedHashSet<>();
+            for (Object[] ob : list) {
+                timeSet.add(ob[0].toString());
+            }
+            jsonObject.put("timestamps",timeSet);
+
             String timestamp = list.get(0)[0].toString();
             int idTime = 0;
             double salary = 0;
@@ -486,7 +510,7 @@ public class IndustryService {
                     timestamp = ob[0].toString();
                 }
                 HashMap<String , String> jobObject = new HashMap<>();
-                jobObject.put("id", "J" + ob[1].toString());
+                jobObject.put("id", ob[1].toString());
                 jobObject.put("name", ob[2].toString());
                 jobArray.add(jobObject);
                 salary =  (double) ob[ob.length - 3];
@@ -503,11 +527,16 @@ public class IndustryService {
             timeObject.put("growth", growthArray);
             jsonObject.put(timestamp, timeObject);
         }
-        else if(locationId.contains("P")){
+        else{
             System.out.println(industryId);
             int idIndustry = Integer.valueOf(industryId.replace("I",""));
             int idProvince  = Integer.valueOf(locationId.replace("P", ""));
             List<Object[]> list = industryRepository.getHighestSalaryJobWithProvince(idIndustry, idProvince);
+            Set<String> timeSet = new LinkedHashSet<>();
+            for (Object[] ob : list) {
+                timeSet.add(ob[0].toString());
+            }
+            jsonObject.put("timestamps",timeSet);
 
             String timestamp = list.get(0)[0].toString();
             int idTime = 0;
@@ -528,7 +557,7 @@ public class IndustryService {
                     timestamp = ob[0].toString();
                 }
                 HashMap<String , Object> jobObject = new HashMap<>();
-                jobObject.put("id", "J" + ob[1].toString());
+                jobObject.put("id", ob[1].toString());
                 jobObject.put("name", ob[2].toString());
                 jobArray.add(jobObject);
                 salary = (double) ob[ob.length -3];
@@ -569,16 +598,26 @@ public class IndustryService {
         int count = 0;
         Object[] listMale = new Object[ageRangeArray.size()];
         Object[] listFeMale = new Object[ageRangeArray.size()];
-        if( locationId.equals("")){
+        if( locationId.equals("P0")){
             int idIndustry = Integer.valueOf(industryId.replace("I",""));
             List<Object[]> list = industryRepository.getJobDemandByAgeWithCountry(idIndustry);
+            Set<String> timeSet = new LinkedHashSet<>();
+            for (Object[] ob : list) {
+                timeSet.add(ob[0].toString());
+            }
+            jsonObject.put("timestamps",timeSet);
             getJSONJobDemandByAge(jsonObject, timeObject, ageRangeArray, listMale, listFeMale, list);
 
         }
-        else if ( locationId.contains("P")){
+        else{
             int idIndustry = Integer.valueOf(industryId.replace("I",""));
             int idProvince = Integer.valueOf(locationId.replace("P",""));
             List<Object[]> list = industryRepository.getJobDemandByAgeWithProvince(idIndustry, idProvince);
+            Set<String> timeSet = new LinkedHashSet<>();
+            for (Object[] ob : list) {
+                timeSet.add(ob[0].toString());
+            }
+            jsonObject.put("timestamps",timeSet);
             getJSONJobDemandByAge(jsonObject, timeObject, ageRangeArray, listMale, listFeMale, list);
         }
 
@@ -646,15 +685,25 @@ public class IndustryService {
         Object[] listPastValueLiteracy = new Object[listLiteracy.size()];
         Object[] listGrowth = new Object[listLiteracy.size()];
         System.out.println(listLiteracy.toString());
-        if(locationId.equals("")){
+        if(locationId.equals("P0")){
             int idIndustry = Integer.valueOf(industryId.replace("I",""));
             List<Object[]> list = industryRepository.getJobDemandByLiteracyWithCountry(idIndustry);
+            Set<String> timeSet = new LinkedHashSet<>();
+            for (Object[] ob : list) {
+                timeSet.add(ob[0].toString());
+            }
+            jsonObject.put("timestamps",timeSet);
             getJSONJobDemandLiteracy(jsonObject, listLiteracy, timeObject, listValueLiteracy, listPastValueLiteracy, listGrowth, list);
         }
-        else if (locationId.contains("P")){
+        else {
             int idIndustry = Integer.valueOf(industryId.replace("I",""));
             int idProvince = Integer.valueOf(locationId.replace("P",""));
             List<Object[]> list = industryRepository.getjobDemandByLiteracyWithProvince(idIndustry, idProvince);
+            Set<String> timeSet = new LinkedHashSet<>();
+            for (Object[] ob : list) {
+                timeSet.add(ob[0].toString());
+            }
+            jsonObject.put("timestamps",timeSet);
             getJSONJobDemandLiteracy(jsonObject, listLiteracy, timeObject, listValueLiteracy, listPastValueLiteracy, listGrowth, list);
         }
         return jsonObject;
