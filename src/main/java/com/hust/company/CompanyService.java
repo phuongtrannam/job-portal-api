@@ -22,7 +22,7 @@ public class CompanyService {
 
         List<Object[]> list = companyRepository.getCompanyList();
         for(Object[] ob : list){
-            HashMap<String, String> companyObject = new HashMap<String, String>();
+            HashMap<String, Object> companyObject = new HashMap<String, Object>();
             companyObject.put("id", ob[0].toString());
             companyObject.put("name", ob[1].toString());
 //            companyObject.put("phonenumber", ob[2].toString());
@@ -67,7 +67,7 @@ public class CompanyService {
 
         List<Object[]> list = companyRepository.getCompanyInfo(id);
         System.out.println(id);
-        HashMap<String, String> companyObject = new HashMap<String, String>();
+        HashMap<String, Object> companyObject = new HashMap<String, Object>();
         for(Object[] ob : list){
             
             companyObject.put("id", id);
@@ -77,7 +77,7 @@ public class CompanyService {
 //            companyObject.put("founded_year", ob[3].toString());
 //            companyObject.put("website", ob[4].toString());
             companyObject.put("location", ob[5].toString());
-            companyObject.put("num_job", ob[6].toString());
+            companyObject.put("num_job",(int) Double.parseDouble(ob[6].toString()));
 //            companyObject.put("logo", ob[0].toString());
         }
         jsonObject.put("result", companyObject);
@@ -123,13 +123,13 @@ public class CompanyService {
         List<Object[]> list = companyRepository.getRecentJobByCompany(id);
         System.out.println(id);
         for(Object[] ob : list){
-            HashMap<String, String> jobObject = new HashMap<String, String>();
+            HashMap<String, Object> jobObject = new HashMap<String, Object>();
             jobObject.put("id", ob[0].toString());
             jobObject.put("job_name", ob[1].toString());
             jobObject.put("province", ob[2].toString());
             jobObject.put("min_salary", ob[3].toString());
             jobObject.put("max_salary", ob[4].toString());
-            jobObject.put("num_job", ob[5].toString());
+            jobObject.put("num_job",(int) (double) ob[5]);
             jobObject.put("industry", ob[0].toString());
             jobList.add(jobObject);
         }
@@ -147,11 +147,11 @@ public class CompanyService {
         List<Object[]> list = companyRepository.getJobDemandByPeriodOfTime(id);
         System.out.println(id);
         for(Object[] ob : list){
-            HashMap<String, String> period = new HashMap<String, String>();
+            HashMap<String, Object> period = new HashMap<String, Object>();
             period.put("id", ob[0].toString());
             period.put("province", ob[1].toString());
             period.put("timestamp", ob[2].toString());
-            period.put("num_job", ob[3].toString());
+            period.put("num_job", (int) (double) ob[3]);
             // period.put("year", ob[0].toString());
             // period.put("quarter", ob[0].toString());
             periods.add(period);
@@ -171,12 +171,12 @@ public class CompanyService {
         List<Object[]> list = companyRepository.getJobDemandByLiteracy(id);
         System.out.println(id);
         for(Object[] ob : list){
-            HashMap<String, String> literacy = new HashMap<String, String>();
+            HashMap<String, Object> literacy = new HashMap<String, Object>();
             literacy.put("id", ob[0].toString());
             literacy.put("idTime", ob[1].toString());
             literacy.put("timestamp", ob[2].toString());
             literacy.put("literacy", ob[3].toString());
-            literacy.put("num_job", ob[4].toString());
+            literacy.put("num_job", (int) (double) ob[4]);
             // literacy.put("year", ob[0].toString());
             // literacy.put("quarter", ob[0].toString());
             literacies.add(literacy);
@@ -195,13 +195,13 @@ public class CompanyService {
         List<Object[]> list = companyRepository.getJobDemandByAge(id);
         System.out.println(id);
         for(Object[] ob : list){
-            HashMap<String, String> ageRange = new HashMap<String, String>();
+            HashMap<String, Object> ageRange = new HashMap<String, Object>();
             ageRange.put("id", ob[0].toString());
             ageRange.put("idTime", ob[1].toString());
             ageRange.put("timestamp", ob[2].toString());
             ageRange.put("age", ob[3].toString());
             ageRange.put("gender", ob[4].toString());
-            ageRange.put("num_job", ob[5].toString());
+            ageRange.put("num_job", (int) (double) ob[5]);
             ageRanges.add(ageRange);
         }
         jsonObject.put("result", ageRanges);
