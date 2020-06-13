@@ -13,17 +13,23 @@ public interface JobRepository extends CrudRepository<Job, String> {
     @Query(value = "select * from province order by Province", nativeQuery = true)
     List<Object[]> getCityList();
 
-    @Query(value = "select job_fact.idTime,job.idJob, job.name_job, gender.gender, " + 
-                    "min(salary), max(salary), sum(job_fact.number_of_recruitment) as `so luong tuyen dung` " +
-                    "from job, job_fact , job_industry, province, gender " +
-                    "where job.idJob = job_fact.idJob and job.idJob = job_industry.idJob " +
-                        "and job_fact.idGender = gender.idGender " +
-                        "and job_fact.IdProvince = province.idProvince " + 
-                        "and job_fact.idTime in ( select idTime from ( " + 
-                            "select idTime from timed order by timestampD desc limit 1 ) as t ) " +
-                    "group by job_fact.idTime,gender.idGender,job_fact.idJob " +
-                    "order by sum(job_fact.number_of_recruitment) desc limit :numJob", nativeQuery = true)
+    @Query(value = "select fact.idTime,job.idJob, job.name_job,\n" +
+            "min(salary), max(salary), sum(fact.number_of_recruitment) as `so luong tuyen dung`\n" +
+            "from job, (select distinct idTime, idCompany,idProvince, idJob,salary, number_of_recruitment\n" +
+            "           from company_fact) as fact , job_industry, province, gender\n" +
+            "where job.idJob = fact.idJob and job.idJob = job_industry.idJob\n" +
+            "and fact.IdProvince = province.idProvince\n" +
+            "and fact.idTime in ( select idTime from (\n" +
+            "select idTime from timed order by timestampD desc limit 1 ) as t )\n" +
+            "group by fact.idTime,fact.idJob\n" +
+            "order by sum(fact.number_of_recruitment) desc limit :numJob", nativeQuery = true)
     List<Object[]> getTopJob(@Param("numJob") int numJob);
+
+    @Query( value = "select distinct gender.gender\n" +
+            "from job_fact, gender\n" +
+            "where job_fact.idGender = gender.idGender\n" +
+            "    and job_fact.idJob = :idJob", nativeQuery = true)
+    List<Object[]> getGenderByJob(@Param("idJob") int idJob);
     
     @Query(value = "select job_fact.idTime,job.idJob, job.name_job, gender.gender, " + 
                     "min(salary), max(salary), sum(job_fact.number_of_recruitment) as `so luong tuyen dung` " +
@@ -233,6 +239,13 @@ public interface JobRepository extends CrudRepository<Job, String> {
 
     @Query( value = " select * from academic_level order by academic_level;", nativeQuery = true)
     List<Object[]> getLiteracy();
+
+    @Query(value = "select distinct company.idCompany, company.name_company,location.location\n" +
+            "from company_fact, company, location\n" +
+            "where company_fact.idCompany = company.idCompany\n" +
+            "    and company.idLocation = location.idLocation\n" +
+            "    and company_fact.idJob = :idJob", nativeQuery = true)
+    List<Object[]> getListCompanyHiringJob(@Param("idJob") int idJob);
 
 
 }

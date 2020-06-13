@@ -50,10 +50,14 @@ public class JobService {
             final HashMap<String, String> jobObject = new HashMap<String, String>();
             jobObject.put("id", ob[1].toString());
             jobObject.put("name", ob[2].toString());
-            jobObject.put("gender", ob[3].toString());
-            jobObject.put("minSalary", ob[4].toString());
-            jobObject.put("maxSalary", ob[5].toString());
-            jobObject.put("numJob", String.valueOf(Math.round(Float.parseFloat(ob[6].toString()))));
+            String gender = "";
+            for (Object[] objects : jobRepository.getGenderByJob((int)ob[1])){
+                gender = gender + objects[0].toString() + ",";
+            }
+            jobObject.put("gender", gender.substring(0,gender.length()-1));
+            jobObject.put("minSalary", ob[3].toString());
+            jobObject.put("maxSalary", ob[4].toString());
+            jobObject.put("numJob", String.valueOf(Math.round(Float.parseFloat(ob[5].toString()))));
             // jobObject.put("jobType", ob[5].toString());
             jobArr.add(jobObject);
         }
@@ -170,6 +174,24 @@ public class JobService {
         // jobObject.put("jobType", ob[5].toString());
 
         return jobInfo;
+    }
+
+    public JSONObject getCompanyHiringJob(final String idJob){
+        final JSONObject jsonObject = new JSONObject();
+        jsonObject.put("description","The company hiring job");
+
+        final JSONArray companyArray = new JSONArray();
+        final List<Object[]> list = jobRepository.getListCompanyHiringJob(Integer.valueOf(idJob));
+        for (Object[] ob: list){
+            HashMap<String, String> companyObject = new HashMap<String, String>();
+            companyObject.put("id",ob[0].toString());
+            companyObject.put("name", ob[1].toString());
+            companyObject.put("location", ob[2].toString());
+
+            companyArray.add(companyObject);
+        }
+        jsonObject.put("result",companyArray);
+        return  jsonObject;
     }
 
     public JSONObject getJobRelated(final String idJob) {

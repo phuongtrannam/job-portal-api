@@ -117,4 +117,11 @@ public class JobController {
         return jobService.getJobDemandByLiteracy(idJob, idLocation);
     }
 
+    @CrossOrigin(origins =  "http://localhost:4200")
+    @RequestMapping(value = "/jobs/get_company_hiring_job", method = RequestMethod.POST)
+    public JSONObject getCompanyHiringJob(@RequestBody Map<String, Object> payload) throws Exception {
+        String idJob = payload.get("idJob").toString();
+        return jobService.getCompanyHiringJob(idJob);
+    }
+
 }

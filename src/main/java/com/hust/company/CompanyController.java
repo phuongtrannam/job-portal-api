@@ -73,6 +73,8 @@ public class CompanyController {
         return companyService.getJobDemandByAge(companyId);
     }
 
+
+
     // @RequestMapping("/companies/getnumberofjob")
     // public JSONObject getNumberOfJob() {
     //     return companyService.getNumberOfJob();
