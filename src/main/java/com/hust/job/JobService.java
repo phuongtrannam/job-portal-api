@@ -4,7 +4,7 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -421,7 +421,7 @@ public class JobService {
 
         if (idLocation.equals("P0")) {
             final List<Object[]> list = jobRepository.getJobDemandByAgeCountry(idJob);
-            Set<String> timeSet = new HashSet<>();
+            Set<String> timeSet = new LinkedHashSet<>();
             for (Object[] ob : list) {
                 timeSet.add(ob[1].toString());
             }
@@ -453,7 +453,7 @@ public class JobService {
         } else {
             final List<Object[]> list = jobRepository.getJobDemandByAgeCity(idJob, idLocation);
             if (list.size() != 0) {
-                Set<String> timeSet = new HashSet<>();
+                Set<String> timeSet = new LinkedHashSet<>();
                 for (Object[] ob : list) {
                     timeSet.add(ob[1].toString());
                 }
@@ -515,7 +515,7 @@ public class JobService {
 
         if (idLocation.equals("P0")) {
             final List<Object[]> list = jobRepository.getJobDemandByLiteracyCountry(idJob);
-            Set<String> timeSet = new HashSet<>();
+            Set<String> timeSet = new LinkedHashSet<>();
             for (Object[] ob : list) {
                 timeSet.add(ob[1].toString());
             }
@@ -561,7 +561,7 @@ public class JobService {
         } else {
             final List<Object[]> list = jobRepository.getJobDemandByLiteracyCity(idJob, idLocation);
             if (list.size() != 0) {
-                Set<String> timeSet = new HashSet<>();
+                Set<String> timeSet = new LinkedHashSet<>();
                 for (Object[] ob : list) {
                     timeSet.add(ob[1].toString());
                 }
