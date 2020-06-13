@@ -74,7 +74,7 @@ public interface IndustryRepository extends CrudRepository<Industry, String> {
             "select company.idCompany, company.name_company,\n" +
             "       sum(number_of_recruitment) as `so luong tuyen dung`, avg(salary) as `luong`,\n" +
             "       concat(\"Quý \",timed.quarterD,\"/\",timed.yearD) as `time`, timed.idTime,\n" +
-            "       rank() over (partition by idTime,province.idProvince, industries.idIndustry order by sum(number_of_recruitment) desc) as `rank`\n" +
+            "       rank() over (partition by idTime,province.idProvince, industries.idIndustry order by avg(salary) desc) as `rank`\n" +
             "from (select distinct idTime, idCompany,idProvince,idIndustry, idJob,salary, number_of_recruitment\n" +
             "           from company_fact where idProvince = :idProvince and idIndustry = :industryId   ) as fact, timed, company, industries, province\n" +
             "where fact.idTime = timed.idTime and fact.idProvince = province.idProvince\n" +
@@ -307,20 +307,37 @@ public interface IndustryRepository extends CrudRepository<Industry, String> {
     @Query(value = "select company.name_company, avg(salary)\n" +
             "from company_fact, company, timed\n" +
             "where company_fact.idCompany = company.idCompany and company_fact.idTime = timed.idTime\n" +
-            "    and timed.idTime = :idTime and company.idCompany = :idCompany\n" +
-            "group by company_fact.idTime, company_fact.idCompany;", nativeQuery = true)
-    List<Object[]> getAvgSalaryForCompanyByCountry(@Param("idTime") int idTime, @Param("idCompany") int idCompany);
+            "    and timed.idTime = :idTime and company.idCompany = :idCompany and company_fact.idIndustry = :idIndustry\n" +
+            "group by company_fact.idTime, company_fact.idCompany, company_fact.idIndustry;", nativeQuery = true)
+    List<Object[]> getAvgSalaryForCompanyByCountry(@Param("idTime") int idTime, @Param("idCompany") int idCompany,
+                                                   @Param("idIndustry") int idIndustry);
 
+
+    @Query(value = "select company.name_company, sum(number_of_recruitment)\n" +
+            "from (select distinct idTime, idCompany, idJob,idIndustry, number_of_recruitment\n" +
+            "           from company_fact where idTime = :idTime and idCompany = :idCompany and idIndustry = :idIndustry) as fact, company, timed, industries\n" +
+            "where fact.idCompany = company.idCompany and fact.idTime = timed.idTime and fact.idIndustry = industries.idIndustry\n" +
+            "group by fact.idTime,fact.idIndustry, fact.idCompany;", nativeQuery = true)
+    List<Object[]> getNumJobForCompanyByCountry(@Param("idTime") int idTime, @Param("idCompany") int idCompany,
+                                                @Param("idIndustry") int idIndustry);
 
     // lay thong tin  so luong tuyen dung cong ty theo quy
     @Query(value = "select company.name_company, sum(number_of_recruitment)\n" +
-            "from company_fact, company, timed, province, industries\n" +
-            "where company_fact.idCompany = company.idCompany and company_fact.idTime = timed.idTime\n" +
-            "    and company_fact.idProvince = province.idProvince and company_fact.idIndustry = industries.idIndustry\n" +
-            "    and timed.idTime = :idTime and company.idCompany = :idCompany and province.idProvince = :idProvince\n" +
-            "    and industries.idIndustry = :industryId\n" +
-            "group by company_fact.idTime, company_fact.idCompany,industries.idIndustry, province.idProvince;", nativeQuery = true)
+            "from (select distinct idTime, idCompany,idProvince,idIndustry, idJob, number_of_recruitment\n" +
+            "           from company_fact where idTime = :idTime and idCompany = :idCompany and idProvince = :idProvince and idIndustry = :industryId) as fact, company, timed, province, industries\n" +
+            "where fact.idCompany = company.idCompany and fact.idTime = timed.idTime\n" +
+            "    and fact.idProvince = province.idProvince and fact.idIndustry = industries.idIndustry\n" +
+            "group by fact.idTime, fact.idCompany,industries.idIndustry, province.idProvince;", nativeQuery = true)
     List<Object[]> getRecruitmentOfCompanyInQuarter( @Param("idTime") int idTime, @Param("idCompany") int idCompany,
+                                                     @Param("idProvince") int idProvince, @Param("industryId") int industryId);
+
+    @Query(value = "select company.name_company, avg(salary)\n" +
+            "from (select distinct idTime, idCompany,idProvince,idIndustry, idJob, salary\n" +
+            "           from company_fact where idTime = :idTime and idCompany = :idCompany and idProvince = :idProvince and idIndustry = :industryId) as fact, company, timed, province, industries\n" +
+            "where fact.idCompany = company.idCompany and fact.idTime = timed.idTime\n" +
+            "    and fact.idProvince = province.idProvince and fact.idIndustry = industries.idIndustry\n" +
+            "group by fact.idTime, fact.idCompany,industries.idIndustry, province.idProvince;", nativeQuery = true)
+    List<Object[]> getSalaryOfCompanyInQuarter( @Param("idTime") int idTime, @Param("idCompany") int idCompany,
                                                      @Param("idProvince") int idProvince, @Param("industryId") int industryId);
 
 

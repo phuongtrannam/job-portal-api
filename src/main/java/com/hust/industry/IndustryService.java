@@ -114,7 +114,7 @@ public class IndustryService {
                 companyObject.put("id", "C" + idCompany);
                 companyObject.put("timestamp", ob[ob.length - 2].toString());
                 companyObject.put("name", ob[1].toString());
-                List<Object[]> avgSalaryOfCompany = industryRepository.getAvgSalaryForCompanyByCountry(idTime, idCompany);
+                List<Object[]> avgSalaryOfCompany = industryRepository.getAvgSalaryForCompanyByCountry(idTime, idCompany, idIndustry);
                 companyObject.put("averageSalary", round((double) avgSalaryOfCompany.get(0)[1],2));
                 double numJob = (double) ob[2];
                 companyObject.put("numJob", (int) numJob);
@@ -154,6 +154,74 @@ public class IndustryService {
                 companyList.add(companyObject);
             }
         }
+
+
+        final JSONObject jsonObject = new JSONObject();
+        jsonObject.put("description", "The top company by industry");
+
+        jsonObject.put("result", companyList);
+        return jsonObject;
+    }
+
+
+
+    public JSONObject getTopSalaryCompanyByIndustry(String industryId, String locationId ){
+
+        List<Object[]> list = null;
+        JSONArray companyList = new JSONArray();
+//        System.out.println(locationId.contains("P"));
+        if(locationId.equals("P0")){
+            int idIndustry = Integer.valueOf(industryId.replace("I",""));
+            list = industryRepository.getTopSalaryCompanyByIndustryWithCountry(idIndustry);
+
+            for(Object[] ob : list){
+                int idCompany = (int) ob[0];
+                int idTime = (int) ob[ob.length - 1];
+                HashMap<String, Object> companyObject = new HashMap<String, Object>();
+                companyObject.put("id", "C" + idCompany);
+                companyObject.put("timestamp", ob[ob.length - 2].toString());
+                companyObject.put("name", ob[1].toString());
+                List<Object[]> numJobCompany = industryRepository.getNumJobForCompanyByCountry(idTime, idCompany, idIndustry);
+                companyObject.put("numJob", round((double) numJobCompany.get(0)[1],2));
+                double salary = (double) ob[2];
+                companyObject.put("averageSalary", round(salary,2));
+                companyObject.put("growth", ob[3]);
+                companyList.add(companyObject);
+            }
+        }
+        else{
+            int idIndustry = Integer.valueOf(industryId.replace("I",""));
+            int idProvince = Integer.valueOf(locationId.replace("P",""));
+            list = industryRepository.getTopSalaryCompanyByIndustryWithProvince(idProvince, idIndustry);
+            System.out.println(list);
+            for( Object[] ob: list){
+                int idCompany = (int) ob[0];
+//                System.out.println(idCompany);
+                int idTime = (int) ob[ob.length - 1];
+                HashMap<String, Object> companyObject = new HashMap<String, Object>();
+                companyObject.put("id","C" +  ob[0].toString());
+                companyObject.put("timestamp", ob[ob.length - 2].toString());
+                companyObject.put("name", ob[1].toString());
+                double avgSalary = (double) ob[3];
+                companyObject.put("averageSalary", round(avgSalary,2));
+                companyObject.put("numJob", (int) (double) ob[2]);
+                int lastIdTime = idTime - 1 ;
+                System.out.println(lastIdTime);
+                List<Object[]> salaryOfCompanyInQuarter = industryRepository.getSalaryOfCompanyInQuarter(lastIdTime,idCompany,idProvince, idIndustry);
+                double growth = 0;
+                try {
+                    double salaryInLastQuarter = (double) salaryOfCompanyInQuarter.get(0)[1];
+                    growth = (((double)ob[3]/salaryInLastQuarter) - 1)*100;
+                    companyObject.put("growth",round(growth,2));
+                }
+                catch (Exception e){
+                    System.out.println(e);
+                    companyObject.put("growth",0);
+                }
+                companyList.add(companyObject);
+            }
+        }
+
 
         final JSONObject jsonObject = new JSONObject();
         jsonObject.put("description", "The top company by industry");
