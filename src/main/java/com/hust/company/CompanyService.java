@@ -25,13 +25,13 @@ public class CompanyService {
             HashMap<String, String> companyObject = new HashMap<String, String>();
             companyObject.put("id", ob[0].toString());
             companyObject.put("name", ob[1].toString());
-            companyObject.put("phonenumber", ob[2].toString());
-            companyObject.put("description", ob[1].toString());
-            companyObject.put("founded_year", ob[4].toString());
+//            companyObject.put("phonenumber", ob[2].toString());
+//            companyObject.put("description", ob[1].toString());
+//            companyObject.put("founded_year", ob[4].toString());
             // companyObject.put("industry", ob[1].toString());
-            companyObject.put("website", ob[5].toString());
+//            companyObject.put("website", ob[5].toString());
             companyObject.put("location", ob[6].toString());
-            companyObject.put("logo", ob[1].toString());
+//            companyObject.put("logo", ob[1].toString());
             companyList.add(companyObject);
         }
         jsonObject.put("result", companyList);
@@ -72,13 +72,13 @@ public class CompanyService {
             
             companyObject.put("id", id);
             companyObject.put("name", ob[0].toString());
-            companyObject.put("phonenumber", ob[1].toString());
-            companyObject.put("description", ob[0].toString());
-            companyObject.put("founded_year", ob[3].toString());
-            companyObject.put("website", ob[4].toString());
+//            companyObject.put("phonenumber", ob[1].toString());
+//            companyObject.put("description", ob[0].toString());
+//            companyObject.put("founded_year", ob[3].toString());
+//            companyObject.put("website", ob[4].toString());
             companyObject.put("location", ob[5].toString());
             companyObject.put("num_job", ob[6].toString());
-            companyObject.put("logo", ob[0].toString());
+//            companyObject.put("logo", ob[0].toString());
         }
         jsonObject.put("result", companyObject);
         return jsonObject;
@@ -99,12 +99,12 @@ public class CompanyService {
             HashMap<String, String> companyObject = new HashMap<String, String>();
             companyObject.put("id", ob[0].toString());
             companyObject.put("name", ob[1].toString());
-            companyObject.put("phonenumber", ob[2].toString());
-            companyObject.put("description", ob[1].toString());
-            companyObject.put("founded_year", ob[4].toString());
-            companyObject.put("website", ob[5].toString());
+//            companyObject.put("phonenumber", ob[2].toString());
+//            companyObject.put("description", ob[1].toString());
+//            companyObject.put("founded_year", ob[4].toString());
+//            companyObject.put("website", ob[5].toString());
             companyObject.put("location", ob[6].toString());
-            companyObject.put("logo", ob[0].toString());
+//            companyObject.put("logo", ob[0].toString());
             relatedCompany.add(companyObject);
         }
         jsonObject.put("result", relatedCompany);
