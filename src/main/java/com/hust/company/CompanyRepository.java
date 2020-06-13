@@ -65,7 +65,8 @@ public interface CompanyRepository extends CrudRepository<Company, String> {
                     "and fact.idTime in " +
                         "( select idTime from " + 
                             "( select idTime from timed order by timestampD desc limit 1 ) as t )" +
-                    "group by fact.idJob, fact.idProvince ;", nativeQuery = true)
+                    "group by fact.idJob, fact.idProvince " +
+            "order by sum(number_of_recruitment) desc ;", nativeQuery = true)
     List<Object[]> getRecentJobByCompany(@Param("id") String id);
 
     
