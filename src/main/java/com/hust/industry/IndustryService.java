@@ -367,7 +367,7 @@ public class IndustryService {
     public JSONObject getTopHiringJob(String industryId, String locationId ){
 
         final JSONObject jsonObject = new JSONObject();
-        jsonObject.put("description", "The top hiring company");
+        jsonObject.put("description", "The top hiring job");
 
         JSONArray jobArray = new JSONArray();
         JSONArray dataArray = new JSONArray();
@@ -388,7 +388,7 @@ public class IndustryService {
 
             for(Object[] ob : list){
                 if(!timestamp.equals(ob[0].toString())){
-                    timeObject.put("company",jobArray);
+                    timeObject.put("job",jobArray);
                     timeObject.put("data", dataArray);
                     timeObject.put("growth", growthArray);
                     jsonObject.put(timestamp, timeObject);
@@ -409,7 +409,7 @@ public class IndustryService {
                 List<Object[]> recruitmentOfJobInQuarter = industryRepository.getRecruitmentJobInQuarterWithCountry((int)ob[1],idIndustry, lastIdTime);
                 getGrowthValue(growthArray, (double) ob[ob.length -2], recruitmentOfJobInQuarter);
             }
-            timeObject.put("company",jobArray);
+            timeObject.put("job",jobArray);
             timeObject.put("data", dataArray);
             timeObject.put("growth", growthArray);
             jsonObject.put(timestamp, timeObject);
@@ -430,7 +430,7 @@ public class IndustryService {
 
             for(Object[] ob : list){
                 if(!ob[0].toString().equals(timestamp)){
-                    timeObject.put("company",jobArray);
+                    timeObject.put("job",jobArray);
                     timeObject.put("data", dataArray);
                     timeObject.put("growth", growthArray);
                     jsonObject.put(timestamp, timeObject);
@@ -451,7 +451,7 @@ public class IndustryService {
                 List<Object[]> recruitmentOfJobInQuarter = industryRepository.getRecruitmentJobInQuarterWithProvince((int)ob[1],idIndustry, lastIdTime, idProvince);
                 getGrowthValue(growthArray, (double) ob[ob.length -2], recruitmentOfJobInQuarter);
             }
-            timeObject.put("company",jobArray);
+            timeObject.put("job",jobArray);
             timeObject.put("data", dataArray);
             timeObject.put("growth", growthArray);
             jsonObject.put(timestamp, timeObject);
@@ -497,7 +497,7 @@ public class IndustryService {
 
             for(Object[] ob : list){
                 if(!timestamp.equals(ob[0].toString())){
-                    timeObject.put("company",jobArray);
+                    timeObject.put("job",jobArray);
                     timeObject.put("data", dataArray);
                     timeObject.put("numJob", numJobArray);
                     timeObject.put("growth", growthArray);
@@ -522,7 +522,7 @@ public class IndustryService {
                 List<Object[]> recruitmentOfJobInQuarter = industryRepository.getSalaryJobInQuarterWithCountry((int)ob[1],idIndustry, lastIdTime);
                 getGrowthValue(growthArray, (double) ob[ob.length -3], recruitmentOfJobInQuarter);
             }
-            timeObject.put("company",jobArray);
+            timeObject.put("job",jobArray);
             timeObject.put("data", dataArray);
             timeObject.put("growth", growthArray);
             jsonObject.put(timestamp, timeObject);
@@ -544,7 +544,7 @@ public class IndustryService {
 
             for(Object[] ob : list){
                 if(!ob[0].toString().equals(timestamp)){
-                    timeObject.put("company",jobArray);
+                    timeObject.put("job",jobArray);
                     timeObject.put("data", dataArray);
                     timeObject.put("numJob", numJobArray);
                     timeObject.put("growth", growthArray);
@@ -569,7 +569,7 @@ public class IndustryService {
                 List<Object[]> recruitmentOfJobInQuarter = industryRepository.getSalaryJobInQuarterWithProvince((int)ob[1],idIndustry, lastIdTime, idProvince);
                 getGrowthValue(growthArray, (double) ob[ob.length -3], recruitmentOfJobInQuarter);
             }
-            timeObject.put("company",jobArray);
+            timeObject.put("job",jobArray);
             timeObject.put("data", dataArray);
             timeObject.put("numJob", numJobArray);
             timeObject.put("growth", growthArray);
