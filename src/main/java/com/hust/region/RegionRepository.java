@@ -9,24 +9,27 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 @Repository
 public interface RegionRepository extends CrudRepository<Region, String> {
-
-
+    // Pending
     @Query(value = "select * from job fact", nativeQuery = true)
     List<Object[]> getRootRegion(@Param("id") String id);
-
+    
+    //Done
     @Query(value = "select idProvince, Province\n" +
             "from province;", nativeQuery = true)
     List<Object[]> getProvinceRegion();
 
+    //Pending
     @Query( value = "select district\n" +
             "from province, location\n" +
             "where province.idProvince = location.IdProvince\n" +
             "    and province.idProvince = :id ;", nativeQuery = true)
     List<Object[]> getDistinctByProvince(@Param("id") int id);
 
+    //Pending
     @Query(value = "select * from job fact", nativeQuery = true)
     List<Object[]> getRelatedRegions(@Param("id") String id);
 
+    // Done - slow      
     @Query(value = "select timed.idTime, concat(\"Quý \",timed.quarterD,\"/\",timed.yearD) as `time`, sum(number_of_recruitment)\n" +
             "from (select distinct idTime, idCompany, idJob, number_of_recruitment\n" +
             "      from company_fact) as fact, timed\n" +
@@ -35,6 +38,7 @@ public interface RegionRepository extends CrudRepository<Region, String> {
             "group by timed.idTime;", nativeQuery = true)
     List<Object[]> getNumberJobPostingInCountry();
 
+    //Done - slow
     @Query( value = "select timed.idTime, concat(\"Quý \",timed.quarterD,\"/\",timed.yearD) as `time`, sum(fact.number_of_recruitment)\n" +
             "from (select distinct idTime, idCompany,idProvince, idJob, number_of_recruitment\n" +
             "      from company_fact \n" +
@@ -44,6 +48,7 @@ public interface RegionRepository extends CrudRepository<Region, String> {
             "group by timed.idTime, province.idProvince;", nativeQuery = true)
     List<Object[]> getNumberJobPostingInProvince(@Param("idProvince") int idProvince);
 
+    //Done - slow
     @Query(value = "with tmp as (\n" +
             "    select distinct idTime, idCompany\n" +
             "    from company_fact\n" +
@@ -56,6 +61,7 @@ public interface RegionRepository extends CrudRepository<Region, String> {
             "order by idTime desc;", nativeQuery = true)
     List<Object[]> getNumberCompanyInCountry();
 
+     //Done - slow
     @Query( value = "with tmp as (\n" +
             "    select distinct idTime, idCompany\n" +
             "    from company_fact\n" +
@@ -72,20 +78,21 @@ public interface RegionRepository extends CrudRepository<Region, String> {
     @Query(value = "select * from job fact", nativeQuery = true)
     List<Object[]> getAverageSalaryInRegion(@Param("id") String id);
 
+    // Done - Không hiểu câu này ra cái gì     
     @Query( value = "select year(timestampD) as `thoi gian`, number_of_recruitment, salary\n" +
             "from company_fact, timed\n" +
             "where company_fact.idTime = timed.idTime\n" +
             "    and timed.yearD between year(curdate()) - 2 and year(curdate()) -1 \n" +
             "order by timed.idTime desc;", nativeQuery = true)
     List<Object[]> getListSalaryInLastYearWithCountry();
-
+    // Done - Không hiểu câu này ra cái gì      
     @Query( value = "select year(timestampD) as `thoi gian`, number_of_recruitment, salary\n" +
             "from company_fact, timed\n" +
             "where company_fact.idTime = timed.idTime and idProvince = :idProvince \n" +
             "    and timed.yearD between year(curdate()) - 2 and year(curdate()) -1 \n" +
             "order by timed.idTime desc;", nativeQuery = true)
     List<Object[]> getListSalaryInLastYearWithProvince(@Param("idProvince") int idProvince);
-
+    // Done - Không hiểu câu này ra cái gì 
     @Query(value = "select year(timestampD) as `thoi gian`, number_of_recruitment, age\n" +
             "from company_fact, timed, age\n" +
             "where company_fact.idTime = timed.idTime\n" +
@@ -93,14 +100,14 @@ public interface RegionRepository extends CrudRepository<Region, String> {
             "  and timed.yearD between year(curdate())-2 and year(curdate())-1 \n" +
             "order by timed.idTime desc;", nativeQuery = true)
     List<Object[]> getAverageAgeInCountry();
-
+    // Done - slow - Không hiểu câu này ra cái gì 
     @Query( value = "select year(timestampD) as `thoi gian`, number_of_recruitment, age\n" +
             "from company_fact, timed, age, province\n" +
             "where company_fact.idTime = timed.idTime and company_fact.idProvince = province.idProvince\n" +
             "  and company_fact.idAge = age.idAge and province.idProvince = :idProvince \n" +
             "  and timed.yearD between year(curdate())-1 and year(curdate());", nativeQuery = true)
     List<Object[]> getAverageAgeInProvince(@Param("idProvince") int idProvince);
-
+    // Done - slow 
     @Query(value = "select industries.idIndustry, industries.name_industry,\n" +
             "       top10.salary, top10.growth, timed.idTime,\n" +
             "       concat(\"Quý \",timed.quarterD,\"/\",timed.yearD) as `time`\n" +
@@ -110,7 +117,8 @@ public interface RegionRepository extends CrudRepository<Region, String> {
             "  and top10.idIndustry = industries.idIndustry\n" +
             "order by timed.idTime, top10.salary desc;", nativeQuery = true)
     List<Object[]> getAverageSalaryByIndustryWithCountry();
-
+    
+    // Done - slow 
     @Query( value = "select industries.idIndustry, industries.name_industry,\n" +
             "       top10.salary, top10.growth, timed.idTime,\n" +
             "       concat(\"Quý \",timed.quarterD,\"/\",timed.yearD) as `time`\n" +
@@ -121,7 +129,7 @@ public interface RegionRepository extends CrudRepository<Region, String> {
             "  and province.idProvince = :idProvince \n" +
             "order by timed.idTime, top10.salary desc;", nativeQuery = true)
     List<Object[]> getAverageSalaryByIndustryWithProvince(@Param("idProvince") int idProvince);
-    
+    //Done
     @Query(value = "select industries.idIndustry, industries.name_industry,\n" +
             "       top10.number_of_recruitment, top10.growth, concat(\"Quý \",timed.quarterD,\"/\",timed.yearD) as `time`\n" +
             "from top10_industries_with_the_highest_recruitment as top10, timed, industries\n" +
@@ -130,7 +138,7 @@ public interface RegionRepository extends CrudRepository<Region, String> {
             "  and top10.idIndustry = industries.idIndustry\n" +
             "order by timed.idTime, top10.number_of_recruitment desc", nativeQuery = true)
     List<Object[]> getJobDemandByIndustryWithCountry();
-
+    //Done
     @Query( value = "select industries.idIndustry, industries.name_industry,\n" +
             "       top10.number_of_recruitment, top10.growth, concat(\"Quý \",timed.quarterD,\"/\",timed.yearD) as `time`\n" +
             "from top10_industries_with_the_highest_recruitment_by_region as top10, timed, province, industries\n" +
@@ -140,7 +148,7 @@ public interface RegionRepository extends CrudRepository<Region, String> {
             "  and province.idProvince = :idProvince \n" +
             "order by timed.idTime, top10.number_of_recruitment desc", nativeQuery = true)
     List<Object[]> getJobDemandByIndustryWithProvince(@Param("idProvince") int idProvince);
-
+    //Done
     @Query(value = "select job.idJob, job.name_job,\n" +
             "       top10.salary, top10.growth, timed.idTime,concat(\"Quý \",timed.quarterD,\"/\",timed.yearD) as `time`\n" +
             "from top10_highest_salary_jobs as top10, timed, job\n" +
@@ -149,7 +157,7 @@ public interface RegionRepository extends CrudRepository<Region, String> {
             "  and top10.idTime in (select idTime from ( select idTime from timed order by timestampD desc limit 3) as t)\n" +
             "order by timed.idTime, top10.salary desc;", nativeQuery = true)
     List<Object[]> getHighestSalaryJobsWithCountry();
-
+    //Done
     @Query( value = "select job.idJob, job.name_job,\n" +
             "       top10.salary, top10.growth, timed.idTime,concat(\"Quý \",timed.quarterD,\"/\",timed.yearD) as `time`\n" +
             "from top10_highest_salary_jobs_by_region as top10, timed, province,  job\n" +
@@ -159,7 +167,7 @@ public interface RegionRepository extends CrudRepository<Region, String> {
             "  and top10.idTime in (select idTime from ( select idTime from timed order by timestampD desc limit 3) as t)\n" +
             "order by timed.idTime, province.idProvince, top10.salary desc;", nativeQuery = true)
     List<Object[]> getHighestSalaryJobsWithProvince(@Param("idProvince") int idProvince);
-
+    //Done
     @Query(value = "select job.idJob, job.name_job,\n" +
             "       top10.number_of_recruitment, top10.growth, timed.idTime,concat(\"Quý \",timed.quarterD,\"/\",timed.yearD) as `time`\n" +
             "from top10_jobs_with_the_highest_recruitment as top10, timed, job\n" +
@@ -168,7 +176,7 @@ public interface RegionRepository extends CrudRepository<Region, String> {
             "  and top10.idTime in (select idTime from ( select idTime from timed order by timestampD desc limit 3) as t)\n" +
             "order by timed.idTime, top10.number_of_recruitment desc;", nativeQuery = true)
     List<Object[]> getHighestDemandJobsWithCountry();
-
+    //Done
     @Query(value = "select job.idJob, job.name_job,\n" +
             "       top10.number_of_recruitment, top10.growth, timed.idTime,concat(\"Quý \",timed.quarterD,\"/\",timed.yearD) as `time`\n" +
             "from top10_jobs_with_the_highest_recruitment_by_region as top10, timed, province,  job\n" +
@@ -178,7 +186,7 @@ public interface RegionRepository extends CrudRepository<Region, String> {
             "  and top10.idTime in (select idTime from ( select idTime from timed order by timestampD desc limit 3) as t)\n" +
             "order by timed.idTime, province.idProvince, top10.number_of_recruitment desc;", nativeQuery = true)
     List<Object[]> getHighestDemandJobsWithProvince(@Param("idProvince") int idProvince);
-
+    //Done
     @Query(value = "select company.idCompany, company.name_company,\n" +
             "       top10.salary, top10.growth, timed.idTime,\n" +
             "       concat(\"Quý \",timed.quarterD,\"/\",timed.yearD) as `time`\n" +
@@ -188,7 +196,7 @@ public interface RegionRepository extends CrudRepository<Region, String> {
             "  and top10.idTime in (select idTime from ( select idTime from timed order by timestampD desc limit 3) as t)\n" +
             "order by timed.idTime, top10.salary desc;", nativeQuery = true)
     List<Object[]> getHighestPayingCompaniesWithCountry();
-
+    //Done
     @Query( value = "select company.idCompany, company.name_company,\n" +
             "       top10.salary, top10.growth, timed.idTime,\n" +
             "       concat(\"Quý \",timed.quarterD,\"/\",timed.yearD) as `time`\n" +
@@ -198,7 +206,7 @@ public interface RegionRepository extends CrudRepository<Region, String> {
             "  and top10.idTime in (select idTime from ( select idTime from timed order by timestampD desc limit 3) as t)\n" +
             "order by timed.idTime, top10.salary desc;", nativeQuery = true)
     List<Object[]> getHighestPayingCompaniesWithProvince(@Param("idProvince") int idProvince);
-
+    //Done
     @Query(value = "select company.idCompany, company.name_company,\n" +
             "       top10.number_of_recruitment, top10.growth, timed.idTime, concat(\"Quý \",timed.quarterD,\"/\",timed.yearD) as `time`\n" +
             "from top10_companies_with_the_highest_recruitment as top10, timed,  company\n" +
@@ -207,7 +215,7 @@ public interface RegionRepository extends CrudRepository<Region, String> {
             "  and top10.idTime in (select idTime from ( select idTime from timed order by timestampD desc limit 3) as t)\n" +
             "order by timed.idTime, top10.number_of_recruitment desc;", nativeQuery = true)
     List<Object[]> getTopHiringCompaniesWithCountry();
-
+    //Done
     @Query( value ="select company.idCompany, company.name_company,\n" +
             "       top10.number_of_recruitment, top10.growth, timed.idTime, concat(\"Quý \",timed.quarterD,\"/\",timed.yearD) as `time`\n" +
             "from top10_companies_with_the_highest_recruitment_by_region as top10, timed,  company, province\n" +
