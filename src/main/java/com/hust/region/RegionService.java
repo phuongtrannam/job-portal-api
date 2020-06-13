@@ -1,9 +1,6 @@
 package com.hust.region;
 
-import java.util.HashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -924,6 +921,101 @@ public class RegionService {
     }
 
 
+    public JSONObject getJobDemandByLiteracy( String locationId ){
+        final JSONObject jsonObject = new JSONObject();
+        jsonObject.put("description", "The job demand by literacy");
+
+        List<String> listLiteracy = new ArrayList<>();
+
+        JSONObject timeObject = new JSONObject();
+        JSONArray literacyArray = new JSONArray();
+        JSONArray dataArray = new JSONArray();
+        JSONArray growthArray = new JSONArray();
+        List<Object[]> listObjectLiteracy = regionRepository.getLiteracy();
+        for( Object[] ob : listObjectLiteracy){
+            HashMap<String, Object> literacyObject = new HashMap<>();
+            literacyObject.put("id", ob[0].toString());
+            literacyObject.put("name",ob[1].toString());
+            literacyArray.add(literacyObject);
+            listLiteracy.add(ob[0].toString());
+        }
+        jsonObject.put("literacy",literacyArray);
+        Object[] listValueLiteracy = new Object[listLiteracy.size()];
+        Object[] listPastValueLiteracy = new Object[listLiteracy.size()];
+        Object[] listGrowth = new Object[listLiteracy.size()];
+        System.out.println(listLiteracy.toString());
+        if(locationId.equals("P0")){
+            List<Object[]> list = regionRepository.getJobDemandByLiteracyWithCountry();
+            Set<String> timeSet = new LinkedHashSet<>();
+            for (Object[] ob : list) {
+                timeSet.add(ob[0].toString());
+            }
+            jsonObject.put("timestamps",timeSet);
+            getJSONJobDemandLiteracy(jsonObject, listLiteracy, timeObject, listValueLiteracy, listPastValueLiteracy, listGrowth, list);
+        }
+        else {
+            int idProvince = Integer.valueOf(locationId.replace("P",""));
+            List<Object[]> list = regionRepository.getjobDemandByLiteracyWithProvince( idProvince);
+            Set<String> timeSet = new LinkedHashSet<>();
+            for (Object[] ob : list) {
+                timeSet.add(ob[0].toString());
+            }
+            jsonObject.put("timestamps",timeSet);
+            getJSONJobDemandLiteracy(jsonObject, listLiteracy, timeObject, listValueLiteracy, listPastValueLiteracy, listGrowth, list);
+        }
+        return jsonObject;
+    }
+
+    private void getJSONJobDemandLiteracy(JSONObject jsonObject, List<String> listLiteracy, JSONObject timeObject, Object[] listValueLiteracy, Object[] listPastValueLiteracy, Object[] listGrowth, List<Object[]> list) {
+        JSONArray dataArray;
+        JSONArray growthArray;
+        String time = list.get(0)[0].toString();
+        for(Object[] ob : list){
+//            System.out.println(ob[0].toString());
+//            System.out.println(ob[1].toString());
+//            System.out.println(ob[2].toString());
+            if(!time.equals(ob[0].toString())) {
+                if(!checkArrayStringNotNull(listPastValueLiteracy)){
+                    time = ob[0].toString();
+                    listPastValueLiteracy = listValueLiteracy.clone();
+                    listValueLiteracy = new Object[listLiteracy.size()];
+                }
+                else{
+                    dataArray = convertArrayToJSON(listValueLiteracy);
+                    growthArray = convertArrayToJSON(listGrowth);
+                    timeObject.put("data", dataArray);
+                    timeObject.put("growth", growthArray);
+                    jsonObject.put(time, timeObject);
+                    listPastValueLiteracy = listValueLiteracy.clone();
+                    listValueLiteracy = new Object[listLiteracy.size()];
+                    listGrowth = new Object[listLiteracy.size()];
+                    timeObject = new JSONObject();
+                    time = ob[0].toString();
+                }
+            }
+            for(String literacy: listLiteracy){
+                int index = listLiteracy.indexOf(literacy);
+                if(ob[ob.length - 2].toString().equals(literacy)){
+                    listValueLiteracy[index] = (int) (double) ob[1];
+                    try {
+                        double growth = (( (double)(int)listValueLiteracy[index] / (double) (int) listPastValueLiteracy[index]) - 1) * 100;
+                        listGrowth[index] = round(growth, 2);
+                    } catch (Exception e) {
+                        System.out.println(e);
+                        listGrowth[index] = 0.0;
+                    }
+                }
+            }
+        }
+        dataArray = convertArrayToJSON(listValueLiteracy);
+        growthArray = convertArrayToJSON(listGrowth);
+//            System.out.println(growthArray.toString());
+        timeObject.put("data", dataArray);
+        timeObject.put("growth", growthArray);
+        jsonObject.put(time, timeObject);
+    }
+
+
 
     public static double round(double value, final int places) {
         if (places < 0) throw new IllegalArgumentException();
@@ -960,5 +1052,14 @@ public class RegionService {
             jsArray.add(myArray[i]);
         }
         return jsArray;
+    }
+
+    public static boolean checkArrayStringNotNull( Object[] list){
+        for( Object i: list){
+            if( i != null){
+                return true;
+            }
+        }
+        return false;
     }
 }

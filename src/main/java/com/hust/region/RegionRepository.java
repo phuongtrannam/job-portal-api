@@ -329,4 +329,32 @@ public interface RegionRepository extends CrudRepository<Region, String> {
             "order by timed.idTime, gender.idGender, age.age;", nativeQuery = true)
     List<Object[]> getJobDemandByAgeWithProvince(@Param("locationId") int locationId);
 
+    @Query( value = " select * from academic_level;", nativeQuery = true)
+    List<Object[]> getLiteracy();
+
+    @Query(value = "select concat(\"Quý \",timed.quarterD,\"/\",timed.yearD) as `time`,\n" +
+            "       sum(fact.number_of_recruitment),\n" +
+            "       academic_level.idAcademic_Level,academic_level.academic_level\n" +
+            "from (select distinct idTime, idCompany, idJob,idAcademic_Level, number_of_recruitment\n" +
+            "      from company_fact \n " +
+            ") as fact, academic_level, timed\n" +
+            "where fact.idTime = timed.idTime and fact.idAcademic_Level = academic_level.idAcademic_Level\n" +
+            "    and fact.idTime in (select idTime from (select idTime from timed order by timestampD desc limit 4) as t )\n" +
+            "group by timed.idTime, academic_level.idAcademic_Level\n" +
+            "order by timed.timestampD, academic_level.academic_level;", nativeQuery = true)
+    List<Object[]> getJobDemandByLiteracyWithCountry();
+
+    @Query( value = "select concat(\"Quý \",timed.quarterD,\"/\",timed.yearD) as `time`,\n" +
+            "       sum(fact.number_of_recruitment),\n" +
+            "       academic_level.idAcademic_Level,academic_level.academic_level\n" +
+            "from (select distinct idTime, idCompany, idJob,idAcademic_Level,idProvince, number_of_recruitment\n" +
+            "      from company_fact \n" +
+            "where idProvince = :locationId) as fact, academic_level, timed, province\n" +
+            "where fact.idTime = timed.idTime and fact.idAcademic_Level = academic_level.idAcademic_Level\n" +
+            "  and fact.idProvince = province.idProvince\n" +
+            "  and fact.idTime in (select idTime from (select idTime from timed order by timestampD desc limit 4) as t )\n" +
+            "group by timed.idTime,province.idProvince, academic_level.idAcademic_Level\n" +
+            "order by timed.timestampD, academic_level.academic_level;", nativeQuery = true)
+    List<Object[]> getjobDemandByLiteracyWithProvince(@Param("locationId") int locationId);
+
 }

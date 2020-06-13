@@ -113,6 +113,14 @@ public class RegionController {
         return regionService.getJobDemandByAge(locationId);
     }
 
+    @CrossOrigin(origins = "http://localhost:4200")
+    @RequestMapping(value = "/regions/get_job_demand_by_literacy", method = RequestMethod.POST)
+    public JSONObject getJobDemandByLiteracy(@RequestBody Map<String, Object> payload) throws Exception {
+        // System.out.println(payload.get("id"));
+        String locationId = payload.get("locationId").toString();
+        return regionService.getJobDemandByLiteracy(locationId);
+    }
+
     //todo
     @CrossOrigin(origins = "http://localhost:4200")
     @RequestMapping(value = "/regions/get_related_regions", method = RequestMethod.POST)
