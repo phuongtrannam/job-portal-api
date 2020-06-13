@@ -304,4 +304,29 @@ public interface RegionRepository extends CrudRepository<Region, String> {
             "group by idTime,idProvince, idCompany;", nativeQuery = true)
     List<Object[]> getSalaryByCompanyWithProvince(@Param("idTime") int idTime, @Param("idCompany") int idCompany,
                                                   @Param("idProvince") int idProvince);
+
+    @Query( value = " select * from age;", nativeQuery = true)
+    List<Object[]> getAgeRange();
+
+    @Query(value = "select concat(\"Quý \",timed.quarterD,\"/\",timed.yearD) as `time`, sum(number_of_recruitment), age.age, gender.gender\n" +
+            "from (select distinct idTime, idCompany,idAge, idGender, idJob, number_of_recruitment\n" +
+            "           from company_fact) as fact, gender, age, timed\n" +
+            "where fact.idTime = timed.idTime and fact.idGender = gender.idGender\n" +
+            "  and fact.idAge = age.idAge\n" +
+            "  and fact.idTime in (select idTime from ( select idTime from timed order by timestampD desc limit 4) as t )\n" +
+            "group by timed.idTime, gender.idGender, age.idAge\n" +
+            "order by timed.idTime, gender.idGender, age.age;", nativeQuery = true)
+    List<Object[]> getJobDemandByAgeWithCountry();
+
+    @Query( value = "select concat(\"Quý \",timed.quarterD,\"/\",timed.yearD) as `time`, sum(number_of_recruitment), age.age, gender.gender\n" +
+            "from (select distinct idTime, idCompany,idAge, idGender,idProvince, idJob, number_of_recruitment \n" +
+            "        from company_fact where idProvince = :locationId ) as fact, gender, age, timed, province\n" +
+            "where fact.idTime = timed.idTime and fact.idGender = gender.idGender\n" +
+            "  and fact.idAge = age.idAge\n" +
+            "  and fact.idProvince = province.idProvince\n" +
+            "  and fact.idTime in (select idTime from ( select idTime from timed order by timestampD desc limit 4) as t )\n" +
+            "group by timed.idTime, province.idProvince, gender.idGender, age.idAge\n" +
+            "order by timed.idTime, gender.idGender, age.age;", nativeQuery = true)
+    List<Object[]> getJobDemandByAgeWithProvince(@Param("locationId") int locationId);
+
 }

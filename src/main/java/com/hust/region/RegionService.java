@@ -841,6 +841,90 @@ public class RegionService {
         jsonObject.put(time, timeObject);
     }
 
+    public JSONObject getJobDemandByAge(String locationId ){
+        final JSONObject jsonObject = new JSONObject();
+        jsonObject.put("description", "The job demand by age and gender");
+
+        JSONObject timeObject = new JSONObject();
+        JSONArray ageRangeArray = new JSONArray();
+        JSONArray maleArray = new JSONArray();
+        JSONArray femaleArray = new JSONArray();
+
+        List<Object[]> listObjectAgeRange = regionRepository.getAgeRange();
+
+        for( Object[] ob : listObjectAgeRange){
+            ageRangeArray.add(ob[1].toString());
+            System.out.println(ob[1].toString());
+        };
+        jsonObject.put("ageRange", ageRangeArray);
+
+        int count = 0;
+        Object[] listMale = new Object[ageRangeArray.size()];
+        Object[] listFeMale = new Object[ageRangeArray.size()];
+        if( locationId.equals("P0")){
+            List<Object[]> list = regionRepository.getJobDemandByAgeWithCountry();
+            Set<String> timeSet = new LinkedHashSet<>();
+            for (Object[] ob : list) {
+                timeSet.add(ob[0].toString());
+            }
+            jsonObject.put("timestamps",timeSet);
+            getJSONJobDemandByAge(jsonObject, timeObject, ageRangeArray, listMale, listFeMale, list);
+
+        }
+        else{
+            int idProvince = Integer.valueOf(locationId.replace("P",""));
+            List<Object[]> list = regionRepository.getJobDemandByAgeWithProvince( idProvince);
+            Set<String> timeSet = new LinkedHashSet<>();
+            for (Object[] ob : list) {
+                timeSet.add(ob[0].toString());
+            }
+            jsonObject.put("timestamps",timeSet);
+            getJSONJobDemandByAge(jsonObject, timeObject, ageRangeArray, listMale, listFeMale, list);
+        }
+
+
+        return jsonObject;
+    }
+
+    private void getJSONJobDemandByAge(JSONObject jsonObject, JSONObject timeObject, JSONArray ageRangeArray, Object[] listMale, Object[] listFeMale, List<Object[]> list) {
+        JSONArray maleArray;
+        JSONArray femaleArray;
+        String time = list.get(0)[0].toString();
+        for(Object[] ob: list){
+            for(Object age : ageRangeArray){
+                if(!time.equals(ob[0].toString())){
+                    maleArray = convertArrayToJSON(listMale);
+                    femaleArray = convertArrayToJSON(listFeMale);
+                    timeObject.put("male", maleArray);
+                    timeObject.put("female", femaleArray);
+                    jsonObject.put(time, timeObject);
+                    timeObject = new JSONObject();
+//                        maleArray = new JSONArray();
+//                        femaleArray = new JSONArray();
+                    time = ob[0].toString();
+
+                }
+                if(ob[ob.length -2].toString().equals(age.toString())){
+                    System.out.println(ageRangeArray.indexOf(age));
+                    int index = ageRangeArray.indexOf(age);
+                    if(ob[ob.length-1].toString().equals("Nam")){
+                        listMale[index] = (int) (double)ob[1];
+                    }
+                    else {
+                        listFeMale[index] = (int) (double) ob[1];
+                    }
+                }
+            }
+        }
+        maleArray = convertArrayToJSON(listMale);
+        femaleArray = convertArrayToJSON(listFeMale);
+        timeObject.put("male", maleArray);
+        timeObject.put("female", femaleArray);
+        jsonObject.put(time, timeObject);
+    }
+
+
+
     public static double round(double value, final int places) {
         if (places < 0) throw new IllegalArgumentException();
 
@@ -859,5 +943,22 @@ public class RegionService {
         } catch (final Exception e) {
             growthArray.add("");
         }
+    }
+
+    public static JSONArray convertArrayToJSON( Object[] myArray){
+        JSONArray jsArray = new JSONArray();
+
+        for (int i = 0; i < myArray.length; i++) {
+            if(myArray[i] == null){
+                try{
+                    myArray[i] = 0.0;
+                }
+                catch (Exception e){
+                    myArray[i] = 0;
+                }
+            }
+            jsArray.add(myArray[i]);
+        }
+        return jsArray;
     }
 }
