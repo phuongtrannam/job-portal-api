@@ -67,7 +67,7 @@ public interface IndustryRepository extends CrudRepository<Industry, String> {
             "where top.idTime = timed.idTime and top.idCompany = company.idCompany and top.idIndustry = industries.idIndustry\n" +
             "  and industries.idIndustry = :industryId\n" +
             "  and top.idTime in ( select idTime from ( select idTime from timed order by timestampD desc limit 1 ) as t )\n" +
-            "order by top.idTime,top.idIndustry, top.salary desc;", nativeQuery = true)
+            "order by top.idTime,top.idIndustry, top.salary desc limit 10;", nativeQuery = true)
     List<Object[]> getTopSalaryCompanyByIndustryWithCountry(@Param("industryId") int industryId);
 
     @Query(value = "with rank_companies_1 as (\n" +
@@ -84,7 +84,7 @@ public interface IndustryRepository extends CrudRepository<Industry, String> {
             "select idCompany, name_company, `so luong tuyen dung`, `luong`, `time`, idTime \n" +
             "from rank_companies_1\n" +
             "where `rank` <= 10\n" +
-            "  and rank_companies_1.idTime in ( select idTime from ( select idTime from timed order by timestampD desc limit 1 ) as t );", nativeQuery = true)
+            "  and rank_companies_1.idTime in ( select idTime from ( select idTime from timed order by timestampD desc limit 1 ) as t ) limit 10;", nativeQuery = true)
     List<Object[]> getTopSalaryCompanyByIndustryWithProvince(@Param("idProvince") int idProvince, @Param("industryId") int industryId);
 
 
