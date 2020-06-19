@@ -41,7 +41,7 @@ public interface JobRepository extends CrudRepository<Job, String> {
                         "select idTime from timed order by timestampD desc limit 1 ) as t ) " +
                     "and job.name_job = :queryContent " +
                     "group by job_fact.idTime,gender.idGender,job_fact.idJob " +
-                    "order by job_fact.idTime, job_fact.idJob desc " , nativeQuery = true)
+                    "order by  job_fact.idJob asc, job_fact.idTime desc " , nativeQuery = true)
     List<Object[]> basicSearchJob(@Param("queryContent") String queryContent);
     
     @Query(value = "with jobs_1 as ( " +
