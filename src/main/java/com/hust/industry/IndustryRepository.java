@@ -149,7 +149,8 @@ public interface IndustryRepository extends CrudRepository<Industry, String> {
             "where top.idIndustry = industries.idIndustry and top.idCompany = company.idCompany\n" +
             "    and top.idTime = timed.idTime\n" +
             "    and top.idTime in (select idTime from (select idTime from timed order by timestampD asc limit 8) as t)\n" +
-            "    and industries.idIndustry = :industryId \n;", nativeQuery = true)
+            "    and industries.idIndustry = :industryId \n" +
+            "order by top.idTime,top.number_of_recruitment desc;;", nativeQuery = true)
     List<Object[]> getTopHiringCompanyWithCountry(@Param("industryId") int industryId);
 
     @Query( value = "with rank_companies_1 as (\n" +
