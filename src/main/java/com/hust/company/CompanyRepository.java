@@ -22,7 +22,7 @@ public interface CompanyRepository extends CrudRepository<Company, String> {
         @Query(value =  "select fact.idTime, company.idCompany ,company.name_company, " +
                         "sum(fact.number_of_recruitment) as `so luong tuyen dung`, count(fact.idJob) as `so luong cong viec` " +
                         "from company, (select distinct idTime, idCompany, idJob, number_of_recruitment " +
-                                "from company_fact where idCompany = (:id)) as fact " +
+                                "from company_fact where idCompany IN (:id)) as fact " +
                         "where fact.idCompany = company.idCompany " +
                         "and fact.idTime in ( select idTime from ( select idTime from timed order by timestampD desc limit 1 ) as t ) " +
                         "group by fact.idTime, fact.idCompany; " , nativeQuery = true)
