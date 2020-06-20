@@ -1,5 +1,7 @@
 package com.hust.company;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -13,6 +15,31 @@ public class CompanyService {
     @Autowired
     private CompanyRepository companyRepository;
 
+    public JSONObject searchCompany(final String companyName){
+        final JSONObject jsonObject = new JSONObject();
+        jsonObject.put("description", "The company list search");
+        final List<Object[]> listId = companyRepository.getIdCompanyByName(companyName);
+        List<String> idComanyList = new ArrayList<>();
+        if(listId.size() != 0){
+            for(final Object[] ob : listId){
+                System.out.println(ob[0].toString());
+                idComanyList.add(ob[0].toString());
+            }
+            final List<Object[]> listCompany = companyRepository.searchCompany(idComanyList);
+            final JSONArray companyList = new JSONArray();
+            for(final Object[] ob1 : listCompany){
+                final HashMap<String, Object> companyObject = new HashMap<String, Object>();
+                companyObject.put("id", ob1[1].toString());
+                companyObject.put("name", ob1[2].toString());
+                companyObject.put("numJob", ob1[3].toString());
+                companyList.add(companyObject);
+            }
+            jsonObject.put("result", companyList);
+        }
+        
+        return jsonObject;
+    }
+
     public JSONObject getCompanyList(){
 
         final JSONObject jsonObject = new JSONObject();
@@ -20,9 +47,9 @@ public class CompanyService {
 
         final JSONArray companyList = new JSONArray();
 
-        List<Object[]> list = companyRepository.getCompanyList();
-        for(Object[] ob : list){
-            HashMap<String, Object> companyObject = new HashMap<String, Object>();
+        final List<Object[]> list = companyRepository.getCompanyList();
+        for(final Object[] ob : list){
+            final HashMap<String, Object> companyObject = new HashMap<String, Object>();
             companyObject.put("id", ob[0].toString());
             companyObject.put("name", ob[1].toString());
 //            companyObject.put("phonenumber", ob[2].toString());
@@ -39,17 +66,17 @@ public class CompanyService {
 
     }
 
-    public JSONObject getBusinessLinesOfTheCompany(String id) {
+    public JSONObject getBusinessLinesOfTheCompany(final String id) {
         final JSONObject jsonObject = new JSONObject();
         jsonObject.put("id", id);
         jsonObject.put("description", "The business lines of the company");
 
         final JSONArray businessLines = new JSONArray();
 
-        List<Object[]> list = companyRepository.getBusinessLinesOfTheCompany(id);
+        final List<Object[]> list = companyRepository.getBusinessLinesOfTheCompany(id);
         System.out.println(id);
-        for(Object[] ob : list){
-            HashMap<String, String> industryObject = new HashMap<String, String>();
+        for(final Object[] ob : list){
+            final HashMap<String, String> industryObject = new HashMap<String, String>();
             industryObject.put("id", ob[0].toString());
             industryObject.put("name", ob[1].toString());
             
@@ -60,15 +87,15 @@ public class CompanyService {
 
     }
 
-    public JSONObject getCompanyInfo(String id) {
+    public JSONObject getCompanyInfo(final String id) {
         final JSONObject jsonObject = new JSONObject();
         jsonObject.put("id", id);
         jsonObject.put("description", "The company info");
 
-        List<Object[]> list = companyRepository.getCompanyInfo(id);
+        final List<Object[]> list = companyRepository.getCompanyInfo(id);
         System.out.println(id);
-        HashMap<String, Object> companyObject = new HashMap<String, Object>();
-        for(Object[] ob : list){
+        final HashMap<String, Object> companyObject = new HashMap<String, Object>();
+        for(final Object[] ob : list){
             
             companyObject.put("id", id);
             companyObject.put("name", ob[0].toString());
@@ -85,7 +112,7 @@ public class CompanyService {
 
     }
 
-    public JSONObject getRelatedCompany(String id){
+    public JSONObject getRelatedCompany(final String id){
         
         final JSONObject jsonObject = new JSONObject();
         jsonObject.put("id", id);
@@ -93,10 +120,10 @@ public class CompanyService {
 
         final JSONArray relatedCompany = new JSONArray();
 
-        List<Object[]> list = companyRepository.getRelatedCompany(id);
+        final List<Object[]> list = companyRepository.getRelatedCompany(id);
         System.out.println(id);
-        for(Object[] ob : list){
-            HashMap<String, String> companyObject = new HashMap<String, String>();
+        for(final Object[] ob : list){
+            final HashMap<String, String> companyObject = new HashMap<String, String>();
             companyObject.put("id", ob[0].toString());
             companyObject.put("name", ob[1].toString());
 //            companyObject.put("phonenumber", ob[2].toString());
@@ -112,7 +139,7 @@ public class CompanyService {
     }
 
 
-    public JSONObject getRecentJobByCompany(String id){
+    public JSONObject getRecentJobByCompany(final String id){
         System.out.println(id);
         final JSONObject jsonObject = new JSONObject();
         jsonObject.put("id", id);
@@ -120,10 +147,10 @@ public class CompanyService {
 
         final JSONArray jobList = new JSONArray();
 
-        List<Object[]> list = companyRepository.getRecentJobByCompany(id);
+        final List<Object[]> list = companyRepository.getRecentJobByCompany(id);
         System.out.println(id);
-        for(Object[] ob : list){
-            HashMap<String, Object> jobObject = new HashMap<String, Object>();
+        for(final Object[] ob : list){
+            final HashMap<String, Object> jobObject = new HashMap<String, Object>();
             jobObject.put("id", ob[0].toString());
             jobObject.put("job_name", ob[1].toString());
             jobObject.put("province", ob[2].toString());
@@ -137,17 +164,17 @@ public class CompanyService {
         return jsonObject;
     }
 
-    public JSONObject getJobDemandByPeriodOfTime(String id){
+    public JSONObject getJobDemandByPeriodOfTime(final String id){
         final JSONObject jsonObject = new JSONObject();
         jsonObject.put("id", id);
         jsonObject.put("description", "The job demand by period of time");
 
         final JSONArray periods = new JSONArray();
         System.out.println(id);
-        List<Object[]> list = companyRepository.getJobDemandByPeriodOfTime(id);
+        final List<Object[]> list = companyRepository.getJobDemandByPeriodOfTime(id);
         System.out.println(id);
-        for(Object[] ob : list){
-            HashMap<String, Object> period = new HashMap<String, Object>();
+        for(final Object[] ob : list){
+            final HashMap<String, Object> period = new HashMap<String, Object>();
             period.put("id", ob[0].toString());
             period.put("province", ob[1].toString());
             period.put("timestamp", ob[2].toString());
@@ -161,17 +188,17 @@ public class CompanyService {
 
     }
 
-    public JSONObject getJobDemandByLiteracy(String id){
+    public JSONObject getJobDemandByLiteracy(final String id){
         final JSONObject jsonObject = new JSONObject();
         jsonObject.put("id", id);
         jsonObject.put("description", "The job demand by literacy");
 
         final JSONArray literacies = new JSONArray();
         System.out.println(id);
-        List<Object[]> list = companyRepository.getJobDemandByLiteracy(id);
+        final List<Object[]> list = companyRepository.getJobDemandByLiteracy(id);
         System.out.println(id);
-        for(Object[] ob : list){
-            HashMap<String, Object> literacy = new HashMap<String, Object>();
+        for(final Object[] ob : list){
+            final HashMap<String, Object> literacy = new HashMap<String, Object>();
             literacy.put("id", ob[0].toString());
             literacy.put("idTime", ob[1].toString());
             literacy.put("timestamp", ob[2].toString());
@@ -185,17 +212,17 @@ public class CompanyService {
         return jsonObject;
     }
 
-    public JSONObject getJobDemandByAge(String id){
+    public JSONObject getJobDemandByAge(final String id){
         final JSONObject jsonObject = new JSONObject();
         jsonObject.put("id", id);
         jsonObject.put("description", "The job demand by age and gender");
 
         final JSONArray ageRanges = new JSONArray();
         System.out.println(id);
-        List<Object[]> list = companyRepository.getJobDemandByAge(id);
+        final List<Object[]> list = companyRepository.getJobDemandByAge(id);
         System.out.println(id);
-        for(Object[] ob : list){
-            HashMap<String, Object> ageRange = new HashMap<String, Object>();
+        for(final Object[] ob : list){
+            final HashMap<String, Object> ageRange = new HashMap<String, Object>();
             ageRange.put("id", ob[0].toString());
             ageRange.put("idTime", ob[1].toString());
             ageRange.put("timestamp", ob[2].toString());

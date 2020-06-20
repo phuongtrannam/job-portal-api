@@ -113,7 +113,7 @@ public interface RegionRepository extends CrudRepository<Region, String> {
             "       concat(\"Quý \",timed.quarterD,\"/\",timed.yearD) as `time`\n" +
             "from top10_highest_salary_industries as top10, timed, industries\n" +
             "where top10.idTime = timed.idTime\n" +
-            "  and top10.idTime in ( select idTime from ( select idTime from timed order by timestampD desc limit 3 ) as t )\n" +
+            "  and top10.idTime in ( select idTime from ( select idTime from timed order by timestampD desc limit 8 ) as t )\n" +
             "  and top10.idIndustry = industries.idIndustry\n" +
             "order by timed.idTime, top10.salary desc;", nativeQuery = true)
     List<Object[]> getAverageSalaryByIndustryWithCountry();
@@ -124,7 +124,7 @@ public interface RegionRepository extends CrudRepository<Region, String> {
             "       concat(\"Quý \",timed.quarterD,\"/\",timed.yearD) as `time`\n" +
             "from top10_highest_salary_industries_by_region as top10, timed, province, industries\n" +
             "where top10.idTime = timed.idTime and top10.idProvince = province.idProvince\n" +
-            "  and top10.idTime in ( select idTime from ( select idTime from timed order by timestampD desc limit 3 ) as t )\n" +
+            "  and top10.idTime in ( select idTime from ( select idTime from timed order by timestampD desc limit 8 ) as t )\n" +
             "  and top10.idIndustry = industries.idIndustry\n" +
             "  and province.idProvince = :idProvince \n" +
             "order by timed.idTime, top10.salary desc;", nativeQuery = true)
@@ -134,7 +134,7 @@ public interface RegionRepository extends CrudRepository<Region, String> {
             "       top10.number_of_recruitment, top10.growth, concat(\"Quý \",timed.quarterD,\"/\",timed.yearD) as `time`\n" +
             "from top10_industries_with_the_highest_recruitment as top10, timed, industries\n" +
             "where top10.idTime = timed.idTime\n" +
-            "  and top10.idTime in ( select idTime from ( select idTime from timed order by timestampD desc limit 3 ) as t )\n" +
+            "  and top10.idTime in ( select idTime from ( select idTime from timed order by timestampD desc limit 8 ) as t )\n" +
             "  and top10.idIndustry = industries.idIndustry\n" +
             "order by timed.idTime, top10.number_of_recruitment desc", nativeQuery = true)
     List<Object[]> getJobDemandByIndustryWithCountry();
@@ -143,7 +143,7 @@ public interface RegionRepository extends CrudRepository<Region, String> {
             "       top10.number_of_recruitment, top10.growth, concat(\"Quý \",timed.quarterD,\"/\",timed.yearD) as `time`\n" +
             "from top10_industries_with_the_highest_recruitment_by_region as top10, timed, province, industries\n" +
             "where top10.idTime = timed.idTime and top10.idProvince = province.idProvince\n" +
-            "  and top10.idTime in ( select idTime from ( select idTime from timed order by timestampD desc limit 3 ) as t )\n" +
+            "  and top10.idTime in ( select idTime from ( select idTime from timed order by timestampD desc limit 8 ) as t )\n" +
             "  and top10.idIndustry = industries.idIndustry\n" +
             "  and province.idProvince = :idProvince \n" +
             "order by timed.idTime, top10.number_of_recruitment desc", nativeQuery = true)
@@ -173,7 +173,7 @@ public interface RegionRepository extends CrudRepository<Region, String> {
             "from top10_jobs_with_the_highest_recruitment as top10, timed, job\n" +
             "where top10.idTime = timed.idTime\n" +
             "  and top10.idJob = job.idJob\n" +
-            "  and top10.idTime in (select idTime from ( select idTime from timed order by timestampD desc limit 3) as t)\n" +
+            "  and top10.idTime in (select idTime from ( select idTime from timed order by timestampD desc limit 4) as t)\n" +
             "order by timed.idTime, top10.number_of_recruitment desc;", nativeQuery = true)
     List<Object[]> getHighestDemandJobsWithCountry();
     //Done
@@ -183,7 +183,7 @@ public interface RegionRepository extends CrudRepository<Region, String> {
             "where top10.idTime = timed.idTime and top10.idProvince = province.idProvince\n" +
             "  and top10.idJob = job.idJob\n" +
             "  and province.idProvince = :idProvince \n" +
-            "  and top10.idTime in (select idTime from ( select idTime from timed order by timestampD desc limit 3) as t)\n" +
+            "  and top10.idTime in (select idTime from ( select idTime from timed order by timestampD desc limit 4) as t)\n" +
             "order by timed.idTime, province.idProvince, top10.number_of_recruitment desc;", nativeQuery = true)
     List<Object[]> getHighestDemandJobsWithProvince(@Param("idProvince") int idProvince);
     //Done
@@ -193,7 +193,7 @@ public interface RegionRepository extends CrudRepository<Region, String> {
             "from top10_highest_salary_companies as top10, timed,  company\n" +
             "where top10.idTime = timed.idTime\n" +
             "  and top10.idCompany = company.idCompany\n" +
-            "  and top10.idTime in (select idTime from ( select idTime from timed order by timestampD desc limit 3) as t)\n" +
+            "  and top10.idTime in (select idTime from ( select idTime from timed order by timestampD desc limit 4) as t)\n" +
             "order by timed.idTime, top10.salary desc;", nativeQuery = true)
     List<Object[]> getHighestPayingCompaniesWithCountry();
     //Done
@@ -203,7 +203,7 @@ public interface RegionRepository extends CrudRepository<Region, String> {
             "from top10_highest_salary_companies_by_region as top10, timed,  company, province\n" +
             "where top10.idTime = timed.idTime and top10.IdProvince = province.idProvince\n" +
             "  and top10.idCompany = company.idCompany and province.idProvince = :idProvince \n" +
-            "  and top10.idTime in (select idTime from ( select idTime from timed order by timestampD desc limit 3) as t)\n" +
+            "  and top10.idTime in (select idTime from ( select idTime from timed order by timestampD desc limit 4) as t)\n" +
             "order by timed.idTime, top10.salary desc;", nativeQuery = true)
     List<Object[]> getHighestPayingCompaniesWithProvince(@Param("idProvince") int idProvince);
     //Done
@@ -212,7 +212,7 @@ public interface RegionRepository extends CrudRepository<Region, String> {
             "from top10_companies_with_the_highest_recruitment as top10, timed,  company\n" +
             "where top10.idTime = timed.idTime\n" +
             "  and top10.idCompany = company.idCompany\n" +
-            "  and top10.idTime in (select idTime from ( select idTime from timed order by timestampD desc limit 3) as t)\n" +
+            "  and top10.idTime in (select idTime from ( select idTime from timed order by timestampD desc limit 4) as t)\n" +
             "order by timed.idTime, top10.number_of_recruitment desc;", nativeQuery = true)
     List<Object[]> getTopHiringCompaniesWithCountry();
     //Done
@@ -221,7 +221,7 @@ public interface RegionRepository extends CrudRepository<Region, String> {
             "from top10_companies_with_the_highest_recruitment_by_region as top10, timed,  company, province\n" +
             "where top10.idTime = timed.idTime and top10.idProvince = province.idProvince\n" +
             "  and top10.idCompany = company.idCompany and province.idProvince = :idProvince \n" +
-            "  and top10.idTime in (select idTime from ( select idTime from timed order by timestampD desc limit 3) as t)\n" +
+            "  and top10.idTime in (select idTime from ( select idTime from timed order by timestampD desc limit 4) as t)\n" +
             "order by timed.idTime, top10.number_of_recruitment desc;", nativeQuery = true)
     List<Object[]> getTopHiringCompaniesWithProvince(@Param("idProvince") int idProvince);
 
