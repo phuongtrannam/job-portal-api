@@ -313,11 +313,11 @@ public class RegionService {
          final Object numJobPosting = getNumberJobPostingInRegion(id).get("result");
          final Object numCompany = getNumberCompanyInRegion(id).get("result");
          final Object averageSalary = getAverageSalaryInRegion(id).get("result");
-         final Object averageAge = getAverageAgeInRegion(id).get("result");
+//         final Object averageAge = getAverageAgeInRegion(id).get("result");
          resultObject.put("numJobPosting", numJobPosting);
          resultObject.put("numCompany", numCompany);
          resultObject.put("averageSalary", averageSalary);
-         resultObject.put("averageAge", averageAge);
+//         resultObject.put("averageAge", averageAge);
         jsonObject.put("result", resultObject);
         return jsonObject;
     }
@@ -975,23 +975,16 @@ public class RegionService {
 //            System.out.println(ob[1].toString());
 //            System.out.println(ob[2].toString());
             if(!time.equals(ob[0].toString())) {
-                if(!checkArrayStringNotNull(listPastValueLiteracy)){
-                    time = ob[0].toString();
-                    listPastValueLiteracy = listValueLiteracy.clone();
-                    listValueLiteracy = new Object[listLiteracy.size()];
-                }
-                else{
-                    dataArray = convertArrayToJSON(listValueLiteracy);
-                    growthArray = convertArrayToJSON(listGrowth);
-                    timeObject.put("data", dataArray);
-                    timeObject.put("growth", growthArray);
-                    jsonObject.put(time, timeObject);
-                    listPastValueLiteracy = listValueLiteracy.clone();
-                    listValueLiteracy = new Object[listLiteracy.size()];
-                    listGrowth = new Object[listLiteracy.size()];
-                    timeObject = new JSONObject();
-                    time = ob[0].toString();
-                }
+                dataArray = convertArrayToJSON(listValueLiteracy);
+                growthArray = convertArrayToJSON(listGrowth);
+                timeObject.put("data", dataArray);
+                timeObject.put("growth", growthArray);
+                jsonObject.put(time, timeObject);
+                listPastValueLiteracy = listValueLiteracy.clone();
+                listValueLiteracy = new Object[listLiteracy.size()];
+                listGrowth = new Object[listLiteracy.size()];
+                timeObject = new JSONObject();
+                time = ob[0].toString();
             }
             for(String literacy: listLiteracy){
                 int index = listLiteracy.indexOf(literacy);

@@ -15,8 +15,7 @@ public interface JobRepository extends CrudRepository<Job, String> {
 
     @Query(value = "select fact.idTime,job.idJob, job.name_job,\n" +
             "min(salary), max(salary), sum(fact.number_of_recruitment) as `so luong tuyen dung`\n" +
-            "from job, (select distinct idTime, idCompany,idProvince, idJob,salary, number_of_recruitment\n" +
-            "           from company_fact) as fact , job_industry, province, gender\n" +
+            "from job, job_fact as fact , job_industry, province, gender\n" +
             "where job.idJob = fact.idJob and job.idJob = job_industry.idJob\n" +
             "and fact.IdProvince = province.idProvince\n" +
             "and fact.idTime in ( select idTime from (\n" +

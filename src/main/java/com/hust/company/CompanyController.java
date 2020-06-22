@@ -21,6 +21,7 @@ public class CompanyController {
     public JSONObject getCompanyList() {
         return companyService.getCompanyList();
     }
+
     @CrossOrigin(origins = "http://localhost:4200")
     @RequestMapping(value = "/companies/search_company", method = RequestMethod.POST)
     public JSONObject searchCompany(@RequestBody Map<String, Object> payload) throws Exception {
