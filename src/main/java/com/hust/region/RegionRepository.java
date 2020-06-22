@@ -31,7 +31,7 @@ public interface RegionRepository extends CrudRepository<Region, String> {
 
     // Done - slow      
     @Query(value = "select timed.idTime, concat(\"Quý \",timed.quarterD,\"/\",timed.yearD) as `time`, sum(number_of_recruitment)\n" +
-            "from (select distinct idTime, idCompany, idJob, number_of_recruitment from company_fact) as fact, timed\n" +
+            "from job_fact as fact, timed\n" +
             "where timed.idTime = fact.idTime\n" +
             "     and fact.idTime in (select idTime from ( select idTime from timed order by timestampD desc limit 2) as t)\n" +
             "group by timed.idTime;", nativeQuery = true)
@@ -39,7 +39,7 @@ public interface RegionRepository extends CrudRepository<Region, String> {
 
     //Done - slow
     @Query( value = "select timed.idTime, concat(\"Quý \",timed.quarterD,\"/\",timed.yearD) as `time`, sum(fact.number_of_recruitment)\n" +
-            "from market_fact as fact, timed, province\n" +
+            "from job_fact as fact, timed, province\n" +
             "where fact.idTime = timed.idTime and fact.idProvince = province.idProvince\n" +
             "    and fact.idProvince = :idProvince \n" +
             "    and fact.idTime in (select idTime from ( select idTime from timed order by timestampD desc limit 2) as t)\n" +
@@ -69,30 +69,35 @@ public interface RegionRepository extends CrudRepository<Region, String> {
     @Query( value = "select year(timestampD) as `thoi gian`, number_of_recruitment, salary\n" +
             "from company_fact, timed\n" +
             "where company_fact.idTime = timed.idTime\n" +
-            "    and timed.yearD between year(curdate()) - 2 and year(curdate()) -1 \n" +
+            "    and timed.yearD between year(curdate()) - 1 and year(curdate())\n" +
             "order by timed.idTime desc;", nativeQuery = true)
     List<Object[]> getListSalaryInLastYearWithCountry();
     // Done - Không hiểu câu này ra cái gì      
     @Query( value = "select year(timestampD) as `thoi gian`, number_of_recruitment, salary\n" +
             "from company_fact, timed\n" +
             "where company_fact.idTime = timed.idTime and idProvince = :idProvince \n" +
-            "    and timed.yearD between year(curdate()) - 2 and year(curdate()) -1 \n" +
+            "    and timed.yearD between year(curdate()) - 1 and year(curdate()) \n" +
             "order by timed.idTime desc;", nativeQuery = true)
     List<Object[]> getListSalaryInLastYearWithProvince(@Param("idProvince") int idProvince);
     // Done - Không hiểu câu này ra cái gì 
-    @Query(value = "select year(timestampD) as `thoi gian`, number_of_recruitment, age\n" +
-            "from company_fact, timed, age\n" +
-            "where company_fact.idTime = timed.idTime\n" +
-            "  and company_fact.idAge = age.idAge\n" +
-            "  and timed.yearD between year(curdate())-2 and year(curdate())-1 \n" +
-            "order by timed.idTime desc;", nativeQuery = true)
+    @Query(value = "select year(timestampD) as `thoi gian`, sum(number_of_recruitment),\n" +
+            "       age.idAge,bin(age.`0-18`),bin(age.`18-25`), bin(age.`25-35`), bin(age.`35-50`), bin(age.`50+`)\n" +
+            "from job_fact, timed, age\n" +
+            "where job_fact.idTime = timed.idTime\n" +
+            "  and job_fact.idAge = age.idAge\n" +
+            "  and timed.yearD between year(curdate())-1 and year(curdate())\n" +
+            "group by timed.timestampD, age.idAge\n" +
+            "order by timed.timestampD;", nativeQuery = true)
     List<Object[]> getAverageAgeInCountry();
     // Done - slow - Không hiểu câu này ra cái gì 
-    @Query( value = "select year(timestampD) as `thoi gian`, number_of_recruitment, age\n" +
-            "from company_fact, timed, age, province\n" +
-            "where company_fact.idTime = timed.idTime and company_fact.idProvince = province.idProvince\n" +
-            "  and company_fact.idAge = age.idAge and province.idProvince = :idProvince \n" +
-            "  and timed.yearD between year(curdate())-1 and year(curdate());", nativeQuery = true)
+    @Query( value = "select year(timestampD) as `thoi gian`, sum(number_of_recruitment),\n" +
+            "       age.idAge,bin(age.`0-18`),bin(age.`18-25`), bin(age.`25-35`), bin(age.`35-50`), bin(age.`50+`)\n" +
+            "from job_fact, timed, age, province\n" +
+            " where job_fact.idTime = timed.idTime and job_fact.idProvince = province.idProvince\n" +
+            "  and job_fact.idAge = age.idAge and province.idProvince = :idProvince\n" +
+            "  and timed.yearD between year(curdate())-1 and year(curdate())\n" +
+            "group by timed.timestampD,province.idProvince, age.idAge\n" +
+            "order by timed.timestampD, province.idProvince;", nativeQuery = true)
     List<Object[]> getAverageAgeInProvince(@Param("idProvince") int idProvince);
     // Done - slow 
     @Query(value = "select industries.idIndustry, industries.name_industry,\n" +
