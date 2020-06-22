@@ -794,17 +794,17 @@ public class IndustryService {
         JSONArray maleArray = new JSONArray();
         JSONArray femaleArray = new JSONArray();
 
-        List<Object[]> listObjectAgeRange = industryRepository.getAgeRange();
-
-        for( Object[] ob : listObjectAgeRange){
-            ageRangeArray.add(ob[1].toString());
-            System.out.println(ob[1].toString());
+//        List<Object[]> listObjectAgeRange = industryRepository.getAgeRange();
+        List<String> listAgeRange = Arrays.asList("0-18", "18-25", "25-35", "35-50", "50+","Không xác định");
+        for( String ob : listAgeRange){
+            ageRangeArray.add(ob);
+            System.out.println(ob);
         };
         jsonObject.put("ageRange", ageRangeArray);
 
         int count = 0;
-        Object[] listMale = new Object[ageRangeArray.size()];
-        Object[] listFeMale = new Object[ageRangeArray.size()];
+        Object[] listMale = new ArrayList<Integer>(Collections.nCopies(ageRangeArray.size(), 0)).toArray();
+        Object[] listFeMale = new ArrayList<Integer>(Collections.nCopies( ageRangeArray.size(), 0)).toArray();
         if( locationId.equals("P0")){
             int idIndustry = Integer.valueOf(industryId.replace("I",""));
             List<Object[]> list = industryRepository.getJobDemandByAgeWithCountry(idIndustry);
@@ -837,30 +837,63 @@ public class IndustryService {
         JSONArray femaleArray;
         String time = list.get(0)[0].toString();
         for(Object[] ob: list){
-            for(Object age : ageRangeArray){
-                if(!time.equals(ob[0].toString())){
-                    maleArray = convertArrayToJSON(listMale);
-                    femaleArray = convertArrayToJSON(listFeMale);
-                    timeObject.put("male", maleArray);
-                    timeObject.put("female", femaleArray);
-                    jsonObject.put(time, timeObject);
-                    timeObject = new JSONObject();
+            if(!time.equals(ob[0].toString())){
+                maleArray = convertArrayToJSON(listMale);
+                femaleArray = convertArrayToJSON(listFeMale);
+                timeObject.put("male", maleArray);
+                timeObject.put("female", femaleArray);
+                jsonObject.put(time, timeObject);
+                timeObject = new JSONObject();
 //                        maleArray = new JSONArray();
 //                        femaleArray = new JSONArray();
-                    time = ob[0].toString();
+                time = ob[0].toString();
 
-                }
-                if(ob[ob.length -2].toString().equals(age.toString())){
-                    System.out.println(ageRangeArray.indexOf(age));
-                    int index = ageRangeArray.indexOf(age);
-                    if(ob[ob.length-1].toString().equals("Nam")){
-                        listMale[index] = (int) (double)ob[1];
+            }
+            boolean flag = false;
+            System.out.println(ob[ob.length -2]);
+            System.out.println(ob[ob.length -1]);
+            if (ob[ob.length -2].toString().equals("1")){
+                for (Object age : ageRangeArray){
+                    int index = ageRangeArray.indexOf(age.toString());
+                    if(index == ageRangeArray.size() - 1) {
+                        if(flag == false){
+                            listMale[index] = (int) listMale[index] + (int)(double) ob[1];
+                            System.out.println(listMale[index]);
+                        }
+                        break;
                     }
-                    else {
-                        listFeMale[index] = (int) (double) ob[1];
+                    if(ob[index + 3].toString().equals("1")){
+                        listMale[index] = (int) listMale[index] + (int)(double) ob[1];
+                        System.out.println(listMale[index]);
+                        flag = true;
                     }
                 }
             }
+            if (ob[ob.length -1].toString().equals("1")){
+                for (Object age : ageRangeArray){
+                    int index = ageRangeArray.indexOf(age.toString());
+                    if(index == ageRangeArray.size() - 1) {
+                        if(flag == false){
+                            listFeMale[index] = (int) listFeMale[index] + (int)(double) ob[1];
+                        }
+                        break;
+                    }
+                    if(ob[index + 3].toString().equals("1")){
+                        listFeMale[index] = (int) listFeMale[index] + (int)(double) ob[1];
+                        flag = true;
+                    }
+                }
+            }
+//                if(ob[ob.length -2].toString().equals(age.toString())){
+//                    System.out.println(ageRangeArray.indexOf(age));
+//                    int index = ageRangeArray.indexOf(age);
+//                    if(ob[ob.length-1].toString().equals("Nam")){
+//                        listMale[index] = (int) (double)ob[1];
+//                    }
+//                    else {
+//                        listFeMale[index] = (int) (double) ob[1];
+//                    }
+//                }
         }
         maleArray = convertArrayToJSON(listMale);
         femaleArray = convertArrayToJSON(listFeMale);

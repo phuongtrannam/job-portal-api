@@ -1,12 +1,7 @@
 package com.hust.job;
 
 import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -434,9 +429,9 @@ public class JobService {
         final JSONObject jsonObject = new JSONObject();
         jsonObject.put("description", "The job demand by age");
         List<String> ageRanges = new ArrayList<String>();
-        final List<Object[]> listAge = jobRepository.getAgeRange();
-        for (Object[] ob : listAge) {
-            ageRanges.add(ob[1].toString());
+        List<String> listAge = Arrays.asList("0-18", "18-25", "25-35", "35-50", "50+","Không xác định");
+        for (String ob : listAge) {
+            ageRanges.add(ob);
         }
         int lenAgeRange = ageRanges.size();
         jsonObject.put("ageRange", ageRanges);
@@ -455,16 +450,51 @@ public class JobService {
                 List<Integer> femaleData = new ArrayList<Integer>(Collections.nCopies(lenAgeRange, 0));
                 for (Object[] ob : list) {
                     String tempTime = ob[1].toString();
-                    if (time.equals(tempTime)) {
-                        index = ageRanges.indexOf(ob[5].toString());
-                        value = Math.round(Float.parseFloat(ob[3].toString()));
-                        if (ob[4].toString().equals("Nữ")) {
-                            femaleData.set(index, value);
-                        }
-                        if (ob[4].toString().equals("Nam")) {
-                            maleData.set(index, value);
+                    boolean flag = false;
+                    System.out.println(ob[ob.length -2]);
+                    System.out.println(ob[ob.length -1]);
+                    if (ob[ob.length -2].toString().equals("1")){
+                        for (Object age : ageRanges){
+                            index = ageRanges.indexOf(age.toString());
+                            if(index == ageRanges.size() - 1) {
+                                if(flag == false){
+                                    maleData.set(index, (int) maleData.get(index) + (int) (double) ob[3]);
+//                                    System.out.println(listMale[index]);
+                                }
+                                break;
+                            }
+                            if(ob[index + 5].toString().equals("1")){
+                                maleData.set(index, (int) maleData.get(index) + (int) (double) ob[3]);
+//                                System.out.println(listMale[index]);
+                                flag = true;
+                            }
                         }
                     }
+                    if (ob[ob.length -1].toString().equals("1")){
+                        for (Object age : ageRanges){
+                            index = ageRanges.indexOf(age.toString());
+                            if(index == ageRanges.size() - 1) {
+                                if(flag == false){
+                                    femaleData.set(index, (int) femaleData.get(index) + (int) (double) ob[3]);
+                                }
+                                break;
+                            }
+                            if(ob[index + 5].toString().equals("1")){
+                                femaleData.set(index, (int) femaleData.get(index) + (int) (double) ob[3]);
+                                flag = true;
+                            }
+                        }
+                    }
+//                    if (time.equals(tempTime)) {
+//                        index = ageRanges.indexOf(ob[5].toString());
+//                        value = Math.round(Float.parseFloat(ob[3].toString()));
+//                        if (ob[4].toString().equals("Nữ")) {
+//                            femaleData.set(index, value);
+//                        }
+//                        if (ob[4].toString().equals("Nam")) {
+//                            maleData.set(index, value);
+//                        }
+//                    }
                 }
 
                 timeObject.put("male", maleData);
@@ -487,16 +517,51 @@ public class JobService {
                     List<Integer> femaleData = new ArrayList<Integer>(Collections.nCopies(lenAgeRange, 0));
                     for (Object[] ob : list) {
                         String tempTime = ob[1].toString();
-                        if (time.equals(tempTime)) {
-                            index = ageRanges.indexOf(ob[6].toString());
-                            value = Math.round(Float.parseFloat(ob[4].toString()));
-                            if (ob[5].toString().equals("Nữ")) {
-                                femaleData.set(index, value);
-                            }
-                            if (ob[5].toString().equals("Nam")) {
-                                maleData.set(index, value);
+                        boolean flag = false;
+                        System.out.println(ob[ob.length -2]);
+                        System.out.println(ob[ob.length -1]);
+                        if (ob[ob.length -2].toString().equals("1")){
+                            for (Object age : ageRanges){
+                                index = ageRanges.indexOf(age.toString());
+                                if(index == ageRanges.size() - 1) {
+                                    if(flag == false){
+                                        maleData.set(index, (int) maleData.get(index) + (int) (double) ob[4]);
+//                                    System.out.println(listMale[index]);
+                                    }
+                                    break;
+                                }
+                                if(ob[index + 6].toString().equals("1")){
+                                    maleData.set(index, (int) maleData.get(index) + (int) (double) ob[4]);
+//                                System.out.println(listMale[index]);
+                                    flag = true;
+                                }
                             }
                         }
+                        if (ob[ob.length -1].toString().equals("1")){
+                            for (Object age : ageRanges){
+                                index = ageRanges.indexOf(age.toString());
+                                if(index == ageRanges.size() - 1) {
+                                    if(flag == false){
+                                        femaleData.set(index, (int) femaleData.get(index) + (int) (double) ob[4]);
+                                    }
+                                    break;
+                                }
+                                if(ob[index + 6].toString().equals("1")){
+                                    femaleData.set(index, (int) femaleData.get(index) + (int) (double) ob[4]);
+                                    flag = true;
+                                }
+                            }
+                        }
+//                        if (time.equals(tempTime)) {
+//                            index = ageRanges.indexOf(ob[6].toString());
+//                            value = Math.round(Float.parseFloat(ob[4].toString()));
+//                            if (ob[5].toString().equals("Nữ")) {
+//                                femaleData.set(index, value);
+//                            }
+//                            if (ob[5].toString().equals("Nam")) {
+//                                maleData.set(index, value);
+//                            }
+//                        }
                     }
 
                     timeObject.put("male", maleData);

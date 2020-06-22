@@ -261,18 +261,22 @@ public interface IndustryRepository extends CrudRepository<Industry, String> {
     List<Object[]> getHighestSalaryJobWithProvince(@Param("industryId") int industryId, @Param("locationId") int locationId);
 
 
-    @Query(value = "select concat(\"Quý \",timed.quarterD,\"/\",timed.yearD) as `time`, sum(number_of_recruitment), age.age, gender.gender\n" +
+    @Query(value = "select concat(\"Quý \",timed.quarterD,\"/\",timed.yearD) as `time`, sum(number_of_recruitment),\n" +
+            "       age.idAge,bin(age.`0-18`),bin(age.`18-25`), bin(age.`25-35`), bin(age.`35-50`), bin(age.`50+`),\n" +
+            "       gender.idGender, bin(gender.`male`), bin(gender.`female`)\n" +
             "from market_fact, gender, age, timed, industries\n" +
             "where market_fact.idTime = timed.idTime and market_fact.idGender = gender.idGender\n" +
             "  and market_fact.idAge = age.idAge and market_fact.idIndustry = industries.idIndustry\n" +
-            "  and industries.idIndustry = :industryId\n" +
+            "  and industries.idIndustry = :industryId \n" +
             "  and market_fact.idTime in (select idTime from ( select idTime from timed order by timestampD desc limit 4) as t )\n" +
             "group by timed.idTime,industries.idIndustry, gender.idGender, age.idAge\n" +
-            "order by timed.idTime, industries.idIndustry, gender.idGender, age.age;", nativeQuery = true)
+            "order by timed.idTime, industries.idIndustry, gender.idGender, age.idAge;", nativeQuery = true)
     List<Object[]> getJobDemandByAgeWithCountry(@Param("industryId") int industryId);
 
 
-    @Query( value = "select concat(\"Quý \",timed.quarterD,\"/\",timed.yearD) as `time`, sum(number_of_recruitment), age.age, gender.gender\n" +
+    @Query( value = "select concat(\"Quý \",timed.quarterD,\"/\",timed.yearD) as `time`, sum(number_of_recruitment),\n" +
+            "       age.idAge,bin(age.`0-18`),bin(age.`18-25`), bin(age.`25-35`), bin(age.`35-50`), bin(age.`50+`),\n" +
+            "       gender.idGender, bin(gender.`male`), bin(gender.`female`)\n" +
             "from market_fact, gender, age, timed, industries, province\n" +
             "where market_fact.idTime = timed.idTime and market_fact.idGender = gender.idGender\n" +
             "  and market_fact.idAge = age.idAge and market_fact.idIndustry = industries.idIndustry\n" +
@@ -280,7 +284,7 @@ public interface IndustryRepository extends CrudRepository<Industry, String> {
             "  and industries.idIndustry = :industryId and province.idProvince = :locationId \n" +
             "  and market_fact.idTime in (select idTime from ( select idTime from timed order by timestampD desc limit 4) as t )\n" +
             "group by timed.idTime,industries.idIndustry, province.idProvince, gender.idGender, age.idAge\n" +
-            "order by timed.idTime, industries.idIndustry, gender.idGender, age.age;", nativeQuery = true)
+            "order by timed.idTime, industries.idIndustry, gender.idGender, age.idAge;", nativeQuery = true)
     List<Object[]> getJobDemandByAgeWithProvince(@Param("industryId") int industryId, @Param("locationId") int locationId);
 
     @Query(value = "select concat(\"Quý \",timed.quarterD,\"/\",timed.yearD) as `time`,\n" +
