@@ -288,23 +288,27 @@ public interface RegionRepository extends CrudRepository<Region, String> {
     @Query( value = " select * from age;", nativeQuery = true)
     List<Object[]> getAgeRange();
 
-    @Query(value = "select concat(\"Quý \",timed.quarterD,\"/\",timed.yearD) as `time`, sum(number_of_recruitment), age.age, gender.gender\n" +
-            "from market_fact as fact, gender, age, timed\n" +
+    @Query(value = "select concat(\"Quý \",timed.quarterD,\"/\",timed.yearD) as `time`, sum(number_of_recruitment),\n" +
+            "       age.idAge,bin(age.`0-18`),bin(age.`18-25`), bin(age.`25-35`), bin(age.`35-50`), bin(age.`50+`),\n" +
+            "       gender.idGender, bin(gender.`male`), bin(gender.`female`)\n" +
+            "from job_fact as fact, gender, age, timed\n" +
             "where fact.idTime = timed.idTime and fact.idGender = gender.idGender\n" +
             "  and fact.idAge = age.idAge\n" +
             "  and fact.idTime in (select idTime from ( select idTime from timed order by timestampD desc limit 4) as t )\n" +
             "group by timed.idTime, gender.idGender, age.idAge\n" +
-            "order by timed.idTime, gender.idGender, age.age;", nativeQuery = true)
+            "order by timed.idTime, gender.idGender, age.idAge;", nativeQuery = true)
     List<Object[]> getJobDemandByAgeWithCountry();
 
-    @Query( value = "select concat(\"Quý \",timed.quarterD,\"/\",timed.yearD) as `time`, sum(number_of_recruitment), age.age, gender.gender\n" +
-            "from market_fact as fact, gender, age, timed, province\n" +
+    @Query( value = "select concat(\"Quý \",timed.quarterD,\"/\",timed.yearD) as `time`, sum(number_of_recruitment),\n" +
+            " age.idAge,bin(age.`0-18`),bin(age.`18-25`), bin(age.`25-35`), bin(age.`35-50`), bin(age.`50+`),\n" +
+            "       gender.idGender, bin(gender.`male`), bin(gender.`female`)\n" +
+            "from job_fact as fact, gender, age, timed, province\n" +
             "where fact.idTime = timed.idTime and fact.idGender = gender.idGender\n" +
             "  and fact.idAge = age.idAge and fact.idProvince = :locationId \n" +
             "  and fact.idProvince = province.idProvince\n" +
             "  and fact.idTime in (select idTime from ( select idTime from timed order by timestampD desc limit 4) as t )\n" +
             "group by timed.idTime, province.idProvince, gender.idGender, age.idAge\n" +
-            "order by timed.idTime, gender.idGender, age.age;", nativeQuery = true)
+            "order by timed.idTime, gender.idGender, age.idAge;", nativeQuery = true)
     List<Object[]> getJobDemandByAgeWithProvince(@Param("locationId") int locationId);
 
     @Query( value = " select * from academic_level;", nativeQuery = true)
