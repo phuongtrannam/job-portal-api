@@ -46,8 +46,17 @@ public class JobService {
             jobObject.put("id", ob[1].toString());
             jobObject.put("name", ob[2].toString());
             String gender = "";
+            boolean flagMale = false;
+            boolean flagFeMale = false;
             for (Object[] objects : jobRepository.getGenderByJob((int)ob[1])){
-                gender = gender + objects[0].toString() + ",";
+                if(objects[1].toString().equals("1") && !flagMale){
+                    gender = gender + "Nam" + ",";
+                    flagMale = true;
+                }
+                if(objects[2].toString().equals("1") && !flagFeMale){
+                    gender = gender + "Nữ" + ",";
+                    flagFeMale = true;
+                }
             }
             jobObject.put("gender", gender.substring(0,gender.length()-1));
             jobObject.put("minSalary", ob[3].toString());
@@ -131,11 +140,11 @@ public class JobService {
         List<Object[]> list = jobRepository.getNumberOfJob(idJob);
         System.out.println(list.get(1)[4]);
         DecimalFormat df = new DecimalFormat("##.##");
-        float growth = Float.parseFloat(list.get(1)[4].toString()) / Float.parseFloat(list.get(0)[4].toString()) - 1.0f;
+        float growth = Float.parseFloat(list.get(0)[4].toString()) / Float.parseFloat(list.get(1)[4].toString()) - 1.0f;
         final JSONObject jobDescription = new JSONObject();
-        jobDescription.put("minSalary", list.get(1)[2].toString());
-        jobDescription.put("maxSalary", list.get(1)[3].toString());
-        jobDescription.put("numJob", list.get(1)[4].toString());
+        jobDescription.put("minSalary", list.get(0)[2].toString());
+        jobDescription.put("maxSalary", list.get(0)[3].toString());
+        jobDescription.put("numJob", list.get(0)[4].toString());
         jobDescription.put("growth", df.format(growth));
         return jobDescription;
     }
