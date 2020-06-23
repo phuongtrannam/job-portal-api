@@ -216,8 +216,13 @@ public class RegionService {
                 sumSalary = 0;
                 numJob = 0;
             }
-            sumSalary += (double) ob[1] * (double) ob[2];
-            numJob += (double) ob[1];
+            try {
+                sumSalary += (double) ob[1] * (double) ob[2];
+                numJob += (double) ob[1];
+            }
+            catch (Exception e){
+                continue;
+            }
         }
         if (growth == 100.0) {
             avgSalary = sumSalary / numJob;
@@ -262,27 +267,62 @@ public class RegionService {
         final String time = list.get(0)[0].toString();
         System.out.println(time);
         for(final Object[] ob: list){
+            int count = 0;
+            int countAge = 0;
             if(!time.equals(ob[0].toString())){
                 avgAge = sumAge/numJob;
-                if(preAvgAge != 0){
-                    growth = avgAge - preAvgAge;
-                }
-                avgAgeObject.put("idTime", "T" +  time);
-                avgAgeObject.put("timeStamp", time);
-                avgAgeObject.put("data", round(avgAge, 2));
-                avgAgeObject.put("growth", round(growth,2));
+//                if(preAvgAge != 0){
+//                    growth = avgAge - preAvgAge;
+//                }
+//                avgAgeObject.put("idTime", "T" +  time);
+//                avgAgeObject.put("timeStamp", time);
+//                avgAgeObject.put("data", round(avgAge, 2));
+//                avgAgeObject.put("growth", round(growth,2));
                 preAvgAge = avgAge;
                 avgAge = 0;
                 sumAge = 0;
                 numJob = 0;
             }
-            final Double age = mapAvgAge.get(ob[2].toString());
-            System.out.println(age + ":" + ob[2].toString());
-            sumAge += (double)ob[1] * age;
-            numJob += (double)ob[1];
+            if(ob[3].toString().equals("1")){
+                Double age = mapAvgAge.get("0-18");
+                countAge += age;
+                count += 1;
+            }
+            if(ob[4].toString().equals("1")){
+                Double age = mapAvgAge.get("18-25");
+                countAge += age;
+                count += 1;
+            }
+            if(ob[5].toString().equals("1")){
+                Double age = mapAvgAge.get("25-35");
+                countAge += age;
+                count += 1;
+            }
+            if(ob[6].toString().equals("1")){
+                Double age = mapAvgAge.get("35-50");
+                countAge += age;
+                count += 1;
+            }
+            if(ob[7].toString().equals("1")){
+                Double age = mapAvgAge.get("50+");
+                countAge += age;
+                count += 1;
+            }
+            if(count == 0 ){
+                continue;
+            }
+            sumAge += (double) ob[1] * (countAge/count);
+            numJob += (double) ob[1];
+//            final Double age = mapAvgAge.get(ob[2].toString());
+//            System.out.println(age + ":" + ob[2].toString());
+//            sumAge += (double)ob[1] * age;
+//            numJob += (double)ob[1];
         }
         if(growth == 0){
             avgAge = sumAge/numJob;
+            if(preAvgAge != 0){
+                growth = avgAge - preAvgAge;
+            }
             avgAgeObject.put("idTime", time);
             avgAgeObject.put("timeStamp", time);
             avgAgeObject.put("data", round(avgAge, 2));
@@ -847,17 +887,16 @@ public class RegionService {
         JSONArray maleArray = new JSONArray();
         JSONArray femaleArray = new JSONArray();
 
-        List<Object[]> listObjectAgeRange = regionRepository.getAgeRange();
-
-        for( Object[] ob : listObjectAgeRange){
-            ageRangeArray.add(ob[1].toString());
-            System.out.println(ob[1].toString());
+        List<String> listAgeRange = Arrays.asList("0-18", "18-25", "25-35", "35-50", "50+","Không xác định");
+        for( String ob : listAgeRange){
+            ageRangeArray.add(ob);
+            System.out.println(ob);
         };
         jsonObject.put("ageRange", ageRangeArray);
 
         int count = 0;
-        Object[] listMale = new Object[ageRangeArray.size()];
-        Object[] listFeMale = new Object[ageRangeArray.size()];
+        Object[] listMale = new ArrayList<Integer>(Collections.nCopies(ageRangeArray.size(), 0)).toArray();
+        Object[] listFeMale = new ArrayList<Integer>(Collections.nCopies( ageRangeArray.size(), 0)).toArray();
         if( locationId.equals("P0")){
             List<Object[]> list = regionRepository.getJobDemandByAgeWithCountry();
             Set<String> timeSet = new LinkedHashSet<>();
@@ -888,30 +927,63 @@ public class RegionService {
         JSONArray femaleArray;
         String time = list.get(0)[0].toString();
         for(Object[] ob: list){
-            for(Object age : ageRangeArray){
-                if(!time.equals(ob[0].toString())){
-                    maleArray = convertArrayToJSON(listMale);
-                    femaleArray = convertArrayToJSON(listFeMale);
-                    timeObject.put("male", maleArray);
-                    timeObject.put("female", femaleArray);
-                    jsonObject.put(time, timeObject);
-                    timeObject = new JSONObject();
+            if(!time.equals(ob[0].toString())){
+                maleArray = convertArrayToJSON(listMale);
+                femaleArray = convertArrayToJSON(listFeMale);
+                timeObject.put("male", maleArray);
+                timeObject.put("female", femaleArray);
+                jsonObject.put(time, timeObject);
+                timeObject = new JSONObject();
 //                        maleArray = new JSONArray();
 //                        femaleArray = new JSONArray();
-                    time = ob[0].toString();
+                time = ob[0].toString();
 
-                }
-                if(ob[ob.length -2].toString().equals(age.toString())){
-                    System.out.println(ageRangeArray.indexOf(age));
-                    int index = ageRangeArray.indexOf(age);
-                    if(ob[ob.length-1].toString().equals("Nam")){
-                        listMale[index] = (int) (double)ob[1];
+            }
+            boolean flag = false;
+            System.out.println(ob[ob.length -2]);
+            System.out.println(ob[ob.length -1]);
+            if (ob[ob.length -2].toString().equals("1")){
+                for (Object age : ageRangeArray){
+                    int index = ageRangeArray.indexOf(age.toString());
+                    if(index == ageRangeArray.size() - 1) {
+                        if(flag == false){
+                            listMale[index] = (int) listMale[index] + (int)(double) ob[1];
+                            System.out.println(listMale[index]);
+                        }
+                        break;
                     }
-                    else {
-                        listFeMale[index] = (int) (double) ob[1];
+                    if(ob[index + 3].toString().equals("1")){
+                        listMale[index] = (int) listMale[index] + (int)(double) ob[1];
+                        System.out.println(listMale[index]);
+                        flag = true;
                     }
                 }
             }
+            if (ob[ob.length -1].toString().equals("1")){
+                for (Object age : ageRangeArray){
+                    int index = ageRangeArray.indexOf(age.toString());
+                    if(index == ageRangeArray.size() - 1) {
+                        if(flag == false){
+                            listFeMale[index] = (int) listFeMale[index] + (int)(double) ob[1];
+                        }
+                        break;
+                    }
+                    if(ob[index + 3].toString().equals("1")){
+                        listFeMale[index] = (int) listFeMale[index] + (int)(double) ob[1];
+                        flag = true;
+                    }
+                }
+            }
+//                if(ob[ob.length -2].toString().equals(age.toString())){
+//                    System.out.println(ageRangeArray.indexOf(age));
+//                    int index = ageRangeArray.indexOf(age);
+//                    if(ob[ob.length-1].toString().equals("Nam")){
+//                        listMale[index] = (int) (double)ob[1];
+//                    }
+//                    else {
+//                        listFeMale[index] = (int) (double) ob[1];
+//                    }
+//                }
         }
         maleArray = convertArrayToJSON(listMale);
         femaleArray = convertArrayToJSON(listFeMale);
@@ -975,23 +1047,16 @@ public class RegionService {
 //            System.out.println(ob[1].toString());
 //            System.out.println(ob[2].toString());
             if(!time.equals(ob[0].toString())) {
-                if(!checkArrayStringNotNull(listPastValueLiteracy)){
-                    time = ob[0].toString();
-                    listPastValueLiteracy = listValueLiteracy.clone();
-                    listValueLiteracy = new Object[listLiteracy.size()];
-                }
-                else{
-                    dataArray = convertArrayToJSON(listValueLiteracy);
-                    growthArray = convertArrayToJSON(listGrowth);
-                    timeObject.put("data", dataArray);
-                    timeObject.put("growth", growthArray);
-                    jsonObject.put(time, timeObject);
-                    listPastValueLiteracy = listValueLiteracy.clone();
-                    listValueLiteracy = new Object[listLiteracy.size()];
-                    listGrowth = new Object[listLiteracy.size()];
-                    timeObject = new JSONObject();
-                    time = ob[0].toString();
-                }
+                dataArray = convertArrayToJSON(listValueLiteracy);
+                growthArray = convertArrayToJSON(listGrowth);
+                timeObject.put("data", dataArray);
+                timeObject.put("growth", growthArray);
+                jsonObject.put(time, timeObject);
+                listPastValueLiteracy = listValueLiteracy.clone();
+                listValueLiteracy = new Object[listLiteracy.size()];
+                listGrowth = new Object[listLiteracy.size()];
+                timeObject = new JSONObject();
+                time = ob[0].toString();
             }
             for(String literacy: listLiteracy){
                 int index = listLiteracy.indexOf(literacy);

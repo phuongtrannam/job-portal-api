@@ -16,14 +16,19 @@ public interface CompanyRepository extends CrudRepository<Company, String> {
                         + "where company.idLocation = location.idLocation ;", nativeQuery = true)
         List<Object[]> getCompanyList();
 
+        @Query(value = "select count(idJob)\n" +
+                "from (select distinct idTime, idCompany, idJob from company_fact where idCompany = :idCompany) as fact\n" +
+                "where idTime in (select idTime from (select idTime from timed order by timestampD desc limit 4) as t )\n" +
+                "group by idTime, idCompany;", nativeQuery = true)
+        List<Object[]> getNumJobByCompany(@Param("idCompany") int idCompany);
+
         @Query(value = "select * from company where company.name_company = :jobName", nativeQuery = true)
         List<Object[]> getIdCompanyByName(@Param("jobName") String jobName);
 
         @Query(value =  "select fact.idTime, company.idCompany ,company.name_company, " +
-                        "sum(fact.number_of_recruitment) as `so luong tuyen dung`, count(fact.idJob) as `so luong cong viec` " +
-                        "from company, (select distinct idTime, idCompany, idJob, number_of_recruitment " +
-                                "from company_fact where idCompany IN (:id)) as fact " +
-                        "where fact.idCompany = company.idCompany " +
+                        "sum(fact.number_of_recruitment) as `so luong tuyen dung`, count(fact.idJob) as `so luong cong viec`, location.location \n" +
+                        "from company,location, company_fact as fact " +
+                        "where fact.idCompany = company.idCompany and fact.idCompany = (:id) and company.idLocation = location.idLocation \n" +
                         "and fact.idTime in ( select idTime from ( select idTime from timed order by timestampD desc limit 1 ) as t ) " +
                         "group by fact.idTime, fact.idCompany; " , nativeQuery = true)
         List<Object[]> searchCompany(@Param("id") List<String> id);
@@ -59,9 +64,8 @@ public interface CompanyRepository extends CrudRepository<Company, String> {
 
         @Query(value = "select job.idJob, job.name_job, province.province, "
                         + "min(fact.salary), max(fact.salary), sum(number_of_recruitment) "
-                        + "from company, (select distinct idTime, idCompany,idProvince, idJob,salary, number_of_recruitment\n"
-                        + "               from company_fact where idCompany = :id) as fact, job, province "
-                        + "where company.idCompany = fact.idCompany " + "and fact.idJob = job.idJob "
+                        + "from company, company_fact as fact, job, province "
+                        + "where company.idCompany = fact.idCompany and fact.idJob = job.idJob and fact.idCompany = :id"
                         + "and fact.idProvince = province.idProvince " + "and fact.idTime in " + "( select idTime from "
                         + "( select idTime from timed order by timestampD desc limit 1 ) as t )"
                         + "group by fact.idJob, fact.idProvince "
@@ -71,18 +75,16 @@ public interface CompanyRepository extends CrudRepository<Company, String> {
         @Query(value = "select fact.idCompany, province.province, "
                         + "concat(timed.quarterD,\"/\",timed.yearD) as `time`, "
                         + "sum(fact.number_of_recruitment) as so_luong_tuyen_dung "
-                        + "from (select distinct idTime, idCompany,idProvince, idJob, number_of_recruitment\n"
-                        + "               from company_fact where idCompany = :id) as fact, province, timed "
-                        + "where fact.idTime = timed.idTime " + "and fact.idProvince = province.idProvince "
+                        + "from company_fact as fact, province, timed "
+                        + "where fact.idTime = timed.idTime and fact.idProvince = province.idProvince and fact.idCompany = :id"
                         + "group by fact.idCompany,province.province, timed.idTime "
                         + "order by province.province, timed.timestampD;", nativeQuery = true)
         List<Object[]> getJobDemandByPeriodOfTime(@Param("id") String id);
 
         @Query(value = "select fact.idCompany,timed.idTime, " + "concat(timed.quarterD,\"/\",timed.yearD) as `time`, "
                         + "academic_level.academic_level, sum(fact.number_of_recruitment) "
-                        + "from (select distinct idTime, idCompany,idAcademic_Level, idJob, number_of_recruitment\n"
-                        + "               from company_fact where idCompany = :id) as fact, academic_level, timed "
-                        + "where fact.idTime = timed.idTime "
+                        + "from company_fact as fact, academic_level, timed "
+                        + "where fact.idTime = timed.idTime and fact.idCompany = :id"
                         + "and fact.idAcademic_Level = academic_level.idAcademic_Level " + "and fact.idTime in "
                         + "(select idTime from " + "(select idTime from timed order by timestampD desc limit 3) as t ) "
                         + "group by fact.idCompany,timed.idTime,timed.timestampD,academic_level.academic_level "

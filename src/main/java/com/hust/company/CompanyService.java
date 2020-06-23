@@ -34,6 +34,7 @@ public class CompanyService {
                 companyObject.put("id", ob1[1].toString());
                 companyObject.put("name", ob1[2].toString());
                 companyObject.put("numJob", ob1[3].toString());
+                companyObject.put("location", ob1[5].toString());
                 companyList.add(companyObject);
             }
             jsonObject.put("result", companyList);
@@ -52,8 +53,16 @@ public class CompanyService {
         final List<Object[]> list = companyRepository.getCompanyList();
         for(final Object[] ob : list){
             final HashMap<String, Object> companyObject = new HashMap<String, Object>();
+            List<Object[]> numJob = companyRepository.getNumJobByCompany((int)ob[0]);
             companyObject.put("id", ob[0].toString());
             companyObject.put("name", ob[1].toString());
+            try {
+                companyObject.put("numJob", numJob.get(0)[0]);
+            }
+            catch (Exception e ){
+                System.out.println(e);
+                continue;
+            }
 //            companyObject.put("phonenumber", ob[2].toString());
 //            companyObject.put("description", ob[1].toString());
 //            companyObject.put("founded_year", ob[4].toString());
