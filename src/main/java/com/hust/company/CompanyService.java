@@ -25,6 +25,8 @@ public class CompanyService {
                 System.out.println(ob[0].toString());
                 idComanyList.add(ob[0].toString());
             }
+            // idComanyList.add("712");
+            // idComanyList.add("1");
             final List<Object[]> listCompany = companyRepository.searchCompany(idComanyList);
             final JSONArray companyList = new JSONArray();
             for(final Object[] ob1 : listCompany){
