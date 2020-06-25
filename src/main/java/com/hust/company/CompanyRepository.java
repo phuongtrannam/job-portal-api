@@ -113,6 +113,17 @@ public interface CompanyRepository extends CrudRepository<Company, String> {
                 "order by timed.idTime;", nativeQuery = true)
         List<Object[]> getJobDemandByCompany(@Param("id") int id);
 
+        @Query( value = "select timed.idTime,company.name_company,\n" +
+                "       concat(\"Quý \",timed.quarterD,\"/\",timed.yearD) as `time`,\n" +
+                "       avg(company_fact.salary)\n" +
+                "from company_fact, timed, company\n" +
+                "where company_fact.idCompany = :id and company_fact.idTime = timed.idTime\n" +
+                "  and company_fact.idCompany = company.idCompany\n" +
+                "  and company_fact.idTime in ( select idTime from ( select idTime from timed order by timestampD desc limit 4 ) as t )\n" +
+                "group by timed.idTime, company_fact.idCompany\n" +
+                "order by timed.idTime;", nativeQuery = true)
+        List<Object[]> getSalaryByCompany(@Param("id") int id);
+
         @Query(value = "select concat(\"Quý \",timed.quarterD,\"/\",timed.yearD) as `time`\n" +
                 "from timed\n" +
                 "order by idTime desc;", nativeQuery = true)

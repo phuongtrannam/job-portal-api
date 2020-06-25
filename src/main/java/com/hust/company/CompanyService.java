@@ -251,8 +251,6 @@ public class CompanyService {
         double growth = 0;
         double preNumJob = 0;
         JSONArray timeArray = new JSONArray();
-        JSONArray dataArray = new JSONArray();
-        JSONArray growthArray = new JSONArray();
 
         List<Object[]> listTimeStamp = companyRepository.getTimeStamps();
         for (Object[] ob : listTimeStamp){
@@ -264,6 +262,32 @@ public class CompanyService {
         int idCompany = Integer.valueOf(companyId.replace("C", ""));
         List<Object[]> list = companyRepository.getJobDemandByCompany(idCompany);
         extractDataJob(growth, preNumJob, timeArray, listData, listGrowth, list, false);
+        jsonObject.put("data", convertArrayToJSON(listData));
+        jsonObject.put("growth", convertArrayToJSON(listGrowth));
+        jsonObject.put("timestamps", timeArray);
+//        jsonObject.put("", companyObject);
+
+        return jsonObject;
+    }
+
+    public JSONObject getSalaryByCompany(String companyId){
+        final JSONObject jsonObject = new JSONObject();
+        final JSONObject companyObject = new JSONObject();
+        jsonObject.put("description", "The job demand by industry");
+        double growth = 0;
+        double preNumJob = 0;
+        JSONArray timeArray = new JSONArray();
+
+        List<Object[]> listTimeStamp = companyRepository.getTimeStamps();
+        for (Object[] ob : listTimeStamp){
+            timeArray.add(ob[0].toString());
+        }
+        Object[] listData = new ArrayList<Integer>(Collections.nCopies(timeArray.size(), 0)).toArray();
+        Object[] listGrowth = new ArrayList<Integer>(Collections.nCopies( timeArray.size(), 0)).toArray();
+
+        int idCompany = Integer.valueOf(companyId.replace("C", ""));
+        List<Object[]> list = companyRepository.getSalaryByCompany(idCompany);
+        extractDataJob(growth, preNumJob, timeArray, listData, listGrowth, list, true);
         jsonObject.put("data", convertArrayToJSON(listData));
         jsonObject.put("growth", convertArrayToJSON(listGrowth));
         jsonObject.put("timestamps", timeArray);
