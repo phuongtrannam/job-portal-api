@@ -100,6 +100,13 @@ public class CompanyController {
         return companyService.getHighestDemandJobs(companyId);
     }
 
+    @CrossOrigin(origins = "http://localhost:4200")
+    @RequestMapping(value = "/companies/get_highest_salary_jobs", method = RequestMethod.POST)
+    public JSONObject getHighestSalaryJobByCompany(@RequestBody Map<String, Object> payload) throws Exception {
+        String companyId = payload.get("id").toString();
+        return companyService.getHighestSalaryJobs(companyId);
+    }
+
 
 
 
