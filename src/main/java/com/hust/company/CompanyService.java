@@ -1,9 +1,6 @@
 package com.hust.company;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -247,6 +244,77 @@ public class CompanyService {
 
     }
 
+    public JSONObject getJobDemandByCompany(String companyId){
+        final JSONObject jsonObject = new JSONObject();
+        final JSONObject companyObject = new JSONObject();
+        jsonObject.put("description", "The job demand by industry");
+        double growth = 0;
+        double preNumJob = 0;
+        JSONArray timeArray = new JSONArray();
+        JSONArray dataArray = new JSONArray();
+        JSONArray growthArray = new JSONArray();
+
+        List<Object[]> listTimeStamp = companyRepository.getTimeStamps();
+        for (Object[] ob : listTimeStamp){
+            timeArray.add(ob[0].toString());
+        }
+        Object[] listData = new ArrayList<Integer>(Collections.nCopies(timeArray.size(), 0)).toArray();
+        Object[] listGrowth = new ArrayList<Integer>(Collections.nCopies( timeArray.size(), 0)).toArray();
+
+        int idCompany = Integer.valueOf(companyId.replace("C", ""));
+        List<Object[]> list = companyRepository.getJobDemandByCompany(idCompany);
+        extractDataJob(growth, preNumJob, timeArray, listData, listGrowth, list, false);
+        jsonObject.put("data", convertArrayToJSON(listData));
+        jsonObject.put("growth", convertArrayToJSON(listGrowth));
+        jsonObject.put("timestamps", timeArray);
+//        jsonObject.put("", companyObject);
+
+        return jsonObject;
+    }
+
+    private void extractDataJob(double growth, double preNumJob, JSONArray timeArray, Object[] listData, Object[] listGrowth, List<Object[]> list , boolean isSalary) {
+        for(Object[] ob : list){
+            int index = timeArray.indexOf(ob[ob.length -2].toString());
+            if(preNumJob != 0){
+                growth = (((double) ob[ob.length -1]/preNumJob) -1)*100;
+            }
+//            timeArray.add(ob[ob.length -2].toString());
+            if (isSalary){
+                listData[index] = round((Double) ob[ob.length -1],2);
+            }
+            else {
+                listData[index] = (int) (double) ob[ob.length -1];
+            }
+            listGrowth[index] = round(growth,2);
+            preNumJob = (double) ob[ob.length -1];
+        }
+    }
+
+    public static double round(double value, int places) {
+        if (places < 0) throw new IllegalArgumentException();
+
+        long factor = (long) Math.pow(10, places);
+        value = value * factor;
+        long tmp = Math.round(value);
+        return (double) tmp / factor;
+    }
+
+    public static JSONArray convertArrayToJSON( Object[] myArray){
+        JSONArray jsArray = new JSONArray();
+
+        for (int i = 0; i < myArray.length; i++) {
+            if(myArray[i] == null){
+                try{
+                    myArray[i] = 0.0;
+                }
+                catch (Exception e){
+                    myArray[i] = 0;
+                }
+            }
+            jsArray.add(myArray[i]);
+        }
+        return jsArray;
+    }
 
     // public JSONObject getNumberOfJob(){
     //     final JSONObject jsonObject = new JSONObject();

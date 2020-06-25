@@ -76,7 +76,7 @@ public interface CompanyRepository extends CrudRepository<Company, String> {
                         + "concat(timed.quarterD,\"/\",timed.yearD) as `time`, "
                         + "sum(fact.number_of_recruitment) as so_luong_tuyen_dung "
                         + "from company_fact as fact, province, timed "
-                        + "where fact.idTime = timed.idTime and fact.idProvince = province.idProvince and fact.idCompany = :id"
+                        + "where fact.idTime = timed.idTime and fact.idProvince = province.idProvince and fact.idCompany = :id \n"
                         + "group by fact.idCompany,province.province, timed.idTime "
                         + "order by province.province, timed.timestampD;", nativeQuery = true)
         List<Object[]> getJobDemandByPeriodOfTime(@Param("id") String id);
@@ -101,4 +101,20 @@ public interface CompanyRepository extends CrudRepository<Company, String> {
                         + "group by timed.idTime, age.age, gender.gender "
                         + "order by timed.timestampD, age.age, gender,gender;", nativeQuery = true)
         List<Object[]> getJobDemandByAge(@Param("id") String id);
+
+        @Query( value = "select timed.idTime,company.name_company,\n" +
+                "       concat(\"Quý \",timed.quarterD,\"/\",timed.yearD) as `time`,\n" +
+                "       sum(company_fact.number_of_recruitment)\n" +
+                "from company_fact, timed, company\n" +
+                "where company_fact.idCompany = :id and company_fact.idTime = timed.idTime\n" +
+                "  and company_fact.idCompany = company.idCompany\n" +
+                "  and company_fact.idTime in ( select idTime from ( select idTime from timed order by timestampD desc limit 4 ) as t )\n" +
+                "group by timed.idTime, company_fact.idCompany\n" +
+                "order by timed.idTime;", nativeQuery = true)
+        List<Object[]> getJobDemandByCompany(@Param("id") int id);
+
+        @Query(value = "select concat(\"Quý \",timed.quarterD,\"/\",timed.yearD) as `time`\n" +
+                "from timed\n" +
+                "order by idTime desc;", nativeQuery = true)
+        List<Object[]> getTimeStamps();
 }

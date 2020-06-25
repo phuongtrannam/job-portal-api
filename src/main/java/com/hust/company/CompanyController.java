@@ -79,6 +79,15 @@ public class CompanyController {
         return companyService.getJobDemandByAge(companyId);
     }
 
+    @CrossOrigin(origins = "http://localhost:4200")
+    @RequestMapping(value = "/companies/get_job_demand", method = RequestMethod.POST)
+    public JSONObject getJobDemandByCompany(@RequestBody Map<String, Object> payload) throws Exception {
+        String companyId = payload.get("id").toString();
+        return companyService.getJobDemandByCompany(companyId);
+    }
+
+
+
 
 
     // @RequestMapping("/companies/getnumberofjob")
