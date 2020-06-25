@@ -124,6 +124,21 @@ public interface CompanyRepository extends CrudRepository<Company, String> {
                 "order by timed.idTime;", nativeQuery = true)
         List<Object[]> getSalaryByCompany(@Param("id") int id);
 
+        @Query( value = "with job_1 as (\n" +
+                "    select fact.idTime, fact.idCompany, job.idJob, job.name_job,\n" +
+                "           sum(fact.number_of_recruitment) as `so luong tuyen dung`, min(salary) as `min`, max(salary) as `max`,\n" +
+                "           rank() over(partition by fact.idTime, fact.idCompany order by sum(fact.number_of_recruitment) desc) as `rank`\n" +
+                "    from (select distinct idTime,idCompany, idJob, number_of_recruitment, salary from company_fact) as fact, job\n" +
+                "    where fact.idJob = job.idJob\n" +
+                "      and fact.idCompany = :id \n" +
+                "    group by fact.idTime, fact.idCompany, job.idJob\n" +
+                "    order by fact.idTime, fact.idCompany, sum(fact.number_of_recruitment) desc)\n" +
+                "select idJob, name_job, `so luong tuyen dung`,`min`,`max`, timed.idTime, concat(\"Quý \",timed.quarterD,\"/\",timed.yearD) as `time`\n" +
+                "from job_1, timed\n" +
+                "where `rank` <= 10 and job_1.idTime = timed.idTime\n" +
+                "order by timed.idTime,idCompany,`rank`;", nativeQuery = true)
+        List<Object[]> getHighestDemandJobCompany(@Param("id") int id);
+
         @Query(value = "select concat(\"Quý \",timed.quarterD,\"/\",timed.yearD) as `time`\n" +
                 "from timed\n" +
                 "order by idTime desc;", nativeQuery = true)

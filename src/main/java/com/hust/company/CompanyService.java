@@ -296,6 +296,70 @@ public class CompanyService {
         return jsonObject;
     }
 
+    public JSONObject getHighestDemandJobs(final String companyId){
+        final JSONObject jsonObject = new JSONObject();
+        jsonObject.put("id", companyId);
+        jsonObject.put("description", "The job highest demand jobs");
+
+        final JSONObject resultObject = new JSONObject();
+
+        JSONObject timeObject = new JSONObject();
+        JSONArray jobArray = new JSONArray();
+        JSONArray salarayArray = new JSONArray();
+        JSONArray growthArray = new JSONArray();
+        JSONArray numJobArray = new JSONArray();
+
+        int idCompany = Integer.valueOf(companyId.replace("C", ""));
+        final List<Object[]> list = companyRepository.getHighestDemandJobCompany(idCompany);
+        final Set<String> timeSet = new LinkedHashSet<>();
+        for (final Object[] ob : list) {
+            timeSet.add(ob[6].toString());
+        }
+        jsonObject.put("timestamps",timeSet);
+        String time = list.get(0)[6].toString();
+        for( final Object[] ob : list){
+            if(!time.equals(ob[ob.length -1].toString())){
+                putDataHighestJobsToJSON(resultObject, timeObject, jobArray, salarayArray, numJobArray, time);
+                jobArray = new JSONArray();
+                salarayArray = new JSONArray();
+                numJobArray = new JSONArray();
+                timeObject = new JSONObject();
+                time = ob[ob.length -1].toString();
+            }
+            final int idJob = getJSONDataHighestJobs(jobArray, numJobArray, ob, false);
+            final HashMap<String, Object> salaryObject = new HashMap<>();
+            salaryObject.put("min", ob[3]);
+            salaryObject.put("max", ob[4]);
+            salarayArray.add(salaryObject);
+        }
+        putDataHighestJobsToJSON(resultObject, timeObject, jobArray, salarayArray, numJobArray, time);
+        jsonObject.put("result", resultObject);
+        return jsonObject;
+    }
+
+    private void putDataHighestJobsToJSON(final JSONObject jsonObject, final JSONObject timeObject, final JSONArray jobArray, final JSONArray salarayArray, final JSONArray numJobArray, final String time) {
+        timeObject.put("job", jobArray);
+        timeObject.put("salary", salarayArray);
+        timeObject.put("numJob", numJobArray);
+        jsonObject.put(time, timeObject);
+    }
+
+    private int getJSONDataHighestJobs(final JSONArray jobArray, final JSONArray dataArray, final Object[] ob, boolean isSalary) {
+        final HashMap<String, Object> jobObject = new HashMap<>();
+        final int idJob = (int) ob[0];
+        jobObject.put("id", "J" + idJob);
+        jobObject.put("name", ob[1].toString());
+        jobArray.add(jobObject);
+        if(isSalary){
+            dataArray.add(round((double)ob[2],2));
+        }
+        else{
+            dataArray.add((int)(double)ob[2]);
+        }
+//        growthArray.add(ob[3]);
+        return idJob;
+    }
+
     private void extractDataJob(double growth, double preNumJob, JSONArray timeArray, Object[] listData, Object[] listGrowth, List<Object[]> list , boolean isSalary) {
         for(Object[] ob : list){
             int index = timeArray.indexOf(ob[ob.length -2].toString());
