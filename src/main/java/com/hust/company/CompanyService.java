@@ -1,5 +1,6 @@
 package com.hust.company;
 
+import java.text.DecimalFormat;
 import java.util.*;
 
 import org.json.simple.JSONArray;
@@ -196,103 +197,226 @@ public class CompanyService {
 
     }
 
-    public JSONObject getJobDemandByLiteracy(final String id){
+    public JSONObject getJobDemandByAge(String companyId){
         final JSONObject jsonObject = new JSONObject();
-        jsonObject.put("id", id);
-        jsonObject.put("description", "The job demand by literacy");
+        jsonObject.put("description", "The job demand by age and gender");
 
-        final JSONArray literacies = new JSONArray();
-        System.out.println(id);
-        final List<Object[]> list = companyRepository.getJobDemandByLiteracy(id);
-        System.out.println(id);
-        for(final Object[] ob : list){
-            final HashMap<String, Object> literacy = new HashMap<String, Object>();
-            literacy.put("id", ob[0].toString());
-            literacy.put("idTime", ob[1].toString());
-            literacy.put("timestamp", ob[2].toString());
-            literacy.put("literacy", ob[3].toString());
-            literacy.put("num_job", (int) (double) ob[4]);
-            // literacy.put("year", ob[0].toString());
-            // literacy.put("quarter", ob[0].toString());
-            literacies.add(literacy);
+        JSONObject timeObject = new JSONObject();
+        JSONArray ageRangeArray = new JSONArray();
+        JSONArray maleArray = new JSONArray();
+        JSONArray femaleArray = new JSONArray();
+
+//        List<Object[]> listObjectAgeRange = industryRepository.getAgeRange();
+        List<String> listAgeRange = Arrays.asList("0-18", "18-25", "25-35", "35-50", "50+","Không xác định");
+        for( String ob : listAgeRange){
+            ageRangeArray.add(ob);
+            System.out.println(ob);
+        };
+        jsonObject.put("ageRange", ageRangeArray);
+
+        int count = 0;
+        Object[] listMale = new ArrayList<Integer>(Collections.nCopies(ageRangeArray.size(), 0)).toArray();
+        Object[] listFeMale = new ArrayList<Integer>(Collections.nCopies( ageRangeArray.size(), 0)).toArray();
+        List<Object[]> list = companyRepository.getJobDemandByAge(companyId);
+        Set<String> timeSet = new LinkedHashSet<>();
+        for (Object[] ob : list) {
+            timeSet.add(ob[0].toString());
         }
-        jsonObject.put("result", literacies);
+        jsonObject.put("timestamps",timeSet);
+        getJSONJobDemandByAge(jsonObject, timeObject, ageRangeArray, listMale, listFeMale, list);
         return jsonObject;
     }
 
-    public JSONObject getJobDemandByAge(final String id){
-        final JSONObject jsonObject = new JSONObject();
-        jsonObject.put("id", id);
-        jsonObject.put("description", "The job demand by age and gender");
+    private void getJSONJobDemandByAge(JSONObject jsonObject, JSONObject timeObject, JSONArray ageRangeArray, Object[] listMale, Object[] listFeMale, List<Object[]> list) {
+        JSONArray maleArray;
+        JSONArray femaleArray;
+        String time = list.get(0)[0].toString();
+        for(Object[] ob: list){
+            if(!time.equals(ob[0].toString())){
+                maleArray = convertArrayToJSON(listMale);
+                femaleArray = convertArrayToJSON(listFeMale);
+                timeObject.put("male", maleArray);
+                timeObject.put("female", femaleArray);
+                jsonObject.put(time, timeObject);
+                timeObject = new JSONObject();
+//                        maleArray = new JSONArray();
+//                        femaleArray = new JSONArray();
+                time = ob[0].toString();
 
-        final JSONArray ageRanges = new JSONArray();
-        System.out.println(id);
-        final List<Object[]> list = companyRepository.getJobDemandByAge(id);
-        System.out.println(id);
-        for(final Object[] ob : list){
-            final HashMap<String, Object> ageRange = new HashMap<String, Object>();
-            ageRange.put("id", ob[0].toString());
-            ageRange.put("idTime", ob[1].toString());
-            ageRange.put("timestamp", ob[2].toString());
-            ageRange.put("age", ob[3].toString());
-            ageRange.put("gender", ob[4].toString());
-            ageRange.put("num_job", (int) (double) ob[5]);
-            ageRanges.add(ageRange);
+            }
+            boolean flag = false;
+            System.out.println(ob[ob.length -2]);
+            System.out.println(ob[ob.length -1]);
+            if (ob[ob.length -2].toString().equals("1")){
+                for (Object age : ageRangeArray){
+                    int index = ageRangeArray.indexOf(age.toString());
+                    if(index == ageRangeArray.size() - 1) {
+                        if(flag == false){
+                            listMale[index] = (int) listMale[index] + (int)(double) ob[1];
+                            System.out.println(listMale[index]);
+                        }
+                        break;
+                    }
+                    if(ob[index + 3].toString().equals("1")){
+                        listMale[index] = (int) listMale[index] + (int)(double) ob[1];
+                        System.out.println(listMale[index]);
+                        flag = true;
+                    }
+                }
+            }
+            if (ob[ob.length -1].toString().equals("1")){
+                for (Object age : ageRangeArray){
+                    int index = ageRangeArray.indexOf(age.toString());
+                    if(index == ageRangeArray.size() - 1) {
+                        if(flag == false){
+                            listFeMale[index] = (int) listFeMale[index] + (int)(double) ob[1];
+                        }
+                        break;
+                    }
+                    if(ob[index + 3].toString().equals("1")){
+                        listFeMale[index] = (int) listFeMale[index] + (int)(double) ob[1];
+                        flag = true;
+                    }
+                }
+            }
         }
-        jsonObject.put("result", ageRanges);
+        maleArray = convertArrayToJSON(listMale);
+        femaleArray = convertArrayToJSON(listFeMale);
+        timeObject.put("male", maleArray);
+        timeObject.put("female", femaleArray);
+        jsonObject.put(time, timeObject);
+    }
+
+    public JSONObject getJobDemandByLiteracy(String companyId){
+        final JSONObject jsonObject = new JSONObject();
+        jsonObject.put("description", "The job demand by literacy");
+
+        List<String> literacies = new ArrayList<String>();
+
+        final List<Object[]> listLiteracy = companyRepository.getLiteracy();
+        for (Object[] ob : listLiteracy) {
+            literacies.add(ob[1].toString());
+        }
+        jsonObject.put("literacy", literacies);
+        int numLiteracy = literacies.size();
+
+        final List<Object[]> list = companyRepository.getJobDemandByLiteracy(companyId);
+        Set<String> timeSet = new LinkedHashSet<>();
+        for (Object[] ob : list) {
+            timeSet.add(ob[2].toString());
+        }
+
+        DecimalFormat df = new DecimalFormat("##.##");
+        int index = 0;
+        int currentValue = 0;
+        int previousValue = 0;
+        float currentGrowth;
+        List<Integer> previousData = new ArrayList<Integer>(Collections.nCopies(numLiteracy, 0));
+        int count = 0;
+        for (String time : timeSet) {
+            final JSONObject timeObject = new JSONObject();
+            List<Integer> data = new ArrayList<Integer>(Collections.nCopies(numLiteracy, 0));
+            List<Float> growth = new ArrayList<Float>(Collections.nCopies(numLiteracy, 0.0f));
+            for (Object[] ob : list) {
+                String tempTime = ob[2].toString();
+                if (time.equals(tempTime)) {
+                    index = literacies.indexOf(ob[3].toString());
+                    currentValue = Math.round(Float.parseFloat(ob[4].toString()));
+                    data.set(index, currentValue);
+                    if (count != 0) {
+                        previousValue = previousData.get(index);
+                        if (previousValue != 0) {
+                            currentGrowth = 100 * (((float) currentValue / previousValue) - 1.0f);
+                            currentGrowth = Float.parseFloat(df.format(currentGrowth));
+                        } else {
+                            currentGrowth = 100.0f;
+                        }
+
+                        growth.set(index, currentGrowth);
+                    }
+                }
+                System.out.println(ob[0].toString());
+                System.out.println(ob[1].toString());
+                System.out.println(ob[2].toString());
+                System.out.println(ob[3].toString());
+                System.out.println(ob[4].toString());
+            }
+            previousData = data;
+            count++;
+            timeObject.put("data", data);
+            timeObject.put("growth", growth);
+            jsonObject.put(time, timeObject);
+        }
+        jsonObject.put("timestamps", timeSet);
         return jsonObject;
 
     }
 
     public JSONObject getJobDemandByCompany(String companyId){
         final JSONObject jsonObject = new JSONObject();
-        final JSONObject companyObject = new JSONObject();
-        jsonObject.put("description", "The job demand by industry");
-        double growth = 0;
-        double preNumJob = 0;
-        JSONArray timeArray = new JSONArray();
+        jsonObject.put("description", "The job demand by company");
 
-        List<Object[]> listTimeStamp = companyRepository.getTimeStamps();
-        for (Object[] ob : listTimeStamp){
-            timeArray.add(ob[0].toString());
+        List<String> timestamp = new ArrayList<String>();
+        List<Float> data = new ArrayList<Float>();
+        List<Float> growth = new ArrayList<Float>();
+
+        final List<Object[]> list = companyRepository.getJobDemandByCompany(companyId);
+        String companyName = list.get(0)[1].toString();
+        int i = 0;
+        float previousValue = 1f;
+        float currentGrowth;
+        DecimalFormat df = new DecimalFormat("##.##");
+        for (final Object[] ob : list) {
+            timestamp.add(ob[2].toString());
+            data.add(Float.parseFloat(df.format(Float.parseFloat(ob[3].toString()))));
+            if (i == 0) {
+                growth.add(0f);
+            } else {
+                currentGrowth = 100 * (Math.round(Float.parseFloat(ob[3].toString())) / previousValue - 1.0f);
+                currentGrowth = Float.parseFloat(df.format(currentGrowth));
+                growth.add(currentGrowth);
+            }
+            i++;
+            previousValue = Float.parseFloat(df.format(Float.parseFloat(ob[3].toString())));
         }
-        Object[] listData = new ArrayList<Integer>(Collections.nCopies(timeArray.size(), 0)).toArray();
-        Object[] listGrowth = new ArrayList<Integer>(Collections.nCopies( timeArray.size(), 0)).toArray();
-
-        int idCompany = Integer.valueOf(companyId.replace("C", ""));
-        List<Object[]> list = companyRepository.getJobDemandByCompany(idCompany);
-        extractDataJob(growth, preNumJob, timeArray, listData, listGrowth, list, false);
-        jsonObject.put("data", convertArrayToJSON(listData));
-        jsonObject.put("growth", convertArrayToJSON(listGrowth));
-        jsonObject.put("timestamps", timeArray);
-//        jsonObject.put("", companyObject);
-
+        jsonObject.put("timestamp", timestamp);
+        jsonObject.put("data", data);
+        jsonObject.put("growth", growth);
+        jsonObject.put("company", companyName);
         return jsonObject;
     }
 
     public JSONObject getSalaryByCompany(String companyId){
         final JSONObject jsonObject = new JSONObject();
-        final JSONObject companyObject = new JSONObject();
-        jsonObject.put("description", "The job demand by industry");
-        double growth = 0;
-        double preNumJob = 0;
-        JSONArray timeArray = new JSONArray();
+        jsonObject.put("description", "The average salary");
 
-        List<Object[]> listTimeStamp = companyRepository.getTimeStamps();
-        for (Object[] ob : listTimeStamp){
-            timeArray.add(ob[0].toString());
+        List<String> timestamp = new ArrayList<String>();
+        List<Float> data = new ArrayList<Float>();
+        List<Float> growth = new ArrayList<Float>();
+
+        final List<Object[]> list = companyRepository.getSalaryByCompany(companyId);
+        String companyName = list.get(0)[1].toString();
+        int i = 0;
+        float previousValue = 1f;
+        float currentGrowth;
+        DecimalFormat df = new DecimalFormat("##.##");
+        for (final Object[] ob : list) {
+            timestamp.add(ob[2].toString());
+            data.add(Float.parseFloat(df.format(Float.parseFloat(ob[3].toString()))));
+            if (i == 0) {
+                growth.add(0f);
+            } else {
+                currentGrowth = 100 * (Math.round(Float.parseFloat(ob[3].toString())) / previousValue - 1.0f);
+                currentGrowth = Float.parseFloat(df.format(currentGrowth));
+                growth.add(currentGrowth);
+            }
+            i++;
+            previousValue = Float.parseFloat(df.format(Float.parseFloat(ob[3].toString())));
         }
-        Object[] listData = new ArrayList<Integer>(Collections.nCopies(timeArray.size(), 0)).toArray();
-        Object[] listGrowth = new ArrayList<Integer>(Collections.nCopies( timeArray.size(), 0)).toArray();
-
-        int idCompany = Integer.valueOf(companyId.replace("C", ""));
-        List<Object[]> list = companyRepository.getSalaryByCompany(idCompany);
-        extractDataJob(growth, preNumJob, timeArray, listData, listGrowth, list, true);
-        jsonObject.put("data", convertArrayToJSON(listData));
-        jsonObject.put("growth", convertArrayToJSON(listGrowth));
-        jsonObject.put("timestamps", timeArray);
-//        jsonObject.put("", companyObject);
-
+        jsonObject.put("timestamp", timestamp);
+        jsonObject.put("data", data);
+        jsonObject.put("growth", growth);
+        jsonObject.put("company", companyName);
         return jsonObject;
     }
 
@@ -388,7 +512,7 @@ public class CompanyService {
         if (ob[2] != null){
             final HashMap<String, Object> jobObject = new HashMap<>();
             final int idJob = (int) ob[0];
-            jobObject.put("id", "J" + idJob);
+            jobObject.put("id", idJob);
             jobObject.put("name", ob[1].toString());
             jobArray.add(jobObject);
             if(isSalary) {
@@ -448,28 +572,5 @@ public class CompanyService {
         return jsArray;
     }
 
-    // public JSONObject getNumberOfJob(){
-    //     final JSONObject jsonObject = new JSONObject();
-        
-    //     return jsonObject;
-
-    // }
-
-    // public JSONObject getJobsHighestSalary(){
-    //     final JSONObject jsonObject = new JSONObject();
-    //     jsonObject.put("description", "The highest paid jobs");
-        
-    //     final JSONArray jobList = new JSONArray();
-    //     HashMap<String, String> jobObject = new HashMap<String, String>();
-    //     jobObject.put("name", "Kĩ sư hệ thống");
-    //     jobObject.put("value", "50");
-    //     jobObject.put("growth", "2");
-    //     jobList.add(jobObject);
-    //     jobList.add(jobObject);
-    //     jsonObject.put("jobList", jobList);
-    //     return jsonObject;
-
-    // }
-    
 
 }

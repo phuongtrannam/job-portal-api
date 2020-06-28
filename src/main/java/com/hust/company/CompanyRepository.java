@@ -10,6 +10,11 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface CompanyRepository extends CrudRepository<Company, String> {
 
+        @Query( value = " select * from age order by age;", nativeQuery = true)
+        List<Object[]> getAgeRange();
+
+        @Query( value = " select * from academic_level order by academic_level;", nativeQuery = true)
+        List<Object[]> getLiteracy();
         @Query(value = "select company.idCompany, company.name_company, company.phone, "
                         + "company.`description`,company.founded_year,company.website, "
                         + "location.location as location_detail " + "from company, location "
@@ -81,48 +86,49 @@ public interface CompanyRepository extends CrudRepository<Company, String> {
                         + "order by province.province, timed.timestampD;", nativeQuery = true)
         List<Object[]> getJobDemandByPeriodOfTime(@Param("id") String id);
 
-        @Query(value = "select fact.idCompany,timed.idTime, " + "concat(timed.quarterD,\"/\",timed.yearD) as `time`, "
+        @Query(value = "select fact.idCompany,timed.idTime, " + "concat(\"Quý \",timed.quarterD,\"/\",timed.yearD) as `time`, "
                         + "academic_level.academic_level, sum(fact.number_of_recruitment) "
                         + "from company_fact as fact, academic_level, timed "
-                        + "where fact.idTime = timed.idTime and fact.idCompany = :id"
+                        + "where fact.idTime = timed.idTime and fact.idCompany = :companyId "
                         + "and fact.idAcademic_Level = academic_level.idAcademic_Level " + "and fact.idTime in "
                         + "(select idTime from " + "(select idTime from timed order by timestampD desc limit 3) as t ) "
                         + "group by fact.idCompany,timed.idTime,timed.timestampD,academic_level.academic_level "
                         + "order by timed.timestampD, academic_level.academic_level;", nativeQuery = true)
-        List<Object[]> getJobDemandByLiteracy(@Param("id") String id);
+        List<Object[]> getJobDemandByLiteracy(@Param("companyId") String companyId);
 
-        @Query(value = "select fact.idCompany,timed.idTime, " + "concat(timed.quarterD,\"/\",timed.yearD) as `time`, "
-                        + "age.age, gender.gender, sum(fact.number_of_recruitment) "
-                        + "from (select distinct idTime, idCompany,idAge, idGender, idJob, number_of_recruitment\n"
-                        + "               from company_fact where idCompany = :id) as fact, gender, age, timed "
-                        + "where fact.idTime = timed.idTime " + "and fact.idGender = gender.idGender "
-                        + "and fact.idAge = age.idAge " + "and fact.idTime in " + "(select idTime from "
-                        + "( select idTime from timed order by timestampD desc limit 3) as t ) "
-                        + "group by timed.idTime, age.age, gender.gender "
-                        + "order by timed.timestampD, age.age, gender,gender;", nativeQuery = true)
-        List<Object[]> getJobDemandByAge(@Param("id") String id);
+        @Query(value = "select concat(\"Quý \",timed.quarterD,\"/\",timed.yearD) as `time`, sum(number_of_recruitment),\n" +
+                        "age.idAge,bin(age.`0-18`),bin(age.`18-25`), bin(age.`25-35`), bin(age.`35-50`), bin(age.`50+`),\n" +
+                        "gender.idGender, bin(gender.`male`), bin(gender.`female`)\n" +
+                        "from (select distinct idTime, idCompany,idAge, idGender, idJob, number_of_recruitment " +
+                                "from company_fact where idCompany = :companyId) as fact, gender, age, timed " + 
+                        "where fact.idTime = timed.idTime and fact.idGender = gender.idGender " +
+                        "and fact.idAge = age.idAge and fact.idTime in (select idTime from  " +
+                        "( select idTime from timed order by timestampD desc limit 3) as t ) " +
+                        "group by timed.idTime, age.idAge, gender.idGender " +
+        "order by timed.timestampD, age.idAge, gender.idGender;", nativeQuery = true)
+        List<Object[]> getJobDemandByAge(@Param("companyId") String companyId);
 
         @Query( value = "select timed.idTime,company.name_company,\n" +
                 "       concat(\"Quý \",timed.quarterD,\"/\",timed.yearD) as `time`,\n" +
                 "       sum(company_fact.number_of_recruitment)\n" +
                 "from company_fact, timed, company\n" +
-                "where company_fact.idCompany = :id and company_fact.idTime = timed.idTime\n" +
+                "where company_fact.idCompany = :companyId and company_fact.idTime = timed.idTime\n" +
                 "  and company_fact.idCompany = company.idCompany\n" +
                 "  and company_fact.idTime in ( select idTime from ( select idTime from timed order by timestampD desc limit 4 ) as t )\n" +
                 "group by timed.idTime, company_fact.idCompany\n" +
                 "order by timed.idTime;", nativeQuery = true)
-        List<Object[]> getJobDemandByCompany(@Param("id") int id);
+        List<Object[]> getJobDemandByCompany(@Param("companyId") String companyId);
 
         @Query( value = "select timed.idTime,company.name_company,\n" +
                 "       concat(\"Quý \",timed.quarterD,\"/\",timed.yearD) as `time`,\n" +
                 "       avg(company_fact.salary)\n" +
                 "from company_fact, timed, company\n" +
-                "where company_fact.idCompany = :id and company_fact.idTime = timed.idTime\n" +
+                "where company_fact.idCompany = :companyId and company_fact.idTime = timed.idTime\n" +
                 "  and company_fact.idCompany = company.idCompany\n" +
                 "  and company_fact.idTime in ( select idTime from ( select idTime from timed order by timestampD desc limit 4 ) as t )\n" +
                 "group by timed.idTime, company_fact.idCompany\n" +
                 "order by timed.idTime;", nativeQuery = true)
-        List<Object[]> getSalaryByCompany(@Param("id") int id);
+        List<Object[]> getSalaryByCompany(@Param("companyId") String companyId);
 
         @Query( value = "with job_1 as (\n" +
                 "    select fact.idTime, fact.idCompany, job.idJob, job.name_job,\n" +
