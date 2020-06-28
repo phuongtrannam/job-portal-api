@@ -529,9 +529,9 @@ public class IndustryService {
         }
         else {
 //            System.out.println(industryId);
-            // int idIndustry = Integer.valueOf(industryId.replace("I", ""));
-            // int idProvince  = Integer.valueOf(locationId.replace("P",""));
-            List<Object[]> list = industryRepository.getTopSalaryHiringCompanyWithProvince(industryId, locationId);
+            int idIndustry = Integer.valueOf(industryId.replace("I", ""));
+            int idProvince  = Integer.valueOf(locationId.replace("P",""));
+            List<Object[]> list = industryRepository.getTopSalaryHiringCompanyWithProvince(idIndustry, idProvince);
             Set<String> timeSet = new LinkedHashSet<>();
             for (Object[] ob : list) {
                 timeSet.add(ob[0].toString());
