@@ -1,5 +1,6 @@
 package com.hust.region;
 
+import java.text.DecimalFormat;
 import java.util.*;
 
 import org.json.simple.JSONArray;
@@ -30,6 +31,126 @@ public class RegionService {
     //     return jsonObject;
 
     // }
+
+    public JSONObject getJobDemandByPeriodOfTime( List<String> regionList) {
+        System.out.println(regionList.contains("P0"));
+        final JSONObject jsonObject = new JSONObject();
+        jsonObject.put("description", "The job demand by period of time");
+        List<String> timestamp = new ArrayList<String>();
+        List<Integer> data = new ArrayList<Integer>();
+        List<Float> growth = new ArrayList<Float>();
+        if (regionList.contains("P0")) {
+            System.out.println("VAO P0");
+            final List<Object[]> list = regionRepository.getJobDemandByPeriodOfTimeCountry();
+            int i = 0;
+            float previousValue = 1f;
+            float currentGrowth;
+            DecimalFormat df = new DecimalFormat("##.##");
+
+            for (final Object[] ob : list) {
+                timestamp.add(ob[1].toString());
+                data.add(Math.round(Float.parseFloat(ob[2].toString())));
+                if (i == 0) {
+                    growth.add(0f);
+                } else {
+                    currentGrowth = 100 * (Float.parseFloat(ob[2].toString()) / previousValue - 1.0f);
+                    currentGrowth = Float.parseFloat(df.format(currentGrowth));
+                    growth.add(currentGrowth);
+                }
+                i++;
+                previousValue = Float.parseFloat(ob[2].toString());
+            }
+            jsonObject.put("timestamp", timestamp);
+            jsonObject.put("data", data);
+            jsonObject.put("growth", growth);
+        } else {
+            System.out.println("VAO KHAC P0");
+            final List<Object[]> list = regionRepository.getJobDemandByPeriodOfTimeProvince(regionList);
+            if (list.size() != 0) {
+                int i = 0;
+                float previousValue = 1f;
+                float currentGrowth;
+                DecimalFormat df = new DecimalFormat("##.##");
+
+                for (final Object[] ob : list) {
+                    timestamp.add(ob[1].toString());
+                    data.add(Math.round(Float.parseFloat(ob[2].toString())));
+                    if (i == 0) {
+                        growth.add(0f);
+                    } else {
+                        currentGrowth = 100 * (Float.parseFloat(ob[2].toString()) / previousValue - 1.0f);
+                        currentGrowth = Float.parseFloat(df.format(currentGrowth));
+                        growth.add(currentGrowth);
+                    }
+                    i++;
+                    previousValue = Float.parseFloat(ob[2].toString());
+                }
+                jsonObject.put("timestamp", timestamp);
+                jsonObject.put("data", data);
+                jsonObject.put("growth", growth);
+            }
+        }
+        return jsonObject;
+    }
+     
+    public JSONObject getAverageSalaryByPeriodOfTime( List<String> regionList) {
+        final JSONObject jsonObject = new JSONObject();
+        jsonObject.put("description", "The average salary");
+
+        List<String> timestamp = new ArrayList<String>();
+        List<Float> data = new ArrayList<Float>();
+        List<Float> growth = new ArrayList<Float>();
+
+        if (regionList.contains("P0")) {
+            final List<Object[]> list = regionRepository.getAverageSalaryByPeriodOfTimeCountry();
+            int i = 0;
+            float previousValue = 1f;
+            float currentGrowth;
+            DecimalFormat df = new DecimalFormat("##.##");
+            for (final Object[] ob : list) {
+
+                timestamp.add(ob[1].toString());
+                data.add(Float.parseFloat(df.format(Float.parseFloat(ob[2].toString()))));
+                if (i == 0) {
+                    growth.add(0f);
+                } else {
+                    currentGrowth = 100 * (Math.round(Float.parseFloat(ob[2].toString())) / previousValue - 1.0f);
+                    currentGrowth = Float.parseFloat(df.format(currentGrowth));
+                    growth.add(currentGrowth);
+                }
+                i++;
+                previousValue = Float.parseFloat(df.format(Float.parseFloat(ob[2].toString())));
+            }
+            jsonObject.put("timestamp", timestamp);
+            jsonObject.put("data", data);
+            jsonObject.put("growth", growth);
+        } else {
+            final List<Object[]> list = regionRepository.getAverageSalaryByPeriodOfTimeProvince(regionList);
+            if (list.size() != 0) {
+                int i = 0;
+                float previousValue = 1f;
+                float currentGrowth;
+                DecimalFormat df = new DecimalFormat("##.##");
+                for (final Object[] ob : list) {
+                    timestamp.add(ob[1].toString());
+                    data.add(Float.parseFloat(df.format(Float.parseFloat(ob[2].toString()))));
+                    if (i == 0) {
+                        growth.add(0f);
+                    } else {
+                        currentGrowth = 100 * (Math.round(Float.parseFloat(ob[2].toString())) / previousValue - 1.0f);
+                        currentGrowth = Float.parseFloat(df.format(currentGrowth));
+                        growth.add(currentGrowth);
+                    }
+                    i++;
+                    previousValue = Float.parseFloat(df.format(Float.parseFloat(ob[2].toString())));
+                }
+                jsonObject.put("timestamp", timestamp);
+                jsonObject.put("data", data);
+                jsonObject.put("growth", growth);
+            }
+        }
+        return jsonObject;
+    }
 
     public JSONObject getRootRegion(final String regionId) {
         final JSONObject jsonObject = new JSONObject();
@@ -124,35 +245,32 @@ public class RegionService {
         return jsonObject;
     }
 
-    public JSONObject getNumberJobPostingInRegion(final String regionId) {
+    public JSONObject getNumberJobPostingInRegion(List<String> regionList) {
         final JSONObject jsonObject = new JSONObject();
-        jsonObject.put("id", regionId);
         jsonObject.put("description", "The number of jos posting in the region");
         final HashMap<String, Object> numJobObject = new HashMap<>();
-        if(regionId.equals("P0")){
+        if(regionList.contains("P0")){
             getDataDashboardToJSONObject(numJobObject, regionRepository.getNumberJobPostingInCountry());
         }
         else{
-            final int idProvince = Integer.valueOf(regionId.replace("P",""));
-            getDataDashboardToJSONObject(numJobObject, regionRepository.getNumberJobPostingInProvince(idProvince));
+            // final int idProvince = Integer.valueOf(regionId.replace("P",""));
+            getDataDashboardToJSONObject(numJobObject, regionRepository.getNumberJobPostingInProvince(regionList));
         }
         jsonObject.put("result", numJobObject);
         return jsonObject;
     }
     
-    public JSONObject getNumberCompanyInRegion(final String regionId) {
+    public JSONObject getNumberCompanyInRegion( List<String> regionList) {
         final JSONObject jsonObject = new JSONObject();
-        jsonObject.put("id", regionId);
         jsonObject.put("description", "The number of jos posting in the region");
 
         final HashMap<String, Object> numCompanyObject = new HashMap<>();
 
-        if(regionId.equals("P0")){
+        if(regionList.contains("P0")){
             getDataDashboardToJSONObject(numCompanyObject, regionRepository.getNumberCompanyInCountry());
         }
         else {
-            final int idProvince = Integer.valueOf(regionId.replace("P",""));
-            getDataDashboardToJSONObject(numCompanyObject, regionRepository.getNumberCompanyInProvince(idProvince));
+            getDataDashboardToJSONObject(numCompanyObject, regionRepository.getNumberCompanyInProvince(regionList));
         }
         jsonObject.put("result", numCompanyObject);
         return jsonObject;
@@ -172,9 +290,8 @@ public class RegionService {
         jsonObject.put("growth", round(growth, 2));
     }
 
-    public JSONObject getAverageSalaryInRegion(final String regionId) {
+    public JSONObject getAverageSalaryInRegion(List<String> regionList) {
         final JSONObject jsonObject = new JSONObject();
-        jsonObject.put("id", regionId);
         jsonObject.put("description", "The number of jos posting in the region");
 
         final HashMap<String, Object> avgSalaryObject = new HashMap<>();
@@ -185,13 +302,12 @@ public class RegionService {
         final double preAvgSalary = 0;
         final double growth = 100.0;
 
-        if(regionId.equals("P0")){
+        if(regionList.contains("P0")){
             final List<Object[]> list = regionRepository.getListSalaryInLastYearWithCountry();
             getJSONObjectAverageSalary(jsonObject, avgSalaryObject, sumSalary, numJob, preAvgSalary, growth, list, "data");
         }
         else {
-            final int idProvince = Integer.valueOf(regionId.replace("P",""));
-            final List<Object[]> list = regionRepository.getListSalaryInLastYearWithProvince(idProvince);
+            final List<Object[]> list = regionRepository.getListSalaryInLastYearWithProvince(regionList);
             getJSONObjectAverageSalary(jsonObject, avgSalaryObject, sumSalary, numJob, preAvgSalary, growth, list, "data");
         }
         return jsonObject;
@@ -235,11 +351,10 @@ public class RegionService {
     }
 
 
-    public JSONObject getAverageAgeInRegion(final String regionId) {
+    public JSONObject getAverageAgeInRegion( List<String> regionList) {
 
         final HashMap<String, Double> mapAvgAge = mapAvgAge();
         final JSONObject jsonObject = new JSONObject();
-        jsonObject.put("id", regionId);
         jsonObject.put("description", "The number of jos posting in the region");
 
         final HashMap<String, Object> avgAgeObject = new HashMap<>();
@@ -250,13 +365,12 @@ public class RegionService {
         final double preAvgAge = 0;
         final double growth = 0;
 
-        if(regionId.equals("P0")){
+        if(regionList.contains("P0")){
             final List<Object[]> list = regionRepository.getAverageAgeInCountry();
             getJSONObjectAverageAge(mapAvgAge, jsonObject, avgAgeObject, sumAge, numJob, preAvgAge, growth, list);
         }
         else{
-            final int idProvince = Integer.valueOf(regionId.replace("P",""));
-            final List<Object[]> list = regionRepository.getAverageAgeInProvince(idProvince);
+            final List<Object[]> list = regionRepository.getAverageAgeInProvince(regionList);
             getJSONObjectAverageAge(mapAvgAge, jsonObject, avgAgeObject, sumAge, numJob, preAvgAge, growth, list);
         }
         return jsonObject;
@@ -342,22 +456,18 @@ public class RegionService {
     }
 
 
-    public JSONObject getDashboardData(final String id) {
+    public JSONObject getDashboardData( List<String> regionList) {
         final JSONObject jsonObject = new JSONObject();
-        jsonObject.put("id", id);
         jsonObject.put("description", "The dashboard data");
-
         final JSONObject resultObject = new JSONObject();
-
-
-         final Object numJobPosting = getNumberJobPostingInRegion(id).get("result");
-         final Object numCompany = getNumberCompanyInRegion(id).get("result");
-         final Object averageSalary = getAverageSalaryInRegion(id).get("result");
-         final Object averageAge = getAverageAgeInRegion(id).get("result");
-         resultObject.put("numJobPosting", numJobPosting);
-         resultObject.put("numCompany", numCompany);
-         resultObject.put("averageSalary", averageSalary);
-         resultObject.put("averageAge", averageAge);
+        final Object numJobPosting = getNumberJobPostingInRegion(regionList).get("result");
+        final Object numCompany = getNumberCompanyInRegion(regionList).get("result");
+        final Object averageSalary = getAverageSalaryInRegion(regionList).get("result");
+        final Object averageAge = getAverageAgeInRegion(regionList).get("result");
+        resultObject.put("numJobPosting", numJobPosting);
+        resultObject.put("numCompany", numCompany);
+        resultObject.put("averageSalary", averageSalary);
+        resultObject.put("averageAge", averageAge);
         jsonObject.put("result", resultObject);
         return jsonObject;
     }
@@ -735,6 +845,7 @@ public class RegionService {
         }
         else{
             final int idProvince = Integer.valueOf(regionId.replace("P",""));
+            System.out.println("Vao tinh day");
             final List<Object[]> list = regionRepository.getHighestPayingCompaniesWithProvince(idProvince);
             if (checkListObjectNull(list)) return null;
             final Set<String> timeSet = new LinkedHashSet<>();
@@ -878,7 +989,7 @@ public class RegionService {
         jsonObject.put(time, timeObject);
     }
 
-    public JSONObject getJobDemandByAge(String locationId ){
+    public JSONObject getJobDemandByAge(List<String> regionList ){
         final JSONObject jsonObject = new JSONObject();
         jsonObject.put("description", "The job demand by age and gender");
 
@@ -897,7 +1008,7 @@ public class RegionService {
         int count = 0;
         Object[] listMale = new ArrayList<Integer>(Collections.nCopies(ageRangeArray.size(), 0)).toArray();
         Object[] listFeMale = new ArrayList<Integer>(Collections.nCopies( ageRangeArray.size(), 0)).toArray();
-        if( locationId.equals("P0")){
+        if( regionList.contains("P0")){
             List<Object[]> list = regionRepository.getJobDemandByAgeWithCountry();
             Set<String> timeSet = new LinkedHashSet<>();
             for (Object[] ob : list) {
@@ -908,8 +1019,8 @@ public class RegionService {
 
         }
         else{
-            int idProvince = Integer.valueOf(locationId.replace("P",""));
-            List<Object[]> list = regionRepository.getJobDemandByAgeWithProvince( idProvince);
+            // int idProvince = Integer.valueOf(locationId.replace("P",""));
+            List<Object[]> list = regionRepository.getJobDemandByAgeWithProvince( regionList);
             Set<String> timeSet = new LinkedHashSet<>();
             for (Object[] ob : list) {
                 timeSet.add(ob[0].toString());
@@ -993,7 +1104,7 @@ public class RegionService {
     }
 
 
-    public JSONObject getJobDemandByLiteracy( String locationId ){
+    public JSONObject getJobDemandByLiteracy( List<String> regionList){
         final JSONObject jsonObject = new JSONObject();
         jsonObject.put("description", "The job demand by literacy");
 
@@ -1016,7 +1127,7 @@ public class RegionService {
         Object[] listPastValueLiteracy = new Object[listLiteracy.size()];
         Object[] listGrowth = new Object[listLiteracy.size()];
         System.out.println(listLiteracy.toString());
-        if(locationId.equals("P0")){
+        if(regionList.contains("P0")){
             List<Object[]> list = regionRepository.getJobDemandByLiteracyWithCountry();
             Set<String> timeSet = new LinkedHashSet<>();
             for (Object[] ob : list) {
@@ -1026,8 +1137,8 @@ public class RegionService {
             getJSONJobDemandLiteracy(jsonObject, listLiteracy, timeObject, listValueLiteracy, listPastValueLiteracy, listGrowth, list);
         }
         else {
-            int idProvince = Integer.valueOf(locationId.replace("P",""));
-            List<Object[]> list = regionRepository.getjobDemandByLiteracyWithProvince( idProvince);
+            // int idProvince = Integer.valueOf(locationId.replace("P",""));
+            List<Object[]> list = regionRepository.getjobDemandByLiteracyWithProvince(regionList);
             Set<String> timeSet = new LinkedHashSet<>();
             for (Object[] ob : list) {
                 timeSet.add(ob[0].toString());

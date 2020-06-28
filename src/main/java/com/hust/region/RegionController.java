@@ -1,5 +1,7 @@
 package com.hust.region;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 import org.json.simple.JSONObject;
@@ -9,6 +11,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+
+import ch.qos.logback.core.pattern.color.BoldBlueCompositeConverter;
 
 @RestController
 public class RegionController {
@@ -54,7 +58,24 @@ public class RegionController {
     @RequestMapping(value = "/regions/get_dashboard_data", method = RequestMethod.POST)
     public JSONObject getDashboardData(@RequestBody Map<String, Object> payload) throws Exception {
         String regionId = payload.get("locationId").toString();
-        return regionService.getDashboardData(regionId);
+        List<String> regionList = Arrays.asList(regionId.split(","));
+        return regionService.getDashboardData(regionList);
+    }
+
+    @CrossOrigin(origins = "http://localhost:4200")
+    @RequestMapping(value = "/regions/get_job_demand_by_period_of_time", method = RequestMethod.POST)
+    public JSONObject getJobDemandByPeriodOfTime(@RequestBody Map<String, Object> payload) throws Exception {
+        String regionId = payload.get("locationId").toString();
+        List<String> regionList = Arrays.asList(regionId.split(","));
+        return regionService.getJobDemandByPeriodOfTime(regionList);
+    }
+
+    @CrossOrigin(origins = "http://localhost:4200")
+    @RequestMapping(value = "/regions/get_average_salary_by_period_of_time", method = RequestMethod.POST)
+    public JSONObject getAverageSalaryByPeriodOfTime(@RequestBody Map<String, Object> payload) throws Exception {
+        String regionId = payload.get("locationId").toString();
+        List<String> regionList = Arrays.asList(regionId.split(","));
+        return regionService.getAverageSalaryByPeriodOfTime(regionList);
     }
 
     //done
@@ -94,7 +115,7 @@ public class RegionController {
     @RequestMapping(value = "/regions/get_highest_paying_companies", method = RequestMethod.POST)
     public JSONObject getHighestPayingCompanies(@RequestBody Map<String, Object> payload) throws Exception {
         String regionId = payload.get("locationId").toString();
-        return regionService.getHighestPayingCompanies(regionId);
+        return regionService.getHighestPayingCompanies("P0");
     }
 
     //done
@@ -110,15 +131,24 @@ public class RegionController {
     public JSONObject getJobDemandByAge(@RequestBody Map<String, Object> payload) throws Exception {
         // System.out.println(payload.get("id"));
         String locationId = payload.get("locationId").toString();
-        return regionService.getJobDemandByAge(locationId);
+        List<String> regionList = Arrays.asList(locationId.split(","));
+        return regionService.getJobDemandByAge(regionList);
     }
 
     @CrossOrigin(origins = "http://localhost:4200")
     @RequestMapping(value = "/regions/get_job_demand_by_literacy", method = RequestMethod.POST)
     public JSONObject getJobDemandByLiteracy(@RequestBody Map<String, Object> payload) throws Exception {
         // System.out.println(payload.get("id"));
+        // List<String> locationId = (List<String>) payload.get("locationId");
+        // boolean isCompare = (boolean) payload.get("isCompare");
         String locationId = payload.get("locationId").toString();
-        return regionService.getJobDemandByLiteracy(locationId);
+        List<String> regionList = Arrays.asList(locationId.split(","));
+        // if(!isCompare){
+        //     System.out.println("khong compare iscompare");
+        // }else{
+        //     System.out.println(" compare di id di");
+        // }
+        return regionService.getJobDemandByLiteracy(regionList);
     }
 
     //todo

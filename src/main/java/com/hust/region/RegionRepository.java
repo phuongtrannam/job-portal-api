@@ -41,10 +41,10 @@ public interface RegionRepository extends CrudRepository<Region, String> {
     @Query( value = "select timed.idTime, concat(\"Quý \",timed.quarterD,\"/\",timed.yearD) as `time`, sum(fact.number_of_recruitment)\n" +
             "from job_fact as fact, timed, province\n" +
             "where fact.idTime = timed.idTime and fact.idProvince = province.idProvince\n" +
-            "    and fact.idProvince = :idProvince \n" +
+            "    and fact.idProvince IN (:regionList) \n" +
             "    and fact.idTime in (select idTime from ( select idTime from timed order by timestampD desc limit 2) as t)\n" +
-            "group by timed.idTime, province.idProvince;", nativeQuery = true)
-    List<Object[]> getNumberJobPostingInProvince(@Param("idProvince") int idProvince);
+            "group by timed.idTime;", nativeQuery = true)
+    List<Object[]> getNumberJobPostingInProvince(@Param("regionList") List<String> regionList);
 
     //Done - slow
     @Query(value = "select timed.idTime, concat(\"Quý\",timed.quarterD,\"/\",timed.yearD) as `time`, count(idCompany)\n" +
@@ -56,11 +56,11 @@ public interface RegionRepository extends CrudRepository<Region, String> {
 
      //Done - slow
     @Query( value = "select timed.idTime, concat(\"Quý\",timed.quarterD,\"/\",timed.yearD) as `time`, count(idCompany)\n" +
-            "from (select distinct idTime, idCompany from company_fact where idProvince = :idProvince) as fact, timed\n" +
+            "from (select distinct idTime, idCompany from company_fact where idProvince IN (:regionList)) as fact, timed\n" +
             "where fact.idTime = timed.idTime\n" +
             "    and fact.idTime in (select idTime from ( select idTime from timed order by timestampD desc limit 2) as t)\n" +
             "group by idTime;", nativeQuery = true)
-    List<Object[]> getNumberCompanyInProvince(@Param("idProvince") int idProvince);
+    List<Object[]> getNumberCompanyInProvince(@Param("regionList") List<String> regionList);
 
     @Query(value = "select * from job fact", nativeQuery = true)
     List<Object[]> getAverageSalaryInRegion(@Param("id") String id);
@@ -75,10 +75,10 @@ public interface RegionRepository extends CrudRepository<Region, String> {
     // Done - Không hiểu câu này ra cái gì      
     @Query( value = "select year(timestampD) as `thoi gian`, number_of_recruitment, salary\n" +
             "from company_fact, timed\n" +
-            "where company_fact.idTime = timed.idTime and idProvince = :idProvince \n" +
+            "where company_fact.idTime = timed.idTime and idProvince IN (:regionList) \n" +
             "    and timed.yearD between year(curdate()) - 1 and year(curdate()) \n" +
             "order by timed.idTime desc;", nativeQuery = true)
-    List<Object[]> getListSalaryInLastYearWithProvince(@Param("idProvince") int idProvince);
+    List<Object[]> getListSalaryInLastYearWithProvince(@Param("regionList") List<String> regionList);
     // Done - Không hiểu câu này ra cái gì 
     @Query(value = "select year(timestampD) as `thoi gian`, sum(number_of_recruitment),\n" +
             "       age.idAge,bin(age.`0-18`),bin(age.`18-25`), bin(age.`25-35`), bin(age.`35-50`), bin(age.`50+`)\n" +
@@ -94,11 +94,42 @@ public interface RegionRepository extends CrudRepository<Region, String> {
             "       age.idAge,bin(age.`0-18`),bin(age.`18-25`), bin(age.`25-35`), bin(age.`35-50`), bin(age.`50+`)\n" +
             "from job_fact, timed, age, province\n" +
             " where job_fact.idTime = timed.idTime and job_fact.idProvince = province.idProvince\n" +
-            "  and job_fact.idAge = age.idAge and province.idProvince = :idProvince\n" +
+            "  and job_fact.idAge = age.idAge and province.idProvince IN (:regionList)\n" +
             "  and timed.yearD between year(curdate())-1 and year(curdate())\n" +
-            "group by timed.timestampD,province.idProvince, age.idAge\n" +
-            "order by timed.timestampD, province.idProvince;", nativeQuery = true)
-    List<Object[]> getAverageAgeInProvince(@Param("idProvince") int idProvince);
+            "group by timed.timestampD, age.idAge\n" +
+            "order by timed.timestampD;", nativeQuery = true)
+    List<Object[]> getAverageAgeInProvince(@Param("regionList") List<String> regionList);
+    
+    @Query( value = "select timed.idTime,concat(\"Quý \",timed.quarterD,\"/\",timed.yearD) as `time`, " + 
+                         "sum(number_of_recruitment) " + 
+                "from job_fact as fact, timed " +
+                "where fact.idTime = timed.idTime " +
+                "group by timed.idTime " +
+                "order by timed.idTime;" , nativeQuery = true)
+    List<Object[]> getJobDemandByPeriodOfTimeCountry();
+    @Query( value = "select timed.idTime, concat(\"Quý \",timed.quarterD,\"/\",timed.yearD) as `time`, " + 
+                        "sum(number_of_recruitment) " +
+                "from job_fact as fact, timed " +
+                "where fact.idTime = timed.idTime " +
+                "and IdProvince IN (:listProvince) " +
+                "group by timed.idTime " +
+                "order by timed.idTime;", nativeQuery = true)
+     List<Object[]> getJobDemandByPeriodOfTimeProvince(@Param("listProvince") List<String> listProvince);
+
+     @Query( value = "select timed.idTime, concat(\"Quý \",timed.quarterD,\"/\",timed.yearD) as `time`, avg(salary) " +
+                        "from job_fact as fact, timed " +
+                        "where fact.idTime = timed.idTime " +
+                        "group by timed.idTime " +
+                        "order by timed.idTime;" , nativeQuery = true)
+    List<Object[]> getAverageSalaryByPeriodOfTimeCountry();
+    @Query( value = "select timed.idTime, concat(\"Quý \",timed.quarterD,\"/\",timed.yearD) as `time`, avg(salary) " +
+                        "from job_fact as fact, timed " + 
+                        "where fact.idTime = timed.idTime " +
+                        "and IdProvince IN (:listProvince) " +
+                        "group by timed.idTime " +
+                        "order by timed.idTime; ", nativeQuery = true)
+     List<Object[]> getAverageSalaryByPeriodOfTimeProvince(@Param("listProvince") List<String> listProvince);
+    
     // Done - slow 
     @Query(value = "select industries.idIndustry, industries.name_industry,\n" +
             "       top10.salary, top10.growth, timed.idTime,\n" +
@@ -309,12 +340,12 @@ public interface RegionRepository extends CrudRepository<Region, String> {
             "       gender.idGender, bin(gender.`male`), bin(gender.`female`)\n" +
             "from job_fact as fact, gender, age, timed, province\n" +
             "where fact.idTime = timed.idTime and fact.idGender = gender.idGender\n" +
-            "  and fact.idAge = age.idAge and fact.idProvince = :locationId \n" +
+            "  and fact.idAge = age.idAge and fact.idProvince IN (:locationId) \n" +
             "  and fact.idProvince = province.idProvince\n" +
             "  and fact.idTime in (select idTime from ( select idTime from timed order by timestampD desc limit 4) as t )\n" +
-            "group by timed.idTime, province.idProvince, gender.idGender, age.idAge\n" +
+            "group by timed.idTime,  gender.idGender, age.idAge\n" +
             "order by timed.idTime, gender.idGender, age.idAge;", nativeQuery = true)
-    List<Object[]> getJobDemandByAgeWithProvince(@Param("locationId") int locationId);
+    List<Object[]> getJobDemandByAgeWithProvince(@Param("locationId") List<String> locationId);
 
     @Query( value = " select * from academic_level;", nativeQuery = true)
     List<Object[]> getLiteracy();
@@ -334,10 +365,10 @@ public interface RegionRepository extends CrudRepository<Region, String> {
             "       academic_level.idAcademic_Level,academic_level.academic_level\n" +
             "from market_fact as fact, academic_level, timed, province\n" +
             "where fact.idTime = timed.idTime and fact.idAcademic_Level = academic_level.idAcademic_Level\n" +
-            "  and fact.idProvince = province.idProvince and fact.idProvince = :locationId \n" +
+            "  and fact.idProvince = province.idProvince and fact.idProvince IN (:locationId) \n" +
             "  and fact.idTime in (select idTime from (select idTime from timed order by timestampD desc limit 4) as t )\n" +
-            "group by timed.idTime,province.idProvince, academic_level.idAcademic_Level\n" +
+            "group by timed.idTime, academic_level.idAcademic_Level\n" +
             "order by timed.timestampD, academic_level.academic_level;", nativeQuery = true)
-    List<Object[]> getjobDemandByLiteracyWithProvince(@Param("locationId") int locationId);
+    List<Object[]> getjobDemandByLiteracyWithProvince(@Param("locationId") List<String> locationId);
 
 }
