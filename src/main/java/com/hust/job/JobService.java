@@ -45,11 +45,11 @@ public class JobService {
             final HashMap<String, String> jobObject = new HashMap<String, String>();
             jobObject.put("id", ob[1].toString());
             jobObject.put("name", ob[2].toString());
-            String gender = "";
-            for (Object[] objects : jobRepository.getGenderByJob((int)ob[1])){
-                gender = gender + objects[0].toString() + ",";
-            }
-            jobObject.put("gender", gender.substring(0,gender.length()-1));
+            // String gender = "";
+            // for (Object[] objects : jobRepository.getGenderByJob((int)ob[1])){
+            //     gender = gender + objects[0].toString() + ",";
+            // }
+            // jobObject.put("gender", gender.substring(0,gender.length()-1));
             jobObject.put("minSalary", ob[3].toString());
             jobObject.put("maxSalary", ob[4].toString());
             jobObject.put("numJob", String.valueOf(Math.round(Float.parseFloat(ob[5].toString()))));
@@ -424,6 +424,94 @@ public class JobService {
         return jsonObject;
     }
 
+    public JSONObject getTopHiringCompanies(final String idJob, List<String> regionList) {
+        final JSONObject jsonObject = new JSONObject();
+        jsonObject.put("description", "The job hiring companies");
+        if(regionList.contains("P0")){
+            final List<Object[]> list = jobRepository.getTopHiringCompaniesCountry(idJob);
+            exactDataCompany(jsonObject, list, false);
+        }else{
+            final List<Object[]> list = jobRepository.getTopHiringCompaniesCity(idJob, regionList);
+            exactDataCompany(jsonObject, list, false);
+        }   
+        return jsonObject;
+    }
+
+    public JSONObject getTopHighestSalaryCompanies(final String idJob, List<String> regionList) {
+        final JSONObject jsonObject = new JSONObject();
+        jsonObject.put("description", "The job highest paying companies");
+        if(regionList.contains("P0")){
+            final List<Object[]> list = jobRepository.getTopHighestSalaryCompaniesCountry(idJob);
+            exactDataCompany(jsonObject, list, true);
+        }else{
+            final List<Object[]> list = jobRepository.getTopHighestSalaryCompaniesCity(idJob, regionList);
+            exactDataCompany(jsonObject, list, true);
+        }   
+        return jsonObject;
+    }
+
+    public JSONObject getTopHiringRegion(final String idJob) {
+        final JSONObject jsonObject = new JSONObject();
+        jsonObject.put("description", "Top hiring region");
+        final List<Object[]> list = jobRepository.getTopHiringRegion(idJob);
+        exactDataCompany(jsonObject, list, false);  
+        return jsonObject;
+    }
+
+    public JSONObject getHighestSalaryRegion(final String idJob) {
+        final JSONObject jsonObject = new JSONObject();
+        jsonObject.put("description", "Top Highest Salary region");
+        final List<Object[]> list = jobRepository.getHighestSalaryRegion(idJob);
+        exactDataCompany(jsonObject, list, true);  
+        return jsonObject;
+    }
+
+    public void exactDataCompany(JSONObject jsonObject, List<Object[]> list, boolean isSalary){
+        DecimalFormat df = new DecimalFormat("##.##");
+        Set<String> timeSet = new LinkedHashSet<>();
+        for (Object[] ob : list) {
+            timeSet.add(ob[3].toString());
+        }
+        jsonObject.put("timestamps", timeSet);
+        for (String time : timeSet) {
+            final JSONObject timeObject = new JSONObject();
+            JSONArray companyList = new JSONArray();
+            int i = 0;
+            if(isSalary){
+                List<Float> data = new ArrayList<Float>();
+                for (Object[] ob : list) {
+                    if(time.equals(ob[3].toString()) && i<=10){
+                        HashMap<String, String> companyObject = new HashMap<String, String>();
+                        companyObject.put("id", ob[0].toString());
+                        companyObject.put("name", ob[1].toString());
+                        companyList.add(companyObject);
+                        float value = Float.parseFloat(ob[2].toString());
+                        value = Float.parseFloat(df.format(value));
+                        data.add(i, value);
+                        i++;
+                    }
+                }
+                timeObject.put("data", data);
+            }else{
+                List<Integer> data = new ArrayList<Integer>();
+                for (Object[] ob : list) {
+                    if(time.equals(ob[3].toString()) && i<=10){
+                        HashMap<String, String> companyObject = new HashMap<String, String>();
+                        companyObject.put("id", ob[0].toString());
+                        companyObject.put("name", ob[1].toString());
+                        companyList.add(companyObject);
+                        data.add(i, Math.round(Float.parseFloat(ob[2].toString())));
+                        i++;
+                    }
+                }
+                timeObject.put("data", data);
+            }
+            
+            timeObject.put("object", companyList);
+            jsonObject.put(time, timeObject);
+        }
+        // return jsonObject;
+    }
     public JSONObject getJobDemandByAge(final String idJob, final String idLocation) {
 
         final JSONObject jsonObject = new JSONObject();

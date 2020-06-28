@@ -1,5 +1,7 @@
 package com.hust.job;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 import org.json.simple.JSONObject;
@@ -101,6 +103,38 @@ public class JobController {
         return jobService.getAverageSalaryInSubRegion(idJob, idLocation);
     }
     
+    @CrossOrigin(origins =  "http://localhost:4200")
+    @RequestMapping(value = "/jobs/get_top_hiring_company", method = RequestMethod.POST)
+    public JSONObject getTopHiringCompanies(@RequestBody Map<String, Object> payload) throws Exception {
+        String idJob = payload.get("idJob").toString();
+        String idLocation = payload.get("idLocation").toString();
+        List<String> regionList = Arrays.asList(idLocation.split(","));
+        return jobService.getTopHiringCompanies(idJob, regionList);
+    }
+
+    @CrossOrigin(origins =  "http://localhost:4200")
+    @RequestMapping(value = "/jobs/get_highest_salary_company", method = RequestMethod.POST)
+    public JSONObject getTopHighestSalaryCompanies(@RequestBody Map<String, Object> payload) throws Exception {
+        String idJob = payload.get("idJob").toString();
+        String idLocation = payload.get("idLocation").toString();
+        List<String> regionList = Arrays.asList(idLocation.split(","));
+        return jobService.getTopHighestSalaryCompanies(idJob, regionList);
+    }
+    
+    @CrossOrigin(origins =  "http://localhost:4200")
+    @RequestMapping(value = "/jobs/get_top_hiring_region", method = RequestMethod.POST)
+    public JSONObject getTopHiringRegion(@RequestBody Map<String, Object> payload) throws Exception {
+        String idJob = payload.get("idJob").toString();
+        return jobService.getTopHiringRegion(idJob);
+    }
+
+    @CrossOrigin(origins =  "http://localhost:4200")
+    @RequestMapping(value = "/jobs/get_highest_salary_region", method = RequestMethod.POST)
+    public JSONObject getHighestSalaryRegion(@RequestBody Map<String, Object> payload) throws Exception {
+        String idJob = payload.get("idJob").toString();
+        return jobService.getHighestSalaryRegion(idJob);
+    }
+
     @CrossOrigin(origins =  "http://localhost:4200")
     @RequestMapping(value = "/jobs/get_job_demand_by_age", method = RequestMethod.POST)
     public JSONObject getJobDemandByAge(@RequestBody Map<String, Object> payload) throws Exception {

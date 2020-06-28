@@ -168,6 +168,110 @@ public interface JobRepository extends CrudRepository<Job, String> {
     @Query(value = "select * from job fact", nativeQuery = true)
     List<Object[]> getAverageSalaryInSubRegion(@Param("idJob") String idJob, @Param("idLocation") String idLocation);
 
+    @Query(value = "with company_1 as ( " +
+                        "select company_fact.idTime,  company_fact.idJob, company.idCompany, company.name_company, " +
+                            "sum(company_fact.number_of_recruitment) as numJob, " +
+                            "rank() over(partition by company_fact.idTime, company_fact.idJob order by sum(company_fact.number_of_recruitment) desc) as `rank` " +
+                        "from company_fact, company, timed " +
+                        "where company_fact.idCompany = company.idCompany " +
+                            "and company_fact.idJob = :idJob " +
+                            "and company_fact.idTime in (select idTime from (select idTime from timed order by timestampD desc limit 4) as t ) " +
+                        "group by company_fact.idTime,  company_fact.idJob, company_fact.idCompany " +
+                        "order by company_fact.idTime, company_fact.idJob, sum(company_fact.number_of_recruitment) desc ) " +
+                    "select company_1.idCompany, company_1.name_company, company_1.numJob, concat(\"Quý \",timed.quarterD,\"/\",timed.yearD) as `time` " +
+                    "from company_1, timed " +
+                    "where `rank` <= 20 " +
+                    "and company_1.idTime = timed.idTime " +
+                    "order by company_1.idTime, company_1.idJob, `rank`;" , nativeQuery = true)
+    List<Object[]> getTopHiringCompaniesCountry(@Param("idJob") String idJob);
+
+    @Query(value = "with company_1 as ( " +
+                        "select company_fact.idTime,  company_fact.idJob, company.idCompany, company.name_company, " +
+                            "sum(company_fact.number_of_recruitment) as numJob, " +
+                            "rank() over(partition by company_fact.idTime, company_fact.idJob order by sum(company_fact.number_of_recruitment) desc) as `rank` " +
+                        "from company_fact, company, timed " +
+                        "where company_fact.idCompany = company.idCompany " +
+                            "and company_fact.idJob = :idJob " +
+                            "and company_fact.idProvince IN (:regionList) " +
+                            "and company_fact.idTime in (select idTime from (select idTime from timed order by timestampD desc limit 4) as t ) " +
+                        "group by company_fact.idTime,  company_fact.idJob, company_fact.idCompany " +
+                        "order by company_fact.idTime, company_fact.idJob, sum(company_fact.number_of_recruitment) desc ) " +
+                    "select company_1.idCompany, company_1.name_company, company_1.numJob, concat(\"Quý \",timed.quarterD,\"/\",timed.yearD) as `time` " +
+                    "from company_1, timed " +
+                    "where `rank` <= 20 " +
+                    "and company_1.idTime = timed.idTime " +
+                    "order by company_1.idTime, company_1.idJob, `rank`; " , nativeQuery = true)
+    List<Object[]> getTopHiringCompaniesCity(@Param("idJob") String idJob, @Param("regionList") List<String> regionList);
+
+    @Query(value = "with company_1 as ( " +
+                        "select company_fact.idTime, company_fact.idJob, company.idCompany, company.name_company, " +
+                            "avg(company_fact.salary) as salary, " +
+                            "rank() over(partition by company_fact.idTime, company_fact.idJob order by avg(company_fact.salary) desc) as `rank` " +
+                        "from company_fact, company " +
+                        "where company_fact.idCompany = company.idCompany " +
+                            "and company_fact.idJob = :idJob " +
+                            "and company_fact.idTime in (select idTime from (select idTime from timed order by timestampD desc limit 4) as t ) " +
+                        "group by company_fact.idTime, company_fact.idJob, company_fact.idCompany " +
+                        "order by company_fact.idTime, company_fact.idJob, avg(company_fact.salary) desc ) " +
+                    "select company_1.idCompany, company_1.name_company, company_1.salary, concat(\"Quý \",timed.quarterD,\"/\",timed.yearD) as `time` " + 
+                    "from company_1, timed " +
+                    "where `rank` <= 20 " +
+                    "and company_1.idTime = timed.idTime " + 
+                    "order by company_1.idTime, company_1.idJob, `rank`; " , nativeQuery = true)
+    List<Object[]> getTopHighestSalaryCompaniesCountry(@Param("idJob") String idJob);
+
+    @Query(value = "with company_1 as ( " +
+                        "select company_fact.idTime, company_fact.idJob, company.idCompany, company.name_company, " +
+                            "avg(company_fact.salary) as salary, " +
+                            "rank() over(partition by company_fact.idTime, company_fact.idJob order by avg(company_fact.salary) desc) as `rank` " +
+                        "from company_fact, company " +
+                        "where company_fact.idCompany = company.idCompany " +
+                            "and company_fact.idJob = :idJob " +
+                            "and company_fact.idProvince IN (:regionList) " +
+                            "and company_fact.idTime in (select idTime from (select idTime from timed order by timestampD desc limit 4) as t ) " +
+                        "group by company_fact.idTime, company_fact.idJob, company_fact.idCompany " +
+                        "order by company_fact.idTime, company_fact.idJob, avg(company_fact.salary) desc ) " +
+                    "select company_1.idCompany, company_1.name_company, company_1.salary, concat(\"Quý \",timed.quarterD,\"/\",timed.yearD) as `time` " + 
+                    "from company_1, timed " +
+                    "where `rank` <= 20 " +
+                    "and company_1.idTime = timed.idTime " + 
+                    "order by company_1.idTime, company_1.idJob, `rank`; " , nativeQuery = true)
+    List<Object[]> getTopHighestSalaryCompaniesCity(@Param("idJob") String idJob, @Param("regionList") List<String> regionList);
+
+    @Query(value = "with province_1 as ( " +
+                        "select job_fact.idTime, job_fact.idJob, province.idProvince, province.Province, " +
+                            "sum(job_fact.number_of_recruitment) as numJob, "  +
+                            "rank() over(partition by job_fact.idTime, job_fact.idJob order by sum(job_fact.number_of_recruitment) desc) as `rank` " +
+                        "from job_fact, province " +
+                        "where job_fact.IdProvince = province.idProvince " +
+                            "and job_fact.idJob = :idJob " +
+                            "and job_fact.idTime in (select idTime from (select idTime from timed order by timestampD desc limit 4) as t ) " +
+                        "group by job_fact.idTime, job_fact.idJob, job_fact.IdProvince " +
+                        "order by job_fact.idTime, job_fact.idJob, sum(job_fact.number_of_recruitment) desc) " +
+                    "select province_1.idProvince, province_1.Province, province_1.numJob, concat(\"Quý \",timed.quarterD,\"/\",timed.yearD) as `time` " +
+                    "from province_1, timed " +
+                    "where `rank` <= 20 " +
+                    "and province_1.idTime = timed.idTime " +
+                    "order by province_1.idTime, province_1.idJob, `rank`;" , nativeQuery = true)
+    List<Object[]> getTopHiringRegion(@Param("idJob") String idJob);
+
+    @Query(value = "with province_1 as ( " +
+                        "select job_fact.idTime, job_fact.idJob, province.idProvince, province.Province, " +
+                            "avg(job_fact.salary) as salary, " +
+                            "rank() over(partition by job_fact.idTime, job_fact.idJob order by avg(job_fact.salary) desc) as `rank` " +
+                        "from job_fact, province " +
+                        "where job_fact.IdProvince = province.idProvince " +
+                            "and job_fact.idJob = :idJob " +
+                            "and job_fact.idTime in (select idTime from (select idTime from timed order by timestampD desc limit 4) as t ) " +
+                        "group by job_fact.idTime, job_fact.idJob, job_fact.IdProvince " +
+                        "order by job_fact.idTime, job_fact.idJob, avg(job_fact.salary) desc) " +
+                    "select province_1.idProvince, province_1.Province, province_1.salary, concat(\"Quý \",timed.quarterD,\"/\",timed.yearD) as `time` " +
+                    "from province_1, timed " +
+                    "where `rank` <= 20 " +
+                    "and province_1.idTime = timed.idTime " +
+                    "order by province_1.idTime, province_1.idJob, `rank`; " , nativeQuery = true)
+    List<Object[]> getHighestSalaryRegion(@Param("idJob") String idJob);
+    
     @Query(value = "select timed.idTime,concat(\"Quý \",timed.quarterD,\"/\",timed.yearD) as `time`,job_fact.idJob,\n" +
             "    sum(job_fact.number_of_recruitment),\n" +
             "   age.idAge,bin(age.`0-18`),bin(age.`18-25`), bin(age.`25-35`), bin(age.`35-50`), bin(age.`50+`),\n" +
