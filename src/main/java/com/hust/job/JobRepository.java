@@ -15,19 +15,18 @@ public interface JobRepository extends CrudRepository<Job, String> {
 
     @Query(value = "select fact.idTime,job.idJob, job.name_job,\n" +
             "min(salary), max(salary), sum(fact.number_of_recruitment) as `so luong tuyen dung`\n" +
-            "from job, job_fact as fact , job_industry, province, gender\n" +
-            "where job.idJob = fact.idJob and job.idJob = job_industry.idJob\n" +
-            "and fact.IdProvince = province.idProvince\n" +
+            "from job, job_fact as fact\n" +
+            "where job.idJob = fact.idJob\n" +
             "and fact.idTime in ( select idTime from (\n" +
             "select idTime from timed order by timestampD desc limit 1 ) as t )\n" +
             "group by fact.idTime,fact.idJob\n" +
             "order by sum(fact.number_of_recruitment) desc limit :numJob", nativeQuery = true)
     List<Object[]> getTopJob(@Param("numJob") int numJob);
 
-    @Query( value = "select distinct gender.gender\n" +
+    @Query( value = "select distinct gender.idGender, bin(gender.`male`), bin(gender.`female`)\n" +
             "from job_fact, gender\n" +
             "where job_fact.idGender = gender.idGender\n" +
-            "    and job_fact.idJob = :idJob", nativeQuery = true)
+            "and job_fact.idJob = :idJob", nativeQuery = true)
     List<Object[]> getGenderByJob(@Param("idJob") int idJob);
     
     @Query(value = "select job_fact.idTime,job.idJob, job.name_job, gender.gender, " + 

@@ -1,9 +1,6 @@
 package com.hust.company;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -247,6 +244,209 @@ public class CompanyService {
 
     }
 
+    public JSONObject getJobDemandByCompany(String companyId){
+        final JSONObject jsonObject = new JSONObject();
+        final JSONObject companyObject = new JSONObject();
+        jsonObject.put("description", "The job demand by industry");
+        double growth = 0;
+        double preNumJob = 0;
+        JSONArray timeArray = new JSONArray();
+
+        List<Object[]> listTimeStamp = companyRepository.getTimeStamps();
+        for (Object[] ob : listTimeStamp){
+            timeArray.add(ob[0].toString());
+        }
+        Object[] listData = new ArrayList<Integer>(Collections.nCopies(timeArray.size(), 0)).toArray();
+        Object[] listGrowth = new ArrayList<Integer>(Collections.nCopies( timeArray.size(), 0)).toArray();
+
+        int idCompany = Integer.valueOf(companyId.replace("C", ""));
+        List<Object[]> list = companyRepository.getJobDemandByCompany(idCompany);
+        extractDataJob(growth, preNumJob, timeArray, listData, listGrowth, list, false);
+        jsonObject.put("data", convertArrayToJSON(listData));
+        jsonObject.put("growth", convertArrayToJSON(listGrowth));
+        jsonObject.put("timestamps", timeArray);
+//        jsonObject.put("", companyObject);
+
+        return jsonObject;
+    }
+
+    public JSONObject getSalaryByCompany(String companyId){
+        final JSONObject jsonObject = new JSONObject();
+        final JSONObject companyObject = new JSONObject();
+        jsonObject.put("description", "The job demand by industry");
+        double growth = 0;
+        double preNumJob = 0;
+        JSONArray timeArray = new JSONArray();
+
+        List<Object[]> listTimeStamp = companyRepository.getTimeStamps();
+        for (Object[] ob : listTimeStamp){
+            timeArray.add(ob[0].toString());
+        }
+        Object[] listData = new ArrayList<Integer>(Collections.nCopies(timeArray.size(), 0)).toArray();
+        Object[] listGrowth = new ArrayList<Integer>(Collections.nCopies( timeArray.size(), 0)).toArray();
+
+        int idCompany = Integer.valueOf(companyId.replace("C", ""));
+        List<Object[]> list = companyRepository.getSalaryByCompany(idCompany);
+        extractDataJob(growth, preNumJob, timeArray, listData, listGrowth, list, true);
+        jsonObject.put("data", convertArrayToJSON(listData));
+        jsonObject.put("growth", convertArrayToJSON(listGrowth));
+        jsonObject.put("timestamps", timeArray);
+//        jsonObject.put("", companyObject);
+
+        return jsonObject;
+    }
+
+    public JSONObject getHighestDemandJobs(final String companyId){
+        final JSONObject jsonObject = new JSONObject();
+        jsonObject.put("id", companyId);
+        jsonObject.put("description", "The job highest demand jobs");
+
+        final JSONObject resultObject = new JSONObject();
+
+        JSONObject timeObject = new JSONObject();
+        JSONArray jobArray = new JSONArray();
+        JSONArray salarayArray = new JSONArray();
+        JSONArray growthArray = new JSONArray();
+        JSONArray numJobArray = new JSONArray();
+
+        int idCompany = Integer.valueOf(companyId.replace("C", ""));
+        final List<Object[]> list = companyRepository.getHighestDemandJobCompany(idCompany);
+        final Set<String> timeSet = new LinkedHashSet<>();
+        for (final Object[] ob : list) {
+            timeSet.add(ob[6].toString());
+        }
+        jsonObject.put("timestamps",timeSet);
+        String time = list.get(0)[6].toString();
+        for( final Object[] ob : list){
+            if(!time.equals(ob[ob.length -1].toString())){
+                putDataHighestJobsToJSON(resultObject, timeObject, jobArray, salarayArray, numJobArray, time);
+                jobArray = new JSONArray();
+                salarayArray = new JSONArray();
+                numJobArray = new JSONArray();
+                timeObject = new JSONObject();
+                time = ob[ob.length -1].toString();
+            }
+            getJSONDataHighestJobs(jobArray, numJobArray, ob, false);
+            final HashMap<String, Object> salaryObject = new HashMap<>();
+            salaryObject.put("min", ob[3]);
+            salaryObject.put("max", ob[4]);
+            salarayArray.add(salaryObject);
+        }
+        putDataHighestJobsToJSON(resultObject, timeObject, jobArray, salarayArray, numJobArray, time);
+        jsonObject.put("result", resultObject);
+        return jsonObject;
+    }
+
+    public JSONObject getHighestSalaryJobs(final String companyId){
+        final JSONObject jsonObject = new JSONObject();
+        jsonObject.put("id", companyId);
+        jsonObject.put("description", "The job highest demand jobs");
+
+        final JSONObject resultObject = new JSONObject();
+
+        JSONObject timeObject = new JSONObject();
+        JSONArray jobArray = new JSONArray();
+        JSONArray salarayArray = new JSONArray();
+        JSONArray growthArray = new JSONArray();
+        JSONArray numJobArray = new JSONArray();
+
+        int idCompany = Integer.valueOf(companyId.replace("C", ""));
+        final List<Object[]> list = companyRepository.getHighestSalaryJobCompany(idCompany);
+        final Set<String> timeSet = new LinkedHashSet<>();
+        for (final Object[] ob : list) {
+            timeSet.add(ob[5].toString());
+        }
+        jsonObject.put("timestamps",timeSet);
+        String time = list.get(0)[5].toString();
+        for( final Object[] ob : list){
+            if(!time.equals(ob[ob.length -1].toString())){
+                putDataHighestJobsToJSON(resultObject, timeObject, jobArray, salarayArray, numJobArray, time);
+                jobArray = new JSONArray();
+                salarayArray = new JSONArray();
+                numJobArray = new JSONArray();
+                timeObject = new JSONObject();
+                time = ob[ob.length -1].toString();
+            }
+            getJSONDataHighestJobs(jobArray, salarayArray, ob, true);
+            if(ob[2] != null){
+                numJobArray.add((int)(double)ob[3]);
+            }
+        }
+        putDataHighestJobsToJSON(resultObject, timeObject, jobArray, salarayArray, numJobArray, time);
+        jsonObject.put("result", resultObject);
+        return jsonObject;
+    }
+
+    private void putDataHighestJobsToJSON(final JSONObject jsonObject, final JSONObject timeObject, final JSONArray jobArray, final JSONArray salarayArray, final JSONArray numJobArray, final String time) {
+        timeObject.put("job", jobArray);
+        timeObject.put("salary", salarayArray);
+        timeObject.put("numJob", numJobArray);
+        jsonObject.put(time, timeObject);
+    }
+
+    private void getJSONDataHighestJobs(final JSONArray jobArray, final JSONArray dataArray, final Object[] ob, boolean isSalary) {
+        if (ob[2] != null){
+            final HashMap<String, Object> jobObject = new HashMap<>();
+            final int idJob = (int) ob[0];
+            jobObject.put("id", "J" + idJob);
+            jobObject.put("name", ob[1].toString());
+            jobArray.add(jobObject);
+            if(isSalary) {
+                dataArray.add(round((double) ob[2], 2));
+            }
+            else{
+                dataArray.add((int)(double)ob[2]);
+            }
+        }
+        else {
+            return ;
+        }
+//        growthArray.add(ob[3]);
+    }
+
+    private void extractDataJob(double growth, double preNumJob, JSONArray timeArray, Object[] listData, Object[] listGrowth, List<Object[]> list , boolean isSalary) {
+        for(Object[] ob : list){
+            int index = timeArray.indexOf(ob[ob.length -2].toString());
+            if(preNumJob != 0){
+                growth = (((double) ob[ob.length -1]/preNumJob) -1)*100;
+            }
+//            timeArray.add(ob[ob.length -2].toString());
+            if (isSalary){
+                listData[index] = round((Double) ob[ob.length -1],2);
+            }
+            else {
+                listData[index] = (int) (double) ob[ob.length -1];
+            }
+            listGrowth[index] = round(growth,2);
+            preNumJob = (double) ob[ob.length -1];
+        }
+    }
+
+    public static double round(double value, int places) {
+        if (places < 0) throw new IllegalArgumentException();
+
+        long factor = (long) Math.pow(10, places);
+        value = value * factor;
+        long tmp = Math.round(value);
+        return (double) tmp / factor;
+    }
+
+    public static JSONArray convertArrayToJSON( Object[] myArray){
+        JSONArray jsArray = new JSONArray();
+
+        for (int i = 0; i < myArray.length; i++) {
+            if(myArray[i] == null){
+                try{
+                    myArray[i] = 0.0;
+                }
+                catch (Exception e){
+                    myArray[i] = 0;
+                }
+            }
+            jsArray.add(myArray[i]);
+        }
+        return jsArray;
+    }
 
     // public JSONObject getNumberOfJob(){
     //     final JSONObject jsonObject = new JSONObject();

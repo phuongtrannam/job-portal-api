@@ -81,6 +81,36 @@ public class CompanyController {
         return companyService.getJobDemandByAge(companyId);
     }
 
+    @CrossOrigin(origins = "http://localhost:4200")
+    @RequestMapping(value = "/companies/get_job_demand", method = RequestMethod.POST)
+    public JSONObject getJobDemandByCompany(@RequestBody Map<String, Object> payload) throws Exception {
+        String companyId = payload.get("id").toString();
+        return companyService.getJobDemandByCompany(companyId);
+    }
+
+    @CrossOrigin(origins = "http://localhost:4200")
+    @RequestMapping(value = "/companies/get_salary", method = RequestMethod.POST)
+    public JSONObject getSalaryByCompany(@RequestBody Map<String, Object> payload) throws Exception {
+        String companyId = payload.get("id").toString();
+        return companyService.getSalaryByCompany(companyId);
+    }
+
+    @CrossOrigin(origins = "http://localhost:4200")
+    @RequestMapping(value = "/companies/get_highest_demand_jobs", method = RequestMethod.POST)
+    public JSONObject getHighestDemandJobByCompany(@RequestBody Map<String, Object> payload) throws Exception {
+        String companyId = payload.get("id").toString();
+        return companyService.getHighestDemandJobs(companyId);
+    }
+
+    @CrossOrigin(origins = "http://localhost:4200")
+    @RequestMapping(value = "/companies/get_highest_salary_jobs", method = RequestMethod.POST)
+    public JSONObject getHighestSalaryJobByCompany(@RequestBody Map<String, Object> payload) throws Exception {
+        String companyId = payload.get("id").toString();
+        return companyService.getHighestSalaryJobs(companyId);
+    }
+
+
+
 
 
     // @RequestMapping("/companies/getnumberofjob")

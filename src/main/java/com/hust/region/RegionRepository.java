@@ -177,7 +177,7 @@ public interface RegionRepository extends CrudRepository<Region, String> {
             "from top10_highest_salary_jobs as top10, timed, job\n" +
             "where top10.idTime = timed.idTime\n" +
             "  and top10.idJob = job.idJob\n" +
-            "  and top10.idTime in (select idTime from ( select idTime from timed order by timestampD desc limit 3) as t)\n" +
+            "  and top10.idTime in (select idTime from ( select idTime from timed order by timestampD desc limit 4) as t)\n" +
             "order by timed.idTime, top10.salary desc;", nativeQuery = true)
     List<Object[]> getHighestSalaryJobsWithCountry();
     //Done
@@ -187,7 +187,7 @@ public interface RegionRepository extends CrudRepository<Region, String> {
             "where top10.idTime = timed.idTime and top10.idProvince = province.idProvince\n" +
             "  and top10.idJob = job.idJob\n" +
             "  and province.idProvince = :idProvince\n" +
-            "  and top10.idTime in (select idTime from ( select idTime from timed order by timestampD desc limit 3) as t)\n" +
+            "  and top10.idTime in (select idTime from ( select idTime from timed order by timestampD desc limit 4) as t)\n" +
             "order by timed.idTime, province.idProvince, top10.salary desc;", nativeQuery = true)
     List<Object[]> getHighestSalaryJobsWithProvince(@Param("idProvince") int idProvince);
     //Done
@@ -353,7 +353,7 @@ public interface RegionRepository extends CrudRepository<Region, String> {
     @Query(value = "select concat(\"Quý \",timed.quarterD,\"/\",timed.yearD) as `time`,\n" +
             "       sum(fact.number_of_recruitment),\n" +
             "       academic_level.idAcademic_Level,academic_level.academic_level\n" +
-            "from market_fact as fact, academic_level, timed\n" +
+            "from job_fact as fact, academic_level, timed\n" +
             "where fact.idTime = timed.idTime and fact.idAcademic_Level = academic_level.idAcademic_Level\n" +
             "    and fact.idTime in (select idTime from (select idTime from timed order by timestampD desc limit 4) as t )\n" +
             "group by timed.idTime, academic_level.idAcademic_Level\n" +
@@ -363,7 +363,7 @@ public interface RegionRepository extends CrudRepository<Region, String> {
     @Query( value = "select concat(\"Quý \",timed.quarterD,\"/\",timed.yearD) as `time`,\n" +
             "       sum(fact.number_of_recruitment),\n" +
             "       academic_level.idAcademic_Level,academic_level.academic_level\n" +
-            "from market_fact as fact, academic_level, timed, province\n" +
+            "from job_fact as fact, academic_level, timed, province\n" +
             "where fact.idTime = timed.idTime and fact.idAcademic_Level = academic_level.idAcademic_Level\n" +
             "  and fact.idProvince = province.idProvince and fact.idProvince IN (:locationId) \n" +
             "  and fact.idTime in (select idTime from (select idTime from timed order by timestampD desc limit 4) as t )\n" +
