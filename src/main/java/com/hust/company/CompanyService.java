@@ -168,7 +168,7 @@ public class CompanyService {
             jobObject.put("min_salary", ob[3].toString());
             jobObject.put("max_salary", ob[4].toString());
             jobObject.put("num_job",(int) (double) ob[5]);
-            jobObject.put("industry", ob[0].toString());
+            // jobObject.put("industry", ob[0].toString());
             jobList.add(jobObject);
         }
         jsonObject.put("result", jobList);

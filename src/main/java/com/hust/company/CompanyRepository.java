@@ -66,10 +66,10 @@ public interface CompanyRepository extends CrudRepository<Company, String> {
                         + "min(fact.salary), max(fact.salary), sum(number_of_recruitment) "
                         + "from company, company_fact as fact, job, province "
                         + "where company.idCompany = fact.idCompany and fact.idJob = job.idJob and fact.idCompany = :id"
-                        + "and fact.idProvince = province.idProvince " + "and fact.idTime in " + "( select idTime from "
+                        + " and fact.idProvince = province.idProvince " + "and fact.idTime in " + "( select idTime from "
                         + "( select idTime from timed order by timestampD desc limit 1 ) as t )"
                         + "group by fact.idJob, fact.idProvince "
-                        + "order by sum(number_of_recruitment) desc ;", nativeQuery = true)
+                        + "order by sum(number_of_recruitment) desc  limit 5;", nativeQuery = true)
         List<Object[]> getRecentJobByCompany(@Param("id") String id);
 
         @Query(value = "select fact.idCompany, province.province, "

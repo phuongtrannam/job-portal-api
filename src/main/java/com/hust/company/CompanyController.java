@@ -47,6 +47,7 @@ public class CompanyController {
     public JSONObject getRelatedCompany(@RequestBody Map<String, Object> payload) throws Exception {
         // System.out.println(payload.get("id"));
         String companyId = payload.get("id").toString();
+        
         return companyService.getRelatedCompany(companyId);
     }
 
@@ -55,13 +56,14 @@ public class CompanyController {
     public JSONObject getRecentJobByCompany(@RequestBody Map<String, Object> payload) throws Exception {
         // System.out.println(payload.get("id"));
         String companyId = payload.get("id").toString();
+        System.out.println("da la company Id" + companyId);
         return companyService.getRecentJobByCompany(companyId);
     }
 
     @CrossOrigin(origins = "http://localhost:4200")
     @RequestMapping(value = "/companies/get_job_demand_by_period_of_time", method = RequestMethod.POST)
     public JSONObject getJobDemandByPeriodOfTime(@RequestBody Map<String, Object> payload) throws Exception {
-        String companyId = payload.get("id").toString();
+        String companyId = payload.get("companyId").toString();
         return companyService.getJobDemandByPeriodOfTime(companyId);
     }
 
