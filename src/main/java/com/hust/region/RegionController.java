@@ -115,7 +115,7 @@ public class RegionController {
     @RequestMapping(value = "/regions/get_highest_paying_companies", method = RequestMethod.POST)
     public JSONObject getHighestPayingCompanies(@RequestBody Map<String, Object> payload) throws Exception {
         String regionId = payload.get("locationId").toString();
-        return regionService.getHighestPayingCompanies("P0");
+        return regionService.getHighestPayingCompanies(regionId);
     }
 
     //done
