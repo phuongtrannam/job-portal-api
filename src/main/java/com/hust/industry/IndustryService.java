@@ -552,14 +552,16 @@ public class IndustryService {
                     growthArray = new JSONArray();
                     timestamp = ob[0].toString();
                 }
-                HashMap<String , String> companyObject = new HashMap<>();
-                companyObject.put("id",  ob[1].toString());
-                companyObject.put("name", ob[2].toString());
-                companyArray.add(companyObject);
-                double salary = (double) ob[ob.length -2];
-                dataArray.add((int)salary);
-                idTime = (int) ob[ob.length-1];
-                int lastIdTime = idTime - 1;
+                if (ob[ob.length -2] != null){
+                    HashMap<String , String> companyObject = new HashMap<>();
+                    companyObject.put("id",  ob[1].toString());
+                    companyObject.put("name", ob[2].toString());
+                    companyArray.add(companyObject);
+                    double salary = (double) ob[ob.length -2];
+                    dataArray.add((int)salary);
+                    idTime = (int) ob[ob.length-1];
+                    int lastIdTime = idTime - 1;
+                }
                 // List<Object[]> recruitmentOfCompanyInQuarter = industryRepository.getSalaryOfCompanyInQuarter(lastIdTime,(int) ob[1], locationId, industryId);
                 // getGrowthValue(growthArray, (double) ob[ob.length -2], recruitmentOfCompanyInQuarter);
             }

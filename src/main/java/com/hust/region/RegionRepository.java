@@ -301,7 +301,7 @@ public interface RegionRepository extends CrudRepository<Region, String> {
     List<Object[]> getDemandByCompanyWithCountry(@Param("idTime") int idTime, @Param("idCompany") int idCompany);
 
     @Query( value = "select sum(number_of_recruitment)\n" +
-            "from market_fact as fact, timed\n" +
+            "from company_fact as fact, timed\n" +
             "where fact.idTime = timed.idTime\n" +
             "   and fact.idCompany = :idCompany and fact.idProvince = :idProvince and fact.idTime = :idTime \n" +
             "group by timed.idTime, fact.idCompany;", nativeQuery =true)
