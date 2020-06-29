@@ -88,10 +88,30 @@ public class JobService {
             final HashMap<String, String> jobObject = new HashMap<String, String>();
             jobObject.put("id", ob[1].toString());
             jobObject.put("name", ob[2].toString());
-            jobObject.put("gender", ob[3].toString());
-            jobObject.put("minSalary", ob[4].toString());
-            jobObject.put("maxSalary", ob[5].toString());
-            jobObject.put("numJob", ob[6].toString());
+            // String gender = "";
+            // for (Object[] objects : jobRepository.getGenderByJob((int)ob[1])){
+            //     gender = gender + objects[0].toString() + ",";
+            // }
+            // jobObject.put("gender", gender.substring(0,gender.length()-1));
+
+            String gender = "";
+            boolean flagMale = false;
+            boolean flagFeMale = false;
+            for (Object[] objects : jobRepository.getGenderByJob((int)ob[1])){
+                if(objects[1].toString().equals("1") && !flagMale){
+                    gender = gender + "Nam" + ",";
+                    flagMale = true;
+                }
+                if(objects[2].toString().equals("1") && !flagFeMale){
+                    gender = gender + "Nữ" + ",";
+                    flagFeMale = true;
+                }
+            }
+            jobObject.put("gender", gender.substring(0,gender.length()-1));
+
+            jobObject.put("minSalary", ob[3].toString());
+            jobObject.put("maxSalary", ob[4].toString());
+            jobObject.put("numJob", String.valueOf(Math.round(Float.parseFloat(ob[5].toString()))));
             // jobObject.put("jobType", ob[5].toString());
             jobArr.add(jobObject);
         }
@@ -99,24 +119,43 @@ public class JobService {
         return jsonObject;
     }
 
-    public JSONObject advancedSearchJob(final String queryContent, final String location, final String industry,
-            final int minSalary, final int maxSalary) {
+    public JSONObject advancedSearchJob(String jobName, List<String> industryList, List<String> regionList,
+            String minSalary, String maxSalary) {
 
         final JSONObject jsonObject = new JSONObject();
-        jsonObject.put("description", "The advanced search job");
+        jsonObject.put("description", "The top job");
 
         final JSONArray jobArr = new JSONArray();
 
-        final List<Object[]> list = jobRepository.advancedSearchJob(queryContent, location, industry, minSalary,
-                maxSalary);
+        final List<Object[]> list = jobRepository.advancedSearchJob(jobName, industryList, regionList, minSalary,  maxSalary);
         for (final Object[] ob : list) {
             final HashMap<String, String> jobObject = new HashMap<String, String>();
             jobObject.put("id", ob[1].toString());
             jobObject.put("name", ob[2].toString());
-            jobObject.put("gender", ob[3].toString());
-            jobObject.put("minSalary", ob[4].toString());
-            jobObject.put("maxSalary", ob[5].toString());
-            jobObject.put("numJob", ob[6].toString());
+            // String gender = "";
+            // for (Object[] objects : jobRepository.getGenderByJob((int)ob[1])){
+            //     gender = gender + objects[0].toString() + ",";
+            // }
+            // jobObject.put("gender", gender.substring(0,gender.length()-1));
+
+            String gender = "";
+            boolean flagMale = false;
+            boolean flagFeMale = false;
+            for (Object[] objects : jobRepository.getGenderByJob((int)ob[1])){
+                if(objects[1].toString().equals("1") && !flagMale){
+                    gender = gender + "Nam" + ",";
+                    flagMale = true;
+                }
+                if(objects[2].toString().equals("1") && !flagFeMale){
+                    gender = gender + "Nữ" + ",";
+                    flagFeMale = true;
+                }
+            }
+            jobObject.put("gender", gender.substring(0,gender.length()-1));
+
+            jobObject.put("minSalary", ob[3].toString());
+            jobObject.put("maxSalary", ob[4].toString());
+            jobObject.put("numJob", String.valueOf(Math.round(Float.parseFloat(ob[5].toString()))));
             // jobObject.put("jobType", ob[5].toString());
             jobArr.add(jobObject);
         }
