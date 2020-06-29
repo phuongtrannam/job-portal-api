@@ -75,6 +75,22 @@ public class CompanyService {
 
     }
 
+    public JSONObject advancedSearchCompany(List<String> industryList, String companyName, String minSalary, String maxSalary){
+        final JSONObject jsonObject = new JSONObject();
+        jsonObject.put("description", "The company list");
+        final JSONArray companyList = new JSONArray();
+        final List<Object[]> list = companyRepository.advancedSearchCompany(industryList, companyName, minSalary, maxSalary);
+        for(final Object[] ob : list){
+            final HashMap<String, Object> companyObject = new HashMap<String, Object>();
+            companyObject.put("id", ob[0].toString());
+            companyObject.put("name", ob[1].toString());
+            companyObject.put("location", ob[12].toString());
+            companyList.add(companyObject);
+        }
+        jsonObject.put("result", companyList);
+        return jsonObject;
+    }
+
     public JSONObject getBusinessLinesOfTheCompany(final String id) {
         final JSONObject jsonObject = new JSONObject();
         jsonObject.put("id", id);
