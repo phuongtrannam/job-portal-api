@@ -30,7 +30,7 @@ public class CompanyController {
         String companyName = payload.get("companyName").toString();
         return companyService.searchCompany(companyName);
     }
-    
+
     @CrossOrigin
     @RequestMapping(value = "/companies/advanced_search_company", method = RequestMethod.POST)
     public JSONObject advancedSearchCompany(@RequestBody Map<String, Object> payload) throws Exception {
@@ -41,7 +41,6 @@ public class CompanyController {
         String maxSalary = payload.get("maxSalary").toString();
         return companyService.advancedSearchCompany(industryList, companyName, minSalary, maxSalary);
     }
-
 
     @CrossOrigin
     @RequestMapping(value = "/companies/get_business_lines_of_the_company", method = RequestMethod.POST)
