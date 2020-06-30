@@ -536,14 +536,16 @@ public class JobService {
                 List<Float> data = new ArrayList<Float>();
                 for (Object[] ob : list) {
                     if(time.equals(ob[3].toString()) && i<=10){
-                        HashMap<String, String> companyObject = new HashMap<String, String>();
-                        companyObject.put("id", ob[0].toString());
-                        companyObject.put("name", ob[1].toString());
-                        companyList.add(companyObject);
-                        float value = Float.parseFloat(ob[2].toString());
-                        value = Float.parseFloat(df.format(value));
-                        data.add(i, value);
-                        i++;
+                        if(ob[2] != null){
+                            HashMap<String, String> companyObject = new HashMap<String, String>();
+                            companyObject.put("id", ob[0].toString());
+                            companyObject.put("name", ob[1].toString());
+                            companyList.add(companyObject);
+                            float value = Float.parseFloat(ob[2].toString());
+                            value = Float.parseFloat(df.format(value));
+                            data.add(i, value);
+                            i++;
+                        }
                     }
                 }
                 timeObject.put("data", data);
