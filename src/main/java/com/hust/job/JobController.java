@@ -41,12 +41,14 @@ public class JobController {
     @CrossOrigin
     @RequestMapping(value = "/jobs/advanced_search_job", method = RequestMethod.POST)
     public JSONObject advancedSearchJob(@RequestBody Map<String, Object> payload) throws Exception {
-        String queryContent = payload.get("queryContent").toString();
-        String location = payload.get("location").toString();
-        String industry = payload.get("industry").toString();
-        int minSalary = Integer.parseInt(payload.get("minSalary").toString());
-        int maxSalary = Integer.parseInt(payload.get("maxSalary").toString());
-        return jobService.advancedSearchJob(queryContent, location, industry, minSalary, maxSalary);
+        String jobName = payload.get("jobName").toString();
+        String regionId = payload.get("regionId").toString();
+        List<String> regionList = Arrays.asList(regionId.split(","));
+        String industryId = payload.get("industryId").toString();
+        List<String> industryList = Arrays.asList(industryId.split(","));
+        String minSalary =  payload.get("minSalary").toString();
+        String maxSalary =  payload.get("maxSalary").toString();
+        return jobService.advancedSearchJob(jobName, industryList, regionList, minSalary,  maxSalary);
     }
     
     @CrossOrigin

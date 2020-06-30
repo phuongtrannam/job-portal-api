@@ -1,5 +1,7 @@
 package com.hust.company;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 import org.json.simple.JSONObject;
@@ -28,6 +30,18 @@ public class CompanyController {
         String companyName = payload.get("companyName").toString();
         return companyService.searchCompany(companyName);
     }
+
+    @CrossOrigin
+    @RequestMapping(value = "/companies/advanced_search_company", method = RequestMethod.POST)
+    public JSONObject advancedSearchCompany(@RequestBody Map<String, Object> payload) throws Exception {
+        String industryId = payload.get("industryId").toString();
+        List<String> industryList = Arrays.asList(industryId.split(","));
+        String companyName = payload.get("companyName").toString();
+        String minSalary = payload.get("minSalary").toString();
+        String maxSalary = payload.get("maxSalary").toString();
+        return companyService.advancedSearchCompany(industryList, companyName, minSalary, maxSalary);
+    }
+
     @CrossOrigin
     @RequestMapping(value = "/companies/get_business_lines_of_the_company", method = RequestMethod.POST)
     public JSONObject getBusinessLinesOfTheCompany(@RequestBody Map<String, Object> payload) throws Exception {

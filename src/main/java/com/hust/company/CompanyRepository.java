@@ -38,6 +38,21 @@ public interface CompanyRepository extends CrudRepository<Company, String> {
                         "group by fact.idTime, fact.idCompany; " , nativeQuery = true)
         List<Object[]> searchCompany(@Param("id") List<String> id);
 
+        @Query(value =   "select distinct company.*, location.location " + 
+                        "from company_fact, company, province, industries, location " +
+                        "where company_fact.idCompany = company.idCompany " + 
+                        "and company_fact.idIndustry = industries.idIndustry " +
+                        "and company_fact.idProvince = province.idProvince " +
+                        "and company.idLocation = location.idLocation " +
+                        "and idTime in ( select idTime from ( select idTime from timed order by timestampD desc limit 1 ) as t ) " +
+                        "and industries.idIndustry IN (:industryList) " +
+                        "and company.name_company = :companyName " + 
+                        "and company_fact.salary between :minSalary and :maxSalary ", nativeQuery = true)
+        List<Object[]> advancedSearchCompany(@Param("industryList") List<String> industryList,
+                        @Param("companyName") String companyName,
+                        @Param("minSalary") String minSalary,
+                        @Param("maxSalary") String maxSalary);
+
         @Query(value = "select industries.idIndustry, industries.name_industry, company.name_company "
                         + "from company, companies_industries, industries "
                         + "where companies_industries.idCompany = company.idCompany "

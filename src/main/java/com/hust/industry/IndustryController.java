@@ -120,14 +120,14 @@ public class IndustryController {
         return industryService.getHighestSalaryJob(industryId, locationId);
     }
 
-    @CrossOrigin(origins =  "http://localhost:4200")
+    @CrossOrigin
     @RequestMapping(value = "/industries/get_top_hiring_region", method = RequestMethod.POST)
     public JSONObject getTopHiringRegion(@RequestBody Map<String, Object> payload) throws Exception {
         String industryId = payload.get("industryId").toString();
         return industryService.getTopHiringRegion(industryId);
     }
 
-    @CrossOrigin(origins =  "http://localhost:4200")
+    @CrossOrigin
     @RequestMapping(value = "/industries/get_highest_salary_region", method = RequestMethod.POST)
     public JSONObject getHighestSalaryRegion(@RequestBody Map<String, Object> payload) throws Exception {
         String industryId = payload.get("industryId").toString();

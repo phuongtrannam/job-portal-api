@@ -29,47 +29,44 @@ public interface JobRepository extends CrudRepository<Job, String> {
             "and job_fact.idJob = :idJob", nativeQuery = true)
     List<Object[]> getGenderByJob(@Param("idJob") int idJob);
     
-    @Query(value = "select job_fact.idTime,job.idJob, job.name_job, gender.gender, " + 
+    @Query(value = "select job_fact.idTime,job.idJob, job.name_job, " + 
                     "min(salary), max(salary), sum(job_fact.number_of_recruitment) as `so luong tuyen dung` " +
-                    "from job, job_fact , job_industry, province, gender " +
+                    "from job, job_fact , job_industry, province " +
                     "where job.idJob = job_fact.idJob and job.idJob = job_industry.idJob " +
-                    "and job_fact.idGender = gender.idGender " +
                     "and job_fact.IdProvince = province.idProvince " +
                     "and job_fact.idTime in ( select idTime from ( " + 
                         "select idTime from timed order by timestampD desc limit 1 ) as t ) " +
                     "and job.name_job = :queryContent " +
-                    "group by job_fact.idTime,gender.idGender,job_fact.idJob " +
+                    "group by job_fact.idTime,job_fact.idJob " +
                     "order by  job_fact.idJob asc, job_fact.idTime desc " , nativeQuery = true)
     List<Object[]> basicSearchJob(@Param("queryContent") String queryContent);
-    
+
+
     @Query(value = "with jobs_1 as ( " +
-                    "select job_fact.idTime,job.idJob, job.name_job, " +
+                    "select job_fact.idTime,job.idJob, job.name_job, " + 
                         "min(salary) as `min salary`, max(salary) as `max salary`, " + 
                         "sum(job_fact.number_of_recruitment) as `so luong tuyen dung`, " +
-                        "rank() over( partition by job_fact.idJob order by idTime desc) as `rank_time` " +
-                    "from job, job_fact , job_industry, province, years_experience, industries, gender " +
+                        "rank() over( partition by job_fact.idJob order by idTime desc) as `rank_time` " + 
+                    "from job, job_fact , job_industry, province, years_experience, industries " +
                     "where job.idJob = job_fact.idJob and job.idJob = job_industry.idJob " +
-                    "and job_industry.idIndustry = industries.idIndustry " +  
-                    "and job_fact.idGender = gender.idGender " + 
-                    "and job_fact.IdProvince = province.idProvince " + 
-                    "and job_fact.idYears_Experience = years_experience.idYears_Experience " +
-                    "and job.name_job = :queryContent " +
-                    "and industries.name_industry = :industry " +
-                    "and province.province = :location " +
+                    "and job_industry.idIndustry = industries.idIndustry " +   
+                    "and job_fact.IdProvince = province.idProvince " +
+                    "and job.name_job = :jobName " +
+                    "and industries.idIndustry IN (:industryList) " +
+                    "and province.idProvince IN (:regionList) " +
                     "and job_fact.salary between :minSalary and :maxSalary " +
                     "group by job_fact.idTime,job_fact.idJob " +
                     "order by job_fact.idTime, job_fact.idJob desc) " + 
-                    "select distinct jobs_1.idTime, jobs_1.idJob, jobs_1.name_job, gender.gender, " +
-                    "jobs_1.`min salary`, jobs_1.`max salary`, jobs_1.`so luong tuyen dung` " +
-                    "from jobs_1, gender, job_fact " +
+                    "select distinct jobs_1.idTime, jobs_1.idJob, jobs_1.name_job, " + 
+                    "jobs_1.`min salary`, jobs_1.`max salary`, jobs_1.`so luong tuyen dung` " +  
+                    "from jobs_1,  job_fact " +
                     "where job_fact.idJob = jobs_1.idJob " + 
-                    "and gender.idGender = job_fact.idGender " +
-                     "and rank_time = 1; ", nativeQuery = true)
-    List<Object[]> advancedSearchJob(@Param("queryContent") String queryContent, 
-                                    @Param("location") String location,
-                                    @Param("industry") String industry,
-                                    @Param("minSalary") int minSalary,
-                                    @Param("maxSalary") int maxSalary);
+                    "and rank_time = 1;" , nativeQuery = true)
+    List<Object[]> advancedSearchJob(@Param("jobName") String jobName, 
+                                    @Param("industryList") List<String> industryList,
+                                    @Param("regionList") List<String> regionList,
+                                    @Param("minSalary") String minSalary,
+                                    @Param("maxSalary") String maxSalary);
 
     @Query(value = "select * from job where job.idJob = :idJob ", nativeQuery = true)
     List<Object[]> getJobDescription(@Param("idJob") String idJob);
