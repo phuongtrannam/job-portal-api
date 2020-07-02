@@ -1,5 +1,7 @@
 package com.hust.industry;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 import org.json.simple.JSONObject;
@@ -58,8 +60,9 @@ public class IndustryController {
     public JSONObject getJobDemandByIndustry(@RequestBody Map<String, Object> payload) throws Exception {
         // System.out.println(payload.get("id"));
         String industryId = payload.get("industryId").toString();
-        String locationId = payload.get("locationId").toString();
-        return industryService.getJobDemandByIndustry(industryId, locationId);
+        String regionId = payload.get("locationId").toString();
+        List<String> regionList = Arrays.asList(regionId.split(","));
+        return industryService.getJobDemandByIndustry(industryId, regionList);
     }
 
     @CrossOrigin
@@ -67,8 +70,9 @@ public class IndustryController {
     public JSONObject getSalaryByIndustry(@RequestBody Map<String, Object> payload) throws Exception {
         // System.out.println(payload.get("id"));
         String industryId = payload.get("industryId").toString();
-        String locationId = payload.get("locationId").toString();
-        return industryService.getSalaryByIndustry(industryId, locationId);
+        String regionId = payload.get("locationId").toString();
+        List<String> regionList = Arrays.asList(regionId.split(","));
+        return industryService.getSalaryByIndustry(industryId, regionList);
     }
 
     //done
@@ -141,8 +145,9 @@ public class IndustryController {
     public JSONObject getJobDemandByAge(@RequestBody Map<String, Object> payload) throws Exception {
         // System.out.println(payload.get("id"));
         String industryId = payload.get("industryId").toString();
-        String locationId = payload.get("locationId").toString();
-        return industryService.getJobDemandByAge(industryId, locationId);
+        String regionId = payload.get("locationId").toString();
+        List<String> regionList = Arrays.asList(regionId.split(","));
+        return industryService.getJobDemandByAge(industryId, regionList);
     }
 
     //done
@@ -151,8 +156,9 @@ public class IndustryController {
     public JSONObject getJobDemandByLiteracy(@RequestBody Map<String, Object> payload) throws Exception {
         // System.out.println(payload.get("id"));
         String industryId = payload.get("industryId").toString();
-        String locationId = payload.get("locationId").toString();
-        return industryService.getJobDemandByLiteracy(industryId, locationId);
+        String regionId = payload.get("locationId").toString();
+        List<String> regionList = Arrays.asList(regionId.split(","));
+        return industryService.getJobDemandByLiteracy(industryId, regionList);
     }
 
     

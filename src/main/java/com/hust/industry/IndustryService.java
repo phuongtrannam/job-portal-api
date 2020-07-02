@@ -241,71 +241,75 @@ public class IndustryService {
 //    }
 
 
-    public JSONObject getJobDemandByIndustry(String industryId, String locationId ){
+    public JSONObject getJobDemandByIndustry(String industryId, List<String> regionList){
         final JSONObject jsonObject = new JSONObject();
-        final JSONObject regionObject = new JSONObject();
-        jsonObject.put("description", "The job demand by industry");
+        // final JSONObject regionObject = new JSONObject();
+        
         double growth = 0;
         double preNumJob = 0;
         JSONArray timeArray = new JSONArray();
         JSONArray dataArray = new JSONArray();
         JSONArray growthArray = new JSONArray();
 
-        if(locationId.equals("P0")){
-            int idIndustry = Integer.valueOf(industryId.replace("I", ""));
-            List<Object[]> list = industryRepository.getJobDemandByIndustryWithCountry(idIndustry);
+        if(regionList.contains("P0")){
+            // int idIndustry = Integer.valueOf(industryId.replace("I", ""));
+            List<Object[]> list = industryRepository.getJobDemandByIndustryWithCountry(industryId);
             extractDataJob(growth, preNumJob, timeArray, dataArray, growthArray, list, false);
-            regionObject.put("name", "Cả nước");
-            regionObject.put("data", dataArray);
-            regionObject.put("growth", growthArray);
+            // jsonObject.put("name", "Cả nước");
+            jsonObject.put("description", "The job demand by industry - all country");
+            jsonObject.put("data", dataArray);
+            jsonObject.put("growth", growthArray);
             jsonObject.put("timestamps", timeArray);
-            jsonObject.put("ALL", regionObject);
+            // jsonObject.put("ALL", regionObject);
         }
         else {
-            int idIndustry = Integer.valueOf(industryId.replace("I", ""));
-            int idProvince = Integer.valueOf(locationId.replace("P", ""));
-            List<Object[]> list = industryRepository.getJobDemandByIndustryWithProvince(idIndustry, idProvince);
+            // int idIndustry = Integer.valueOf(industryId.replace("I", ""));
+            // int idProvince = Integer.valueOf(locationId.replace("P", ""));
+            List<Object[]> list = industryRepository.getJobDemandByIndustryWithProvince(industryId, regionList);
             extractDataJob(growth, preNumJob, timeArray, dataArray, growthArray, list, false);
-            regionObject.put("name", list.get(0)[1]);
-            regionObject.put("data", dataArray);
-            regionObject.put("growth", growthArray);
+            // jsonObject.put("name", list.get(0)[1]);
+            jsonObject.put("description", "The job demand by industry - region");
+            jsonObject.put("data", dataArray);
+            jsonObject.put("growth", growthArray);
             jsonObject.put("timestamps", timeArray);
-            jsonObject.put(locationId, regionObject);
+            // jsonObject.put(locationId, regionObject);
         }
 
         return jsonObject;
     }
 
-    public JSONObject getSalaryByIndustry(String industryId, String locationId ){
+    public JSONObject getSalaryByIndustry(String industryId, List<String> locationId ){
         final JSONObject jsonObject = new JSONObject();
-        final JSONObject regionObject = new JSONObject();
-        jsonObject.put("description", "The job demand by industry");
+        // final JSONObject regionObject = new JSONObject();
+        System.out.println("ok ok ok ok ok ");
         double growth = 0;
         double preNumJob = 0;
         JSONArray timeArray = new JSONArray();
         JSONArray dataArray = new JSONArray();
         JSONArray growthArray = new JSONArray();
 
-        if(locationId.equals("P0")){
-            int idIndustry = Integer.valueOf(industryId.replace("I", ""));
-            List<Object[]> list = industryRepository.getSalaryByIndustryWithCountry(idIndustry);
+        if(locationId.contains("P0")){
+            // int idIndustry = Integer.valueOf(industryId.replace("I", ""));
+            List<Object[]> list = industryRepository.getSalaryByIndustryWithCountry(industryId);
             extractDataJob(growth, preNumJob, timeArray, dataArray, growthArray, list, true);
-            regionObject.put("name", "Cả nước");
-            regionObject.put("data", dataArray);
-            regionObject.put("growth", growthArray);
+            // jsonObject.put("name", "Cả nước");
+            jsonObject.put("description", "The salary by industry - country");
+            jsonObject.put("data", dataArray);
+            jsonObject.put("growth", growthArray);
             jsonObject.put("timestamps", timeArray);
-            jsonObject.put("ALL", regionObject);
+            // jsonObject.put("ALL", regionObject);
         }
         else {
-            int idIndustry = Integer.valueOf(industryId.replace("I", ""));
-            int idProvince = Integer.valueOf(locationId.replace("P", ""));
-            List<Object[]> list = industryRepository.getSalaryByIndustryWithProvince(idIndustry, idProvince);
+            // int idIndustry = Integer.valueOf(industryId.replace("I", ""));
+            // int idProvince = Integer.valueOf(locationId.replace("P", ""));
+            List<Object[]> list = industryRepository.getSalaryByIndustryWithProvince(industryId, locationId);
             extractDataJob(growth, preNumJob, timeArray, dataArray, growthArray, list,true);
-            regionObject.put("name", list.get(0)[1]);
-            regionObject.put("data", dataArray);
-            regionObject.put("growth", growthArray);
+            // jsonObject.put("name", list.get(0)[1]);
+            jsonObject.put("description", "The salary by industry - region");
+            jsonObject.put("data", dataArray);
+            jsonObject.put("growth", growthArray);
             jsonObject.put("timestamps", timeArray);
-            jsonObject.put(locationId, regionObject);
+            // jsonObject.put(locationId, regionObject);
         }
 
         return jsonObject;
@@ -861,7 +865,7 @@ public class IndustryService {
         // return jsonObject;
     }
     
-    public JSONObject getJobDemandByAge(String industryId, String locationId ){
+    public JSONObject getJobDemandByAge(String industryId, List<String> locationId ){
         final JSONObject jsonObject = new JSONObject();
         jsonObject.put("description", "The job demand by age and gender");
 
@@ -881,9 +885,9 @@ public class IndustryService {
         int count = 0;
         Object[] listMale = new ArrayList<Integer>(Collections.nCopies(ageRangeArray.size(), 0)).toArray();
         Object[] listFeMale = new ArrayList<Integer>(Collections.nCopies( ageRangeArray.size(), 0)).toArray();
-        if( locationId.equals("P0")){
-            int idIndustry = Integer.valueOf(industryId.replace("I",""));
-            List<Object[]> list = industryRepository.getJobDemandByAgeWithCountry(idIndustry);
+        if( locationId.contains("P0")){
+            // int idIndustry = Integer.valueOf(industryId.replace("I",""));
+            List<Object[]> list = industryRepository.getJobDemandByAgeWithCountry(industryId);
             Set<String> timeSet = new LinkedHashSet<>();
             for (Object[] ob : list) {
                 timeSet.add(ob[0].toString());
@@ -893,9 +897,9 @@ public class IndustryService {
 
         }
         else{
-            int idIndustry = Integer.valueOf(industryId.replace("I",""));
-            int idProvince = Integer.valueOf(locationId.replace("P",""));
-            List<Object[]> list = industryRepository.getJobDemandByAgeWithProvince(idIndustry, idProvince);
+            // int idIndustry = Integer.valueOf(industryId.replace("I",""));
+            // int idProvince = Integer.valueOf(locationId.replace("P",""));
+            List<Object[]> list = industryRepository.getJobDemandByAgeWithProvince(industryId, locationId);
             Set<String> timeSet = new LinkedHashSet<>();
             for (Object[] ob : list) {
                 timeSet.add(ob[0].toString());
@@ -978,7 +982,7 @@ public class IndustryService {
         jsonObject.put(time, timeObject);
     }
 
-    public JSONObject getJobDemandByLiteracy(String industryId, String locationId ){
+    public JSONObject getJobDemandByLiteracy(String industryId, List<String> locationId ){
         final JSONObject jsonObject = new JSONObject();
         jsonObject.put("description", "The job demand by literacy");
 
@@ -1001,9 +1005,9 @@ public class IndustryService {
         Object[] listPastValueLiteracy = new Object[listLiteracy.size()];
         Object[] listGrowth = new Object[listLiteracy.size()];
         System.out.println(listLiteracy.toString());
-        if(locationId.equals("P0")){
-            int idIndustry = Integer.valueOf(industryId.replace("I",""));
-            List<Object[]> list = industryRepository.getJobDemandByLiteracyWithCountry(idIndustry);
+        if(locationId.contains("P0")){
+            // int idIndustry = Integer.valueOf(industryId.replace("I",""));
+            List<Object[]> list = industryRepository.getJobDemandByLiteracyWithCountry(industryId);
             Set<String> timeSet = new LinkedHashSet<>();
             for (Object[] ob : list) {
                 timeSet.add(ob[0].toString());
@@ -1012,9 +1016,9 @@ public class IndustryService {
             getJSONJobDemandLiteracy(jsonObject, listLiteracy, timeObject, listValueLiteracy, listPastValueLiteracy, listGrowth, list);
         }
         else {
-            int idIndustry = Integer.valueOf(industryId.replace("I",""));
-            int idProvince = Integer.valueOf(locationId.replace("P",""));
-            List<Object[]> list = industryRepository.getjobDemandByLiteracyWithProvince(idIndustry, idProvince);
+            // int idIndustry = Integer.valueOf(industryId.replace("I",""));
+            // int idProvince = Integer.valueOf(locationId.replace("P",""));
+            List<Object[]> list = industryRepository.getjobDemandByLiteracyWithProvince(industryId, locationId);
             Set<String> timeSet = new LinkedHashSet<>();
             for (Object[] ob : list) {
                 timeSet.add(ob[0].toString());
