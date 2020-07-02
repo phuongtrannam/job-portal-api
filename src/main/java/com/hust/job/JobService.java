@@ -287,7 +287,7 @@ public class JobService {
         return jsonObject;
     }
 
-    public JSONObject getJobDemandByPeriodOfTime(final String idJob, final String idLocation) {
+    public JSONObject getJobDemandByPeriodOfTime(String idJob, List<String> idLocation) {
         System.out.println(idLocation);
         System.out.println(idLocation.equals("P0"));
         final JSONObject jsonObject = new JSONObject();
@@ -295,7 +295,7 @@ public class JobService {
         List<String> timestamp = new ArrayList<String>();
         List<Integer> data = new ArrayList<Integer>();
         List<Float> growth = new ArrayList<Float>();
-        if (idLocation.equals("P0")) {
+        if (idLocation.contains("P0")) {
             System.out.println("VAO P0");
             final List<Object[]> list = jobRepository.getJobDemandByPeriodOfTimeCountry(idJob);
             String jobName = list.get(0)[2].toString();
@@ -326,7 +326,7 @@ public class JobService {
             final List<Object[]> list = jobRepository.getJobDemandByPeriodOfTimeCity(idJob, idLocation);
             if (list.size() != 0) {
                 String jobName = list.get(0)[2].toString();
-                String region = list.get(0)[3].toString();
+                // String region = list.get(0)[3].toString();
                 int i = 0;
                 float previousValue = 1f;
                 float currentGrowth;
@@ -334,22 +334,22 @@ public class JobService {
 
                 for (final Object[] ob : list) {
                     timestamp.add(ob[1].toString());
-                    data.add(Math.round(Float.parseFloat(ob[4].toString())));
+                    data.add(Math.round(Float.parseFloat(ob[3].toString())));
                     if (i == 0) {
                         growth.add(0f);
                     } else {
-                        currentGrowth = 100 * (Float.parseFloat(ob[4].toString()) / previousValue - 1.0f);
+                        currentGrowth = 100 * (Float.parseFloat(ob[3].toString()) / previousValue - 1.0f);
                         currentGrowth = Float.parseFloat(df.format(currentGrowth));
                         growth.add(currentGrowth);
                     }
                     i++;
-                    previousValue = Float.parseFloat(ob[4].toString());
+                    previousValue = Float.parseFloat(ob[3].toString());
                 }
                 jsonObject.put("timestamp", timestamp);
                 jsonObject.put("data", data);
                 jsonObject.put("growth", growth);
                 jsonObject.put("jobName", jobName);
-                jsonObject.put("region", region);
+                // jsonObject.put("region", region);
             }
 
         }
@@ -357,7 +357,7 @@ public class JobService {
         return jsonObject;
     }
 
-    public JSONObject getAverageSalary(final String idJob, final String idLocation) {
+    public JSONObject getAverageSalary(String idJob, List<String> idLocation) {
 
         final JSONObject jsonObject = new JSONObject();
         jsonObject.put("description", "The average salary");
@@ -366,7 +366,7 @@ public class JobService {
         List<Float> data = new ArrayList<Float>();
         List<Float> growth = new ArrayList<Float>();
 
-        if (idLocation.equals("P0")) {
+        if (idLocation.contains("P0")) {
             final List<Object[]> list = jobRepository.getAverageSalaryCountry(idJob);
 
             String jobName = list.get(0)[2].toString();
@@ -397,7 +397,7 @@ public class JobService {
             final List<Object[]> list = jobRepository.getAverageSalaryCity(idJob, idLocation);
             if (list.size() != 0) {
                 String jobName = list.get(0)[2].toString();
-                String region = list.get(0)[3].toString();
+                // String region = list.get(0)[3].toString();
                 int i = 0;
                 float previousValue = 1f;
                 float currentGrowth;
@@ -412,22 +412,22 @@ public class JobService {
                 for (final Object[] ob : list) {
 
                     timestamp.add(ob[1].toString());
-                    data.add(Float.parseFloat(df.format(Float.parseFloat(ob[4].toString()))));
+                    data.add(Float.parseFloat(df.format(Float.parseFloat(ob[3].toString()))));
                     if (i == 0) {
                         growth.add(0f);
                     } else {
-                        currentGrowth = 100 * (Math.round(Float.parseFloat(ob[4].toString())) / previousValue - 1.0f);
+                        currentGrowth = 100 * (Math.round(Float.parseFloat(ob[3].toString())) / previousValue - 1.0f);
                         currentGrowth = Float.parseFloat(df.format(currentGrowth));
                         growth.add(currentGrowth);
                     }
                     i++;
-                    previousValue = Float.parseFloat(df.format(Float.parseFloat(ob[4].toString())));
+                    previousValue = Float.parseFloat(df.format(Float.parseFloat(ob[3].toString())));
                 }
                 jsonObject.put("timestamp", timestamp);
                 jsonObject.put("data", data);
                 jsonObject.put("growth", growth);
                 jsonObject.put("jobName", jobName);
-                jsonObject.put("region", region);
+                // jsonObject.put("region", region);
             }
 
         }
@@ -569,7 +569,7 @@ public class JobService {
         }
         // return jsonObject;
     }
-    public JSONObject getJobDemandByAge(final String idJob, final String idLocation) {
+    public JSONObject getJobDemandByAge(String idJob, List<String> idLocation) {
 
         final JSONObject jsonObject = new JSONObject();
         jsonObject.put("description", "The job demand by age");
@@ -581,7 +581,7 @@ public class JobService {
         int lenAgeRange = ageRanges.size();
         jsonObject.put("ageRange", ageRanges);
 
-        if (idLocation.equals("P0")) {
+        if (idLocation.contains("P0")) {
             final List<Object[]> list = jobRepository.getJobDemandByAgeCountry(idJob);
             Set<String> timeSet = new LinkedHashSet<>();
             for (Object[] ob : list) {
@@ -670,13 +670,13 @@ public class JobService {
                                 index = ageRanges.indexOf(age.toString());
                                 if(index == ageRanges.size() - 1) {
                                     if(flag == false){
-                                        maleData.set(index, (int) maleData.get(index) + (int) (double) ob[4]);
+                                        maleData.set(index, (int) maleData.get(index) + (int) (double) ob[3]);
 //                                    System.out.println(listMale[index]);
                                     }
                                     break;
                                 }
-                                if(ob[index + 6].toString().equals("1")){
-                                    maleData.set(index, (int) maleData.get(index) + (int) (double) ob[4]);
+                                if(ob[index + 5].toString().equals("1")){
+                                    maleData.set(index, (int) maleData.get(index) + (int) (double) ob[3]);
 //                                System.out.println(listMale[index]);
                                     flag = true;
                                 }
@@ -687,12 +687,12 @@ public class JobService {
                                 index = ageRanges.indexOf(age.toString());
                                 if(index == ageRanges.size() - 1) {
                                     if(flag == false){
-                                        femaleData.set(index, (int) femaleData.get(index) + (int) (double) ob[4]);
+                                        femaleData.set(index, (int) femaleData.get(index) + (int) (double) ob[3]);
                                     }
                                     break;
                                 }
-                                if(ob[index + 6].toString().equals("1")){
-                                    femaleData.set(index, (int) femaleData.get(index) + (int) (double) ob[4]);
+                                if(ob[index + 5].toString().equals("1")){
+                                    femaleData.set(index, (int) femaleData.get(index) + (int) (double) ob[3]);
                                     flag = true;
                                 }
                             }
@@ -731,7 +731,7 @@ public class JobService {
         return jsonObject;
     }
 
-    public JSONObject getJobDemandByLiteracy(final String idJob, final String idLocation) {
+    public JSONObject getJobDemandByLiteracy(String idJob, List<String> idLocation) {
 
         final JSONObject jsonObject = new JSONObject();
         jsonObject.put("description", "The job demand by literacy");
@@ -745,7 +745,7 @@ public class JobService {
         jsonObject.put("literacy", literacies);
         int numLiteracy = literacies.size();
 
-        if (idLocation.equals("P0")) {
+        if (idLocation.contains("P0")) {
             final List<Object[]> list = jobRepository.getJobDemandByLiteracyCountry(idJob);
             Set<String> timeSet = new LinkedHashSet<>();
             for (Object[] ob : list) {
@@ -812,8 +812,8 @@ public class JobService {
                     for (Object[] ob : list) {
                         String tempTime = ob[1].toString();
                         if (time.equals(tempTime)) {
-                            index = literacies.indexOf(ob[5].toString());
-                            currentValue = Math.round(Float.parseFloat(ob[4].toString()));
+                            index = literacies.indexOf(ob[4].toString());
+                            currentValue = Math.round(Float.parseFloat(ob[3].toString()));
                             data.set(index, currentValue);
                             if (count != 0) {
                                 previousValue = previousData.get(index);

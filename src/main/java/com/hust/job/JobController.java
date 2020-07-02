@@ -77,16 +77,18 @@ public class JobController {
     @RequestMapping(value = "/jobs/get_job_demand_by_period_of_time", method = RequestMethod.POST)
     public JSONObject getJobDemandByPeriodOfTime(@RequestBody Map<String, Object> payload) throws Exception {
         String idJob = payload.get("idJob").toString();
-        String idLocation = payload.get("idLocation").toString();
-        return jobService.getJobDemandByPeriodOfTime(idJob, idLocation);
+        String regionId = payload.get("idLocation").toString();
+        List<String> regionList = Arrays.asList(regionId.split(","));
+        return jobService.getJobDemandByPeriodOfTime(idJob, regionList);
     }
 
     @CrossOrigin
     @RequestMapping(value = "/jobs/get_average_salary", method = RequestMethod.POST)
     public JSONObject getAverageSalary(@RequestBody Map<String, Object> payload) throws Exception {
         String idJob = payload.get("idJob").toString();
-        String idLocation = payload.get("idLocation").toString();
-        return jobService.getAverageSalary(idJob, idLocation);
+        String regionId = payload.get("idLocation").toString();
+        List<String> regionList = Arrays.asList(regionId.split(","));
+        return jobService.getAverageSalary(idJob, regionList);
     }
 
     @CrossOrigin
@@ -141,16 +143,18 @@ public class JobController {
     @RequestMapping(value = "/jobs/get_job_demand_by_age", method = RequestMethod.POST)
     public JSONObject getJobDemandByAge(@RequestBody Map<String, Object> payload) throws Exception {
         String idJob = payload.get("idJob").toString();
-        String idLocation = payload.get("idLocation").toString();
-        return jobService.getJobDemandByAge(idJob, idLocation);
+        String regionId = payload.get("idLocation").toString();
+        List<String> regionList = Arrays.asList(regionId.split(","));
+        return jobService.getJobDemandByAge(idJob, regionList);
     }
 
     @CrossOrigin
     @RequestMapping(value = "/jobs/get_job_demand_by_literacy", method = RequestMethod.POST)
     public JSONObject getJobDemandByLiteracy(@RequestBody Map<String, Object> payload) throws Exception {
         String idJob = payload.get("idJob").toString();
-        String idLocation = payload.get("idLocation").toString();
-        return jobService.getJobDemandByLiteracy(idJob, idLocation);
+        String regionId = payload.get("idLocation").toString();
+        List<String> regionList = Arrays.asList(regionId.split(","));
+        return jobService.getJobDemandByLiteracy(idJob, regionList);
     }
 
     @CrossOrigin
